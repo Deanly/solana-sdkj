@@ -9,3 +9,4 @@ build
 *.dat
 *.properties
 *.json
+.gradle

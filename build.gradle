@@ -1,0 +1,59 @@
+plugins {
+    id 'java-library'           // Java 라이브러리 플러그인
+    id 'maven-publish'          // Maven 배포 플러그인
+}
+
+group = 'com.mmorrell'
+version = '1.20.2'
+description = 'Java client for Solana RPC'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // Java 17 설정
+    }
+    withSourcesJar()   // 소스 JAR 포함
+    withJavadocJar()   // Javadoc JAR 포함
+}
+
+repositories {
+    mavenCentral()     // Maven Central
+}
+
+dependencies {
+    // 메인 의존성
+    api('org.bitcoinj:bitcoinj-core:0.16.4') {
+        exclude group: 'com.google.protobuf', module: 'protobuf-javalite'
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk15to18'
+    }
+    api 'org.bouncycastle:bcprov-jdk15to18:1.79'
+    api 'com.google.guava:guava:33.4.0-jre'
+    api 'com.google.protobuf:protobuf-javalite:4.29.2'
+    api 'com.squareup.okhttp3:okhttp:4.12.0'
+    api 'com.squareup.moshi:moshi:1.15.2'
+    api 'com.squareup.moshi:moshi-adapters:1.15.2'
+    api 'org.java-websocket:Java-WebSocket:1.6.0'
+    api 'org.projectlombok:lombok:1.18.36'
+    api 'net.i2p.crypto:eddsa:0.3.0'
+    api 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+    api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
+    api 'com.syntifi.near:borshj:0.1.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
+
+    // 테스트 의존성
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
+    testImplementation 'org.slf4j:slf4j-nop:2.0.16'
+    testImplementation 'org.mockito:mockito-core:5.14.2'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'    // UTF-8 인코딩 설정
+}
+
+tasks.test {
+    useJUnitPlatform()            // JUnit 5 사용
+}

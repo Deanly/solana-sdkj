@@ -31,7 +31,7 @@ public class AddressLookupTableProgram extends Program {
      * @param recentSlot A recent slot to derive the table's address
      * @return A TransactionInstruction to create a new address lookup table
      */
-    public static TransactionInstruction createLookupTable(PublicKey authority, PublicKey payer, long recentSlot) {
+    public static TransactionInstruction createLookupTable(PublicKey authority, PublicKey payer, long recentSlot, int bumpSeed) {
         PublicKey derivedAddress = PublicKey.findProgramAddress(
             List.of(authority.toByteArray(), ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN).putLong(recentSlot).array()),
             PROGRAM_ID
@@ -43,10 +43,11 @@ public class AddressLookupTableProgram extends Program {
         keys.add(new AccountMeta(payer, true, true));
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
-        ByteBuffer data = ByteBuffer.allocate(9);
+        ByteBuffer data = ByteBuffer.allocate(13);
         data.order(ByteOrder.LITTLE_ENDIAN);
-        data.put(CREATE_LOOKUP_TABLE);
+        data.putInt(CREATE_LOOKUP_TABLE);
         data.putLong(recentSlot);
+        data.put((byte) bumpSeed);
 
         return createTransactionInstruction(PROGRAM_ID, keys, data.array());
     }
@@ -63,8 +64,9 @@ public class AddressLookupTableProgram extends Program {
         keys.add(new AccountMeta(lookupTable, false, true));
         keys.add(new AccountMeta(authority, true, false));
 
-        ByteBuffer data = ByteBuffer.allocate(1);
-        data.put(FREEZE_LOOKUP_TABLE);
+        ByteBuffer data = ByteBuffer.allocate(4);
+        data.order(ByteOrder.LITTLE_ENDIAN);
+        data.putInt(FREEZE_LOOKUP_TABLE);
 
         return createTransactionInstruction(PROGRAM_ID, keys, data.array());
     }
@@ -85,9 +87,9 @@ public class AddressLookupTableProgram extends Program {
         keys.add(new AccountMeta(payer, true, true));
         keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
 
-        ByteBuffer data = ByteBuffer.allocate(1 + 4 + addresses.size() * 32);
+        ByteBuffer data = ByteBuffer.allocate(4 + 8 + addresses.size() * 32);
         data.order(ByteOrder.LITTLE_ENDIAN);
-        data.put(EXTEND_LOOKUP_TABLE);
+        data.putInt(EXTEND_LOOKUP_TABLE);
         data.putInt(addresses.size());
         for (PublicKey address : addresses) {
             data.put(address.toByteArray());
@@ -108,8 +110,9 @@ public class AddressLookupTableProgram extends Program {
         keys.add(new AccountMeta(lookupTable, false, true));
         keys.add(new AccountMeta(authority, true, false));
 
-        ByteBuffer data = ByteBuffer.allocate(1);
-        data.put(DEACTIVATE_LOOKUP_TABLE);
+        ByteBuffer data = ByteBuffer.allocate(4);
+        data.order(ByteOrder.LITTLE_ENDIAN);
+        data.putInt(DEACTIVATE_LOOKUP_TABLE);
 
         return createTransactionInstruction(PROGRAM_ID, keys, data.array());
     }
@@ -128,8 +131,9 @@ public class AddressLookupTableProgram extends Program {
         keys.add(new AccountMeta(authority, true, false));
         keys.add(new AccountMeta(recipient, false, true));
 
-        ByteBuffer data = ByteBuffer.allocate(1);
-        data.put(CLOSE_LOOKUP_TABLE);
+        ByteBuffer data = ByteBuffer.allocate(4);
+        data.order(ByteOrder.LITTLE_ENDIAN);
+        data.putInt(CLOSE_LOOKUP_TABLE);
 
         return createTransactionInstruction(PROGRAM_ID, keys, data.array());
     }

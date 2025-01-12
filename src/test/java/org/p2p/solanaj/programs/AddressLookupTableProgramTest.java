@@ -1,12 +1,20 @@
 package org.p2p.solanaj.programs;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.p2p.solanaj.core.AccountMeta;
 import org.p2p.solanaj.core.PublicKey;
 import org.p2p.solanaj.core.TransactionInstruction;
 
 import java.util.Collections;
+import java.util.List;
 
 public class AddressLookupTableProgramTest {
 
@@ -20,7 +28,7 @@ public class AddressLookupTableProgramTest {
      */
     @Test
     public void testCreateLookupTable() {
-        TransactionInstruction instruction = AddressLookupTableProgram.createLookupTable(AUTHORITY, PAYER, RECENT_SLOT);
+        TransactionInstruction instruction = AddressLookupTableProgram.createLookupTable(AUTHORITY, PAYER, RECENT_SLOT, 254);
         assertNotNull(instruction);
         assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(4, instruction.getKeys().size()); // Check number of keys

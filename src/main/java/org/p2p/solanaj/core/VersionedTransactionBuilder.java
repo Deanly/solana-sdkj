@@ -1,5 +1,7 @@
 package org.p2p.solanaj.core;
 
+import org.p2p.solanaj.rpc.types.AddressLookupTableAccount;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +39,7 @@ public class VersionedTransactionBuilder {
      * @param lookupTable The AddressTableLookup to add
      * @return The current builder instance
      */
-    public VersionedTransactionBuilder addAddressTableLookup(AddressTableLookup lookupTable) {
+    public VersionedTransactionBuilder addAddressTableLookup(AddressLookupTableAccount lookupTable) {
         Objects.requireNonNull(lookupTable, "LookupTable cannot be null");
         this.message.addAddressTableLookup(lookupTable);
         return this;

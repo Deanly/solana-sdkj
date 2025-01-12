@@ -1,6 +1,8 @@
 package org.p2p.solanaj.core;
 
+import lombok.Getter;
 import org.bitcoinj.core.Base58;
+import org.p2p.solanaj.rpc.types.AddressLookupTableAccount;
 import org.p2p.solanaj.utils.ShortvecEncoding;
 
 import lombok.Setter;
@@ -19,11 +21,19 @@ import java.util.Objects;
  */
 public class VersionedMessage {
 
+    @Setter
+    @Getter
     private byte version;
+    @Setter
+    @Getter
     private MessageHeader header;
+    @Getter
     private List<PublicKey> accountKeys;
+    @Getter
     private String recentBlockhash;
+    @Getter
     private List<CompiledInstruction> instructions;
+    @Getter
     private List<MessageAddressTableLookup> addressTableLookups;
 
     // Maps to track unique account keys and their indices
@@ -82,6 +92,43 @@ public class VersionedMessage {
                 lookupTable.getReadonlyIndexes()
         );
         addressTableLookups.add(messageLookup);
+    }
+
+    /**
+     * Adds an Address Lookup Table account to resolve writable and readonly addresses.
+     *
+     * @param atlAccount Address Lookup Table Account
+     */
+    public void addAddressTableLookup(AddressLookupTableAccount atlAccount) {
+        Objects.requireNonNull(atlAccount, "Address Lookup Table Account cannot be null");
+
+        MessageAddressTableLookup lookup = new MessageAddressTableLookup(
+                atlAccount.getKey(),
+                resolveIndexes(atlAccount.getState().getAddresses(), true),
+                resolveIndexes(atlAccount.getState().getAddresses(), false)
+        );
+
+        addressTableLookups.add(lookup);
+    }
+
+    /**
+     * Resolves address indexes for writable or readonly addresses from the ATL account.
+     *
+     * @param addresses Addresses from the Address Lookup Table Account
+     * @param writable  If true, resolve writable indexes; otherwise resolve readonly indexes
+     * @return List of resolved indexes
+     */
+    private List<Integer> resolveIndexes(List<PublicKey> addresses, boolean writable) {
+        List<Integer> resolvedIndexes = new ArrayList<>();
+        for (int i = 0; i < addresses.size(); i++) {
+            PublicKey address = addresses.get(i);
+            if (writable) {
+                resolvedIndexes.add(addAccountKey(address));
+            } else {
+                resolvedIndexes.add(addAccountKey(address));
+            }
+        }
+        return resolvedIndexes;
     }
 
     /**
@@ -252,79 +299,84 @@ public class VersionedMessage {
         }
     }
 
-    // Getters and setters...
-
     /**
-     * Gets the version of the message.
+     * Resolves account keys using provided Address Lookup Table accounts.
      *
-     * @return The version byte
+     * @param atlAccounts List of Address Lookup Table accounts
+     * @return Account keys resolved from the ATL accounts
      */
-    public byte getVersion() {
-        return version;
+    public List<PublicKey> resolveAccountKeys(List<AddressLookupTableAccount> atlAccounts) {
+        List<PublicKey> resolvedKeys = new ArrayList<>();
+        for (MessageAddressTableLookup lookup : addressTableLookups) {
+            AddressLookupTableAccount atlAccount = atlAccounts.stream()
+                    .filter(account -> account.getKey().equals(lookup.getAccountKey()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Address Lookup Table account not found for key: " + lookup.getAccountKey().toBase58()));
+
+            resolvedKeys.addAll(resolveKeysFromLookup(atlAccount, lookup));
+        }
+        return resolvedKeys;
     }
 
     /**
-     * Sets the version of the message.
+     * Resolves keys from a specific MessageAddressTableLookup and ATL account.
      *
-     * @param version The version byte to set
+     * @param atlAccount Address Lookup Table Account
+     * @param lookup     MessageAddressTableLookup
+     * @return List of resolved keys
      */
-    public void setVersion(byte version) {
-        this.version = version;
-    }
+    private List<PublicKey> resolveKeysFromLookup(AddressLookupTableAccount atlAccount, MessageAddressTableLookup lookup) {
+        List<PublicKey> keys = new ArrayList<>();
+        List<PublicKey> addresses = atlAccount.getState().getAddresses();
 
+        for (Byte index : lookup.getWritableIndexes()) {
+            if (index < 0 || index >= addresses.size()) {
+                throw new IllegalArgumentException("Invalid writable index: " + index);
+            }
+            keys.add(addresses.get(index));
+        }
 
-    /**
-     * Gets the list of account keys.
-     *
-     * @return List of PublicKey objects
-     */
-    public List<PublicKey> getAccountKeys() {
-        return accountKeys;
-    }
+        for (Byte index : lookup.getReadonlyIndexes()) {
+            if (index < 0 || index >= addresses.size()) {
+                throw new IllegalArgumentException("Invalid readonly index: " + index);
+            }
+            keys.add(addresses.get(index));
+        }
 
-    /**
-     * Gets the message header.
-     *
-     * @return The MessageHeader object
-     */
-    public MessageHeader getHeader() {
-        return header;
-    }
-
-    /**
-     * Sets the message header.
-     *
-     * @param header The MessageHeader object to set
-     */
-    public void setHeader(MessageHeader header) {
-        this.header = header;
+        return keys;
     }
 
     /**
-     * Gets the recent blockhash.
+     * Ensures that signers are at the beginning of the accountKeys list in the correct order.
      *
-     * @return The recent blockhash as a String
+     * @param signers The list of signers to ensure are at the beginning of accountKeys.
      */
-    public String getRecentBlockhash() {
-        return recentBlockhash;
-    }
+    public void reorderSignersInAccountKeys(List<Account> signers) {
+        // 임시 리스트에 모든 서명자 키를 저장
+        List<PublicKey> signersKeys = new ArrayList<>();
+        for (Account signer : signers) {
+            signersKeys.add(signer.getPublicKey());
+        }
 
-    /**
-     * Gets the list of instructions.
-     *
-     * @return List of CompiledInstruction objects
-     */
-    public List<CompiledInstruction> getInstructions() {
-        return instructions;
-    }
+        // 서명자만 필터링해서 맨 앞에 추가
+        List<PublicKey> reorderedAccountKeys = new ArrayList<>(signersKeys);
 
-    /**
-     * Gets the list of Address Lookup Tables.
-     *
-     * @return List of MessageAddressTableLookup objects
-     */
-    public List<MessageAddressTableLookup> getAddressTableLookups() {
-        return addressTableLookups;
+        // 서명자가 아닌 기존 accountKeys 추가
+        for (PublicKey key : accountKeys) {
+            if (!signersKeys.contains(key)) {
+                reorderedAccountKeys.add(key);
+            }
+        }
+
+        // 재정렬된 accountKeys로 교체
+        accountKeys.clear();
+        accountKeys.addAll(reorderedAccountKeys);
+
+        // accountKeyIndexMap 업데이트
+        for (int i = 0; i < accountKeys.size(); i++) {
+            accountKeyIndexMap.put(accountKeys.get(i), i);
+        }
     }
 
     /**
@@ -454,13 +506,7 @@ public class VersionedMessage {
             byte[] writableLength = ShortvecEncoding.encodeLength(writableIndexes.size());
             byte[] readonlyLength = ShortvecEncoding.encodeLength(readonlyIndexes.size());
 
-            ByteBuffer buffer = ByteBuffer.allocate(
-                    accountKeyBytes.length +
-                            writableLength.length +
-                            writableIndexes.size() +
-                            readonlyLength.length +
-                            readonlyIndexes.size()
-            );
+            ByteBuffer buffer = ByteBuffer.allocate(getSerializedLength());
             buffer.put(accountKeyBytes);
             buffer.put(writableLength);
             for (Byte index : writableIndexes) {

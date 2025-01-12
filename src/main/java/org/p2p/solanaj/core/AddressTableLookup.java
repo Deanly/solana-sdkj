@@ -10,7 +10,11 @@ import java.util.Objects;
  * Represents an Address Lookup Table (ALT) for Solana versioned transactions.
  * ALTs allow transactions to reference additional addresses required for execution,
  * enabling transactions that exceed the maximum number of accounts.
+ *
+ * @deprecated
+ * @see VersionedMessage.MessageAddressTableLookup
  */
+@Deprecated
 public class AddressTableLookup {
     private final PublicKey accountKey;
     private final List<Integer> writableIndexes;

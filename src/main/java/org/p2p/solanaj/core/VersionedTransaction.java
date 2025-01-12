@@ -1,6 +1,7 @@
 package org.p2p.solanaj.core;
 
 import org.bitcoinj.core.Base58;
+import org.p2p.solanaj.rpc.types.AddressLookupTableAccount;
 import org.p2p.solanaj.utils.ShortvecEncoding;
 import org.p2p.solanaj.utils.TweetNaclFast;
 
@@ -44,6 +45,8 @@ public class VersionedTransaction {
      */
     public void sign(List<Account> signers) {
         Objects.requireNonNull(signers, "Signers cannot be null");
+
+        message.reorderSignersInAccountKeys(signers);
         message.getHeader().setNumRequiredSignatures((byte) signers.size());
 
         signatures.clear(); // Clear existing signatures
@@ -64,6 +67,16 @@ public class VersionedTransaction {
      * @param lookupTable The AddressTableLookup to add
      */
     public void addAddressTableLookup(AddressTableLookup lookupTable) {
+        Objects.requireNonNull(lookupTable, "LookupTable cannot be null");
+        message.addAddressTableLookup(lookupTable);
+    }
+
+    /**
+     * Adds an Address Lookup Table to the transaction.
+     *
+     * @param lookupTable The AddressTableLookupAccount to add
+     */
+    public void addAddressTableLookup(AddressLookupTableAccount lookupTable) {
         Objects.requireNonNull(lookupTable, "LookupTable cannot be null");
         message.addAddressTableLookup(lookupTable);
     }

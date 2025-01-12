@@ -241,4 +241,16 @@ public class Transaction {
         transaction.signatures.addAll(signatures);
         return transaction;
     }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "version=" + message.getVersion().name() +
+                ", recentBlockhash='" + recentBlockhash + '\'' +
+                ", feePayer=" + feePayer +
+                ", isCompiled=" + isCompiled() +
+                ", isSigned=" + isSigned() +
+                ", signatures.count=" + signatures.size() +
+                '}';
+    }
 }

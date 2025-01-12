@@ -1,5 +1,6 @@
 package org.p2p.solanaj.core;
 
+import org.p2p.solanaj.core.message.MessageAddressTableLookup;
 import org.p2p.solanaj.utils.ShortvecEncoding;
 
 import java.nio.ByteBuffer;
@@ -12,7 +13,7 @@ import java.util.Objects;
  * enabling transactions that exceed the maximum number of accounts.
  *
  * @deprecated
- * @see VersionedMessage.MessageAddressTableLookup
+ * @see MessageAddressTableLookup
  */
 @Deprecated
 public class AddressTableLookup {

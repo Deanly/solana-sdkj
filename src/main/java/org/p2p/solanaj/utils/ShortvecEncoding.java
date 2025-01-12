@@ -1,5 +1,7 @@
 package org.p2p.solanaj.utils;
 
+import java.nio.ByteBuffer;
+
 /**
  * Utility class for short vector encoding as per Solana's requirements.
  */
@@ -34,6 +36,27 @@ public class ShortvecEncoding {
         int length = 0;
         int shift = 0;
         for (byte b : bytes) {
+            length |= (b & 0x7F) << shift;
+            if ((b & 0x80) == 0) {
+                break;
+            }
+            shift += 7;
+        }
+        return length;
+    }
+
+
+    /**
+     * Decodes a short vector encoded length from a ByteBuffer.
+     *
+     * @param buffer The ByteBuffer containing the encoded length
+     * @return The decoded length
+     */
+    public static int decodeLength(ByteBuffer buffer) {
+        int length = 0;
+        int shift = 0;
+        while (buffer.hasRemaining()) {
+            byte b = buffer.get();
             length |= (b & 0x7F) << shift;
             if ((b & 0x80) == 0) {
                 break;

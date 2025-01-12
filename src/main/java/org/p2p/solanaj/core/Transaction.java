@@ -1,14 +1,18 @@
 package org.p2p.solanaj.core;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 import org.bitcoinj.core.Base58;
+import org.p2p.solanaj.core.message.MessageAddressTableLookup;
+import org.p2p.solanaj.core.message.MessageV0;
+import org.p2p.solanaj.core.message.VersionedMessage;
+import org.p2p.solanaj.core.message.Message;
+import org.p2p.solanaj.rpc.types.AddressLookupTableAccount;
 import org.p2p.solanaj.utils.ShortvecEncoding;
 import org.p2p.solanaj.utils.TweetNaclFast;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a Solana transaction.
@@ -18,16 +22,20 @@ public class Transaction {
 
     public static final int SIGNATURE_LENGTH = 64;
 
-    private final Message message;
+    private final List<TransactionInstruction> instructions;
+    private final List<AddressLookupTableAccount> addressTableLookups;
+    private String recentBlockhash;
+    private PublicKey feePayer;
+    private VersionedMessage message;
     private final List<String> signatures;
-    private byte[] serializedMessage;
 
     /**
      * Constructs a new Transaction instance.
      */
     public Transaction() {
-        this.message = new Message();
-        this.signatures = new ArrayList<>(); // Use diamond operator
+        this.instructions = new ArrayList<>();
+        this.signatures = new ArrayList<>();
+        this.addressTableLookups = new ArrayList<>();
     }
 
     /**
@@ -39,7 +47,28 @@ public class Transaction {
      */
     public Transaction addInstruction(TransactionInstruction instruction) {
         Objects.requireNonNull(instruction, "Instruction cannot be null"); // Add input validation
-        message.addInstruction(instruction);
+        instructions.add(instruction);
+        return this;
+    }
+
+
+    /**
+     * Adds an address lookup table (ALT) account to the transaction.
+     * <p>
+     * Address lookup tables allow a transaction to reference additional
+     * accounts without exceeding the transaction size limit. These accounts
+     * are used to resolve public keys during transaction execution, enabling
+     * more efficient account management in complex transactions.
+     * </p>
+     *
+     * @param addressTableLookup The address lookup table account to add.
+     *                           Must not be null.
+     * @return This Transaction instance for method chaining.
+     * @throws NullPointerException if the provided address lookup table account is null.
+     */
+    public Transaction addAddressTableLookups(AddressLookupTableAccount addressTableLookup) {
+        Objects.requireNonNull(addressTableLookup, "ATL cannot be null"); // Add input validation
+        addressTableLookups.add(addressTableLookup);
         return this;
     }
 
@@ -50,8 +79,7 @@ public class Transaction {
      * @throws NullPointerException if the recentBlockhash is null
      */
     public void setRecentBlockHash(String recentBlockhash) {
-        Objects.requireNonNull(recentBlockhash, "Recent blockhash cannot be null"); // Add input validation
-        message.setRecentBlockHash(recentBlockhash);
+        this.recentBlockhash = Objects.requireNonNull(recentBlockhash, "Recent blockhash cannot be null");
     }
 
     /**
@@ -61,7 +89,7 @@ public class Transaction {
      * @throws NullPointerException if the signer is null
      */
     public void sign(Account signer) {
-        sign(Arrays.asList(Objects.requireNonNull(signer, "Signer cannot be null"))); // Add input validation
+        sign(List.of(Objects.requireNonNull(signer, "Signer cannot be null"))); // Add input validation
     }
 
     /**
@@ -74,12 +102,18 @@ public class Transaction {
         if (signers == null || signers.isEmpty()) {
             throw new IllegalArgumentException("No signers provided");
         }
+        if (feePayer == null) {
+            feePayer = signers.get(0).getPublicKey();
+        } else if (!feePayer.equals(signers.get(0).getPublicKey())) {
+            message = null;
+        }
+        if (!isCompiled()) {
+            compile();
+        }
 
-        Account feePayer = signers.get(0);
-        message.setFeePayer(feePayer);
+        byte[] serializedMessage = message.serialize();
 
-        serializedMessage = message.serialize();
-
+        signatures.clear();
         for (Account signer : signers) {
             try {
                 TweetNaclFast.Signature signatureProvider = new TweetNaclFast.Signature(new byte[0], signer.getSecretKey());
@@ -92,27 +126,119 @@ public class Transaction {
     }
 
     /**
+     * Checks if the transaction has been signed.
+     *
+     * @return true if the transaction has at least one signature; false otherwise.
+     */
+    public boolean isSigned() {
+        return !signatures.isEmpty();
+    }
+
+    /**
+     * Compiles the transaction into a `VersionedMessage` using the stored fee payer,
+     * recent blockhash, instructions, and address lookup tables.
+     * This method determines whether to compile as a legacy `Message` or `MessageV0`
+     * based on the presence of address lookup tables.
+     */
+    public void compile() {
+        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+    }
+
+    /**
+     * Compiles the transaction into a `VersionedMessage` using the provided fee payer
+     * and the stored recent blockhash, instructions, and address lookup tables.
+     *
+     * @param feePayer The public key of the account responsible for paying the transaction fee.
+     */
+    public void compile(PublicKey feePayer) {
+        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+    }
+
+    /**
+     * Compiles the transaction into a `VersionedMessage` using the provided fee payer,
+     * recent blockhash, and instructions, along with the stored address lookup tables.
+     *
+     * @param feePayer       The public key of the account responsible for paying the transaction fee.
+     * @param recentBlockhash The recent blockhash for the transaction.
+     * @param instructions   The list of transaction instructions.
+     */
+    public void compile(PublicKey feePayer, String recentBlockhash, List<TransactionInstruction> instructions) {
+        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+    }
+
+    /**
+     * Compiles the transaction into a `VersionedMessage` using the provided fee payer,
+     * recent blockhash, instructions, and address lookup tables.
+     *
+     * This method determines whether to compile as a legacy `Message` or `MessageV0`
+     * based on the presence of address lookup tables.
+     *
+     * @param feePayer       The public key of the account responsible for paying the transaction fee.
+     * @param recentBlockhash The recent blockhash for the transaction.
+     * @param instructions   The list of transaction instructions.
+     * @param addressTableLookups The list of address lookup table accounts to use for the transaction.
+     */
+    public void compile(PublicKey feePayer, String recentBlockhash, List<TransactionInstruction> instructions, List<AddressLookupTableAccount> addressTableLookups) {
+        if (!addressTableLookups.isEmpty()) {
+            message = MessageV0.compile(feePayer, instructions, recentBlockhash, addressTableLookups);
+        } else {
+            message = Message.compile(feePayer, instructions, recentBlockhash);
+        }
+    }
+
+    /**
+     * Checks if the transaction has been compiled into a `VersionedMessage`.
+     *
+     * @return true if the transaction has been compiled; false otherwise.
+     */
+    public boolean isCompiled() {
+        return message != null;
+    }
+
+    /**
      * Serializes the transaction into a byte array.
      *
      * @return The serialized transaction as a byte array
      */
     public byte[] serialize() {
-        int signaturesSize = signatures.size();
-        byte[] signaturesLength = ShortvecEncoding.encodeLength(signaturesSize);
-
-        // Calculate total size before allocating ByteBuffer
-        int totalSize = signaturesLength.length + signaturesSize * SIGNATURE_LENGTH + serializedMessage.length;
-        ByteBuffer out = ByteBuffer.allocate(totalSize);
-
-        out.put(signaturesLength);
-
-        for (String signature : signatures) {
-            byte[] rawSignature = Base58.decode(signature);
-            out.put(rawSignature);
+        if (message == null) {
+            compile();
         }
 
-        out.put(serializedMessage);
+        int signatureCount = signatures.size();
+        byte[] signatureCountEncoded = ShortvecEncoding.encodeLength(signatureCount);
 
-        return out.array();
+        int totalSize = signatureCountEncoded.length + signatureCount * SIGNATURE_LENGTH + message.serialize().length;
+        ByteBuffer buffer = ByteBuffer.allocate(totalSize);
+
+        buffer.put(signatureCountEncoded);
+        for (String signature : signatures) {
+            buffer.put(Base58.decode(signature));
+        }
+        buffer.put(message.serialize());
+
+        return buffer.array();
+    }
+
+    /**
+     * Deserializes a transaction from a byte array.
+     */
+    public static Transaction deserialize(byte[] serializedTransaction) {
+        ByteBuffer buffer = ByteBuffer.wrap(serializedTransaction);
+
+        int signatureCount = ShortvecEncoding.decodeLength(buffer);
+        List<String> signatures = new ArrayList<>();
+        for (int i = 0; i < signatureCount; i++) {
+            byte[] signatureBytes = new byte[SIGNATURE_LENGTH];
+            buffer.get(signatureBytes);
+            signatures.add(Base58.encode(signatureBytes));
+        }
+
+        VersionedMessage message = VersionedMessage.deserialize(buffer);
+
+        Transaction transaction = new Transaction();
+        transaction.message = message;
+        transaction.signatures.addAll(signatures);
+        return transaction;
     }
 }

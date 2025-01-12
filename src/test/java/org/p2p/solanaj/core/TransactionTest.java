@@ -1,5 +1,6 @@
 package org.p2p.solanaj.core;
 
+import lombok.extern.slf4j.Slf4j;
 import org.p2p.solanaj.programs.MemoProgram;
 import org.p2p.solanaj.programs.SystemProgram;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import org.bitcoinj.core.Base58;
 
+@Slf4j
 public class TransactionTest {
 
     private final static Account signer = new Account(Base58
@@ -27,6 +29,8 @@ public class TransactionTest {
         transaction.setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn");
         transaction.sign(signer);
         byte[] serializedTransaction = transaction.serialize();
+
+        log.info("Serialized: " + Base64.getEncoder().encodeToString(serializedTransaction));
 
         assertEquals(
                 "ASdDdWBaKXVRA+6flVFiZokic9gK0+r1JWgwGg/GJAkLSreYrGF4rbTCXNJvyut6K6hupJtm72GztLbWNmRF1Q4BAAEDBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQzrerzQ2HXrwm2hsYGjM5s+8qMWlbt6vbxngnO8rc3lqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAy+KIwZmU8DLmYglP3bPzrlpDaKkGu6VIJJwTOYQmRfUBAgIAAQwCAAAAuAsAAAAAAAA=",

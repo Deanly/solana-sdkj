@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.Getter;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Sha256Hash;
 import org.p2p.solanaj.utils.ByteUtils;
@@ -17,14 +18,16 @@ import org.p2p.solanaj.utils.TweetNaclFast;
 public class PublicKey {
 
     public static final int PUBLIC_KEY_LENGTH = 32;
+    private static final String DEFAULT_PUBLIC_KEY = "11111111111111111111111111111111";
 
     private final byte[] pubkey;
 
     public PublicKey(String pubkey) {
-        if (pubkey.length() < PUBLIC_KEY_LENGTH) {
-            throw new IllegalArgumentException("Invalid public key input: length must be at least " + PUBLIC_KEY_LENGTH);
+        byte[] decoded = Base58.decode(pubkey);
+        if (decoded.length != PUBLIC_KEY_LENGTH) {
+            throw new IllegalArgumentException("Invalid public key input: length must be exactly " + PUBLIC_KEY_LENGTH);
         }
-        this.pubkey = Base58.decode(pubkey);
+        this.pubkey = decoded;
     }
 
     public PublicKey(byte[] pubkey) {
@@ -92,13 +95,17 @@ public class PublicKey {
     }
 
     public static PublicKey createWithSeed(PublicKey fromPublicKey, String seed, PublicKey programId) {
+        return createWithSeed(fromPublicKey, Base58.decode(seed), programId);
+    }
+
+    public static PublicKey createWithSeed(PublicKey fromPublicKey, byte[] seed, PublicKey programId) {
         try (ByteArrayOutputStream buffer = new ByteArrayOutputStream()) {
-            if (seed.length() > 32) {
-                throw new IllegalArgumentException("Max seed length exceeded: " + seed.length());
+            if (seed.length > 32) {
+                throw new IllegalArgumentException("Max seed length exceeded: " + seed.length);
             }
 
             buffer.write(fromPublicKey.toByteArray());
-            buffer.write(seed.getBytes());
+            buffer.write(seed);
             buffer.write(programId.toByteArray());
 
             byte[] hash = Sha256Hash.hash(buffer.toByteArray());
@@ -108,6 +115,15 @@ public class PublicKey {
         }
     }
 
+    public static PublicKey defaultPublicKey() {
+        return new PublicKey(DEFAULT_PUBLIC_KEY);
+    }
+
+    public static boolean isOnCurve(byte[] pubkey) {
+        return TweetNaclFast.is_on_curve(pubkey) == 0;
+    }
+
+    @Getter
     public static class ProgramDerivedAddress {
         private PublicKey address;
         private int nonce;
@@ -116,15 +132,6 @@ public class PublicKey {
             this.address = address;
             this.nonce = nonce;
         }
-
-        public PublicKey getAddress() {
-            return address;
-        }
-
-        public int getNonce() {
-            return nonce;
-        }
-
     }
 
     public static ProgramDerivedAddress findProgramAddress(List<byte[]> seeds, PublicKey programId) {

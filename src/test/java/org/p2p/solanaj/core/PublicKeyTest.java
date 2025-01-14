@@ -1,11 +1,13 @@
 package org.p2p.solanaj.core;
 
+import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import org.p2p.solanaj.core.PublicKey.ProgramDerivedAddress;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
+import java.util.Base64;
 
 public class PublicKeyTest {
 
@@ -118,10 +120,38 @@ public class PublicKeyTest {
     public void testHashCode() {
         PublicKey key1 = new PublicKey("11111111111111111111111111111111");
         PublicKey key2 = new PublicKey("11111111111111111111111111111111");
-        PublicKey key3 = new PublicKey("22222222222222222222222222222222");
+        PublicKey key3 = new PublicKey("SecondPubey22222222222222222222222222222222");
 
         assertEquals(key1.hashCode(), key2.hashCode());
         assertNotEquals(key1.hashCode(), key3.hashCode());
+    }
+
+    @Test
+    public void testBase58Size() {
+        PublicKey key1 = new PublicKey("11111111111111111111111111111111");
+        PublicKey key2 = new PublicKey("SecondPubey22222222222222222222222222222222");
+        PublicKey key3 = new PublicKey("ThirdPubkey33333333333333333333333333333333");
+
+        assertEquals(32, key1.toByteArray().length);
+        assertEquals(32, key2.toByteArray().length);
+        assertEquals(32, key3.toByteArray().length);
+
+        // 테스트 문자열
+        String input = key1.toBase58();
+
+        // Base58 디코딩
+        byte[] decoded = Base58.decode(input);
+
+        // 결과 출력
+        String encoded = Base58.encode(decoded);
+        assertEquals(input, encoded);
+
+        String base64 = Base64.getEncoder().encodeToString(decoded);
+        byte[] decodedBase64 = Base64.getDecoder().decode(base64);
+        assertEquals(decoded.length, decodedBase64.length);
+
+        String base58 = Base58.encode(decodedBase64);
+        assertEquals(input, base58);
     }
 
     @Test

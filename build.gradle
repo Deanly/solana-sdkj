@@ -39,6 +39,8 @@ dependencies {
     api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     api 'com.syntifi.near:borshj:0.1.0'
 
+    implementation project(":struct-layout")
+
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
     testCompileOnly 'org.projectlombok:lombok:1.18.36'

@@ -1,9 +1,11 @@
-package net.deanly.solanarpcj.message.meta;
+package net.deanly.solanarpcj.message.compiler;
 
 import lombok.ToString;
 import lombok.Value;
 import net.deanly.solanarpcj.core.PublicKey;
 import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.message.meta.LoadedAddresses;
+import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -76,12 +78,12 @@ public class MessageAccountKeys {
         }
 
         // 1. Create keyIndexMap
-        Map<String, Integer> keyIndexMap = new HashMap<>();
+        Map<PublicKey, Integer> keyIndexMap = new HashMap<>();
         List<PublicKey> allKeys = keySegments().stream()
                 .flatMap(List::stream)
                 .toList();
         for (int i = 0; i < allKeys.size(); i++) {
-            keyIndexMap.put(allKeys.get(i).toBase58(), i);
+            keyIndexMap.put(allKeys.get(i), i);
         }
 
         // 2. Compile instructions
@@ -102,8 +104,8 @@ public class MessageAccountKeys {
      * @return The index of the key.
      * @throws IllegalArgumentException If the key is not found in the map.
      */
-    private int findKeyIndex(Map<String, Integer> keyIndexMap, PublicKey key) {
-        Integer index = keyIndexMap.get(key.toBase58());
+    private int findKeyIndex(Map<PublicKey, Integer> keyIndexMap, PublicKey key) {
+        Integer index = keyIndexMap.get(key);
         if (index == null) {
             throw new IllegalArgumentException(
                     "Encountered an unknown instruction account key during compilation: " + key.toBase58());

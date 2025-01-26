@@ -100,7 +100,7 @@ class MessageV0Test {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
                 MessageV0.resolveAddressTableLookups(tableLookups, List.of(differentTableAccount))
         );
-        assertTrue(exception.getMessage().contains("Address lookup table not found for key"));
+        assertTrue(exception.getMessage().contains("Address lookup table not found for account key"));
     }
 
     @Test
@@ -179,16 +179,16 @@ class MessageV0Test {
         MessageHeader header = new MessageHeader(3, 1, 1); // 3 signed, 1 readonly signed, 1 readonly unsigned
         List<PublicKey> staticKeys = List.of(
                 new PublicKey("11111111111111111111111111111111"), // Signed writable
-                new PublicKey("SecondPubey22222222222222222222222222222222"), // Signed readonly
-                new PublicKey("ThirdPubkey33333333333333333333333333333333"), // Unsigned writable
+                new PublicKey("SecondPubey22222222222222222222222222222222"), // Signed writable
+                new PublicKey("ThirdPubkey33333333333333333333333333333333"), // Signed readonly
                 new PublicKey("FourthPubke44444444444444444444444444444444")  // Unsigned readonly
         );
         MessageV0 message = new MessageV0(header, staticKeys, "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn", List.of(), List.of());
 
         // Act & Assert
         assertTrue(message.isAccountWritable(0)); // Writable signed
-        assertFalse(message.isAccountWritable(1)); // Readonly signed
-        assertTrue(message.isAccountWritable(2)); // Writable unsigned
+        assertTrue(message.isAccountWritable(1)); // Readonly signed
+        assertFalse(message.isAccountWritable(2)); // Writable unsigned
         assertFalse(message.isAccountWritable(3)); // Readonly unsigned
     }
 
@@ -294,7 +294,7 @@ class MessageV0Test {
         assertEquals(0, message.getHeader().getNumReadonlySignedAccounts());
         assertEquals(1, message.getHeader().getNumReadonlyUnsignedAccounts());
         assertEquals(1, message.getInstructions().size());
-        assertEquals(2, message.getAccountKeys().size());
+        assertEquals(2, message.getStaticAccountKeys().size());
         assertEquals(1, message.getAddressTableLookups().size());
     }
 

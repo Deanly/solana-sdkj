@@ -11,7 +11,6 @@ import net.deanly.structlayout.annotation.StructSequenceObjectField;
 import net.deanly.solanarpcj.layout.PublicKeyField;
 import net.deanly.solanarpcj.layout.ShortVecField;
 import net.deanly.solanarpcj.message.compiler.MessageCompiler;
-import net.deanly.solanarpcj.message.meta.MessageAccountKeys;
 import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
 
@@ -29,7 +28,7 @@ public class Message implements VersionedMessage {
     protected MessageHeader header;
 
     @StructSequenceField(order = 2, elementType = PublicKeyField.class, lengthType = ShortVecField.class)
-    protected List<PublicKey> accountKeys;
+    protected List<PublicKey> staticAccountKeys;
 
     @Setter
     @StructField(order = 3, type = PublicKeyField.class)
@@ -38,9 +37,9 @@ public class Message implements VersionedMessage {
     @StructSequenceObjectField(order = 4, lengthType = ShortVecField.class)
     protected List<MessageCompiledInstruction> instructions;
 
-    public Message(MessageHeader messageHeader, List<PublicKey> accountKeys, String recentBlockhash, List<MessageCompiledInstruction> instructions) {
+    public Message(MessageHeader messageHeader, List<PublicKey> staticAccountKeys, String recentBlockhash, List<MessageCompiledInstruction> instructions) {
         this.header = messageHeader;
-        this.accountKeys = accountKeys;
+        this.staticAccountKeys = staticAccountKeys;
         this.recentBlockhash = new PublicKey(recentBlockhash);
         this.instructions = instructions;
     }
@@ -54,7 +53,7 @@ public class Message implements VersionedMessage {
     public List<PublicKey> getSigners() {
         List<PublicKey> signers = new ArrayList<>();
         for (int i = 0; i < header.getNumRequiredSignatures(); i++) {
-            signers.add(accountKeys.get(i));
+            signers.add(staticAccountKeys.get(i));
         }
         return signers;
     }
@@ -86,12 +85,8 @@ public class Message implements VersionedMessage {
         return deserialize(buffer);
     }
 
-    public MessageAccountKeys getMessageAccountKeys() {
-        return new MessageAccountKeys(accountKeys);
-    }
-
     public boolean isAccountSigner(int accountIndex) {
-        if (accountIndex < 0 || accountIndex >= accountKeys.size()) {
+        if (accountIndex < 0 || accountIndex >= staticAccountKeys.size()) {
             throw new IndexOutOfBoundsException("Account index is out of range");
         }
         return accountIndex < header.getNumRequiredSignatures();
@@ -101,7 +96,7 @@ public class Message implements VersionedMessage {
         int numSignedAccounts = header.getNumRequiredSignatures();
         if (accountIndex >= header.getNumRequiredSignatures()) {
             int unsignedAccountIndex = accountIndex - numSignedAccounts;
-            int numUnsignedAccounts = accountKeys.size() - numSignedAccounts;
+            int numUnsignedAccounts = staticAccountKeys.size() - numSignedAccounts;
             int numWritableUnsignedAccounts = numUnsignedAccounts - header.getNumReadonlyUnsignedAccounts();
             return unsignedAccountIndex < numWritableUnsignedAccounts;
         } else {

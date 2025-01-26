@@ -128,7 +128,7 @@ public class MessageTest {
         Message message = new Message(header, accountKeys, recentBlockhash, instructions);
 
         assertEquals(header, message.getHeader(), "Message header mismatch!");
-        assertEquals(accountKeys, message.getAccountKeys(), "Account keys mismatch!");
+        assertEquals(accountKeys, message.getStaticAccountKeys(), "Account keys mismatch!");
         assertEquals(recentBlockhash, message.getRecentBlockhash().toBase58(), "Recent blockhash mismatch!");
         assertEquals(instructions, message.getInstructions(), "Instructions mismatch!");
     }
@@ -163,7 +163,7 @@ public class MessageTest {
         // Validate
         assertEquals(originalMessage.getHeader().getNumRequiredSignatures(), deserializedMessage.getHeader().getNumRequiredSignatures());
         assertEquals(originalMessage.getRecentBlockhash(), deserializedMessage.getRecentBlockhash());
-        assertEquals(originalMessage.getAccountKeys().size(), deserializedMessage.getAccountKeys().size());
+        assertEquals(originalMessage.getStaticAccountKeys().size(), deserializedMessage.getStaticAccountKeys().size());
         assertEquals(originalMessage.getInstructions().size(), deserializedMessage.getInstructions().size());
     }
 
@@ -193,7 +193,7 @@ public class MessageTest {
 
         assertTrue(message.isAccountSigner(0), "Account 0 should be a signer!");
         assertTrue(message.isAccountSigner(1), "Account 1 should be a signer!");
-        assertFalse(message.isAccountSigner(2), "Account 2 should not be a signer!");
+        assertThrows(IndexOutOfBoundsException.class, () -> message.isAccountSigner(2), "Account 2 should not be a signer!");
     }
 
     @Test

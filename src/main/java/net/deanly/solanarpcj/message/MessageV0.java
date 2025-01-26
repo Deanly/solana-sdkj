@@ -191,7 +191,7 @@ public class MessageV0 extends Message implements VersionedMessage {
     @Override
     public boolean isAccountWritable(int index) {
         int numSignedAccounts = header.getNumRequiredSignatures();
-        int numStaticAccountKeys = this.accountKeys.size();
+        int numStaticAccountKeys = this.staticAccountKeys.size();
 
         if (index >= numStaticAccountKeys) {
             // Checking lookup account keys

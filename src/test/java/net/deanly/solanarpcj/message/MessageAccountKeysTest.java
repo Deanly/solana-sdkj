@@ -5,7 +5,7 @@ import net.deanly.solanarpcj.core.AccountMeta;
 import net.deanly.solanarpcj.core.PublicKey;
 import net.deanly.solanarpcj.core.TransactionInstruction;
 import net.deanly.solanarpcj.message.meta.LoadedAddresses;
-import net.deanly.solanarpcj.message.meta.MessageAccountKeys;
+import net.deanly.solanarpcj.message.compiler.MessageAccountKeys;
 import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 
 import java.util.List;

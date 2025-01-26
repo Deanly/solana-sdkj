@@ -3,20 +3,20 @@ plugins {
     id 'maven-publish'          // Maven 배포 플러그인
 }
 
-group = 'com.mmorrell'
-version = '1.20.2'
-description = 'Java client for Solana RPC'
+group = 'net.deanly.solanarpcj'
+version = '0.0.1'
+description = 'Solana RPC Methods for java'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17) // Java 17 설정
+        languageVersion = JavaLanguageVersion.of(17)
     }
-    withSourcesJar()   // 소스 JAR 포함
-    withJavadocJar()   // Javadoc JAR 포함
+    withSourcesJar()
+    withJavadocJar()
 }
 
 repositories {
-    mavenCentral()     // Maven Central
+    mavenCentral()
 }
 
 dependencies {
@@ -40,6 +40,7 @@ dependencies {
     api 'com.syntifi.near:borshj:0.1.0'
 
     implementation project(":struct-layout")
+//    implementation 'net.deanly:struct-layout:0.1.1'
 
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'

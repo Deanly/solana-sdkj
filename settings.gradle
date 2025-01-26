@@ -1,1 +1,4 @@
-rootProject.name = 'solanaj'
+rootProject.name = 'solanarpcj'
+
+include(":struct-layout")
+project(":struct-layout").projectDir = file("../struct-layout")

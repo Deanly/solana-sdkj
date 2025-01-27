@@ -1,8 +1,8 @@
 package net.deanly.solanarpcj.token;
 
-import net.deanly.solanarpcj.core.Account;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.Transaction;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.Transaction;
 import net.deanly.solanarpcj.programs.MemoProgram;
 import net.deanly.solanarpcj.programs.TokenProgram;
 import net.deanly.solanarpcj.rpc.RpcClient;

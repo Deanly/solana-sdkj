@@ -1,13 +1,13 @@
 package net.deanly.solanarpcj.message;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
-import net.deanly.solanarpcj.core.AccountMeta;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.account.AccountMeta;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
 import net.deanly.solanarpcj.message.meta.LoadedAddresses;
 import net.deanly.solanarpcj.message.meta.MessageAddressTableLookup;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
-import net.deanly.solanarpcj.alt.AddressLookupTableAccount;
+import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

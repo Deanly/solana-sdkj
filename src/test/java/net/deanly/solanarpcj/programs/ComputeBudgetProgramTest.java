@@ -2,7 +2,7 @@ package net.deanly.solanarpcj.programs;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
 
 /**
  * Test class for ComputeBudgetProgram.

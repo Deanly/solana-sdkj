@@ -1,9 +1,10 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.PublicKey;
 import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import net.deanly.solanarpcj.core.PublicKey.ProgramDerivedAddress;
+import net.deanly.solanarpcj.account.PublicKey.ProgramDerivedAddress;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;

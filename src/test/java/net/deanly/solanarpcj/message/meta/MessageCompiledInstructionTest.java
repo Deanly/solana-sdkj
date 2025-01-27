@@ -1,7 +1,6 @@
-package net.deanly.solanarpcj.message;
+package net.deanly.solanarpcj.message.meta;
 
 import org.junit.jupiter.api.Test;
-import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 import net.deanly.solanarpcj.utils.ShortvecEncoding;
 
 import java.nio.BufferUnderflowException;

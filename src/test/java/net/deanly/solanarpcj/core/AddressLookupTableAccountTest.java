@@ -1,7 +1,8 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.PublicKey;
 import org.junit.jupiter.api.Test;
-import net.deanly.solanarpcj.alt.AddressLookupTableAccount;
+import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

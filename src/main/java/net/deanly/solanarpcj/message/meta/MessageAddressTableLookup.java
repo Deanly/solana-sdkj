@@ -5,9 +5,9 @@ import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.type.basic.UInt8Field;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.layout.PublicKeyField;
-import net.deanly.solanarpcj.layout.ShortVecField;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.layout.field.PublicKeyField;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import net.deanly.solanarpcj.utils.ShortvecEncoding;
 
 import java.nio.ByteBuffer;

@@ -2,6 +2,7 @@ package net.deanly.solanarpcj.layout;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import org.junit.jupiter.api.Test;
 
 class ShortVecFieldTest {

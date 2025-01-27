@@ -1,9 +1,13 @@
 package net.deanly.solanarpcj.core;
 
 import lombok.extern.slf4j.Slf4j;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.programs.MemoProgram;
 import net.deanly.solanarpcj.programs.SystemProgram;
 
+import net.deanly.solanarpcj.transaction.Transaction;
+import net.deanly.solanarpcj.transaction.TransactionBuilder;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

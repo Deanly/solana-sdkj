@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.account;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.bitcoinj.core.Base58;
 import org.bitcoinj.core.Sha256Hash;
 import net.deanly.solanarpcj.utils.ByteUtils;
@@ -15,12 +16,13 @@ import net.deanly.solanarpcj.utils.PublicKeySerializer;
 import net.deanly.solanarpcj.utils.TweetNaclFast;
 
 @JsonSerialize(using = PublicKeySerializer.class)
+@NoArgsConstructor
 public class PublicKey {
 
     public static final int PUBLIC_KEY_LENGTH = 32;
     private static final String DEFAULT_PUBLIC_KEY = "11111111111111111111111111111111";
 
-    private final byte[] pubkey;
+    private byte[] pubkey;
 
     public PublicKey(String pubkey) {
         byte[] decoded = Base58.decode(pubkey);

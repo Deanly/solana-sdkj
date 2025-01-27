@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.account;
 
 
 import com.syntifi.near.borshj.Borsh;

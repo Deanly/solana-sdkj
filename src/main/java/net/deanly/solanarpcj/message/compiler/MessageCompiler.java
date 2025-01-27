@@ -1,11 +1,11 @@
 package net.deanly.solanarpcj.message.compiler;
 
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
 import net.deanly.solanarpcj.message.Message;
 import net.deanly.solanarpcj.message.MessageV0;
 import net.deanly.solanarpcj.message.meta.*;
-import net.deanly.solanarpcj.alt.AddressLookupTableAccount;
+import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
 
 import java.util.*;
 

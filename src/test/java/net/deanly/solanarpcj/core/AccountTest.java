@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.Account;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

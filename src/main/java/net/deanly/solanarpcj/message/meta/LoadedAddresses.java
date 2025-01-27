@@ -3,7 +3,7 @@ package net.deanly.solanarpcj.message.meta;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.Value;
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 
 import java.util.List;
 

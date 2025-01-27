@@ -1,4 +1,6 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.transaction;
+
+import net.deanly.solanarpcj.account.Account;
 
 import java.util.List;
 import java.util.Objects;

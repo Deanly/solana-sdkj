@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.mockito.Mockito;
-import net.deanly.solanarpcj.core.Account;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.Transaction;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.Transaction;
 import net.deanly.solanarpcj.programs.SystemProgram;
 import net.deanly.solanarpcj.rpc.RpcClient;
 import net.deanly.solanarpcj.rpc.RpcApi;

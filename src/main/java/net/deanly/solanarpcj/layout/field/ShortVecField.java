@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.layout;
+package net.deanly.solanarpcj.layout.field;
 
 import net.deanly.structlayout.type.FieldBase;
 import net.deanly.structlayout.type.DynamicSpanField;
@@ -78,7 +78,6 @@ public class ShortVecField extends FieldBase<Integer> implements DynamicSpanFiel
         return this.dynamicSpan;
     }
 
-    @Override
     public void setSpan(int span) {
         this.dynamicSpan = span; // 값을 외부에서 설정할 수도 있음
     }

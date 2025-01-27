@@ -1,9 +1,9 @@
 package net.deanly.solanarpcj.programs.anchor;
 
-import net.deanly.solanarpcj.core.Account;
-import net.deanly.solanarpcj.core.AccountMeta;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.AccountMeta;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
 import net.deanly.solanarpcj.programs.Program;
 
 import java.nio.charset.StandardCharsets;

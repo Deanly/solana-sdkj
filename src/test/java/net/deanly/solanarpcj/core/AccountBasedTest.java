@@ -1,5 +1,7 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
 import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.BeforeAll;
 

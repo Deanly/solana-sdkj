@@ -1,8 +1,8 @@
 package net.deanly.solanarpcj.rpc;
 
-import net.deanly.solanarpcj.core.Account;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.Transaction;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.Transaction;
 import net.deanly.solanarpcj.rpc.types.*;
 import net.deanly.solanarpcj.rpc.types.config.*;
 import net.deanly.solanarpcj.rpc.types.RpcResultTypes.ValueLong;

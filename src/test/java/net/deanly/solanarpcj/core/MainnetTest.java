@@ -1,6 +1,9 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.rpc.types.*;
+import net.deanly.solanarpcj.transaction.Transaction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;

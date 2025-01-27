@@ -1,10 +1,9 @@
 package net.deanly.solanarpcj.message;
 
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.List;
 
 public interface VersionedMessage {
@@ -17,21 +16,18 @@ public interface VersionedMessage {
      * Deserialize a versioned message from a byte array.
      */
     static VersionedMessage deserialize(byte[] serializedMessage) {
-        ByteBuffer buffer = ByteBuffer.wrap(serializedMessage).order(ByteOrder.LITTLE_ENDIAN);
-        return deserialize(buffer);
+        if (serializedMessage.length == 0) {
+            throw new IllegalArgumentException("Message data is empty or corrupted");
+        }
+
+        Version version = Version.detectVersion(serializedMessage);
+        return version.getDeserializer().apply(serializedMessage);
     }
 
     /**
      * Deserialize a versioned message from a ByteBuffer.
      */
     static VersionedMessage deserialize(ByteBuffer buffer) {
-        // Mark the buffer's current position and read the prefix
-        buffer.mark();
-        int prefix = Byte.toUnsignedInt(buffer.get());
-        buffer.reset();
-
-        // Use Version enum to determine the correct deserialization logic
-        Version version = Version.fromPrefix(prefix);
-        return version.getDeserializer().apply(buffer);
+        return deserialize(buffer.array());
     }
 }

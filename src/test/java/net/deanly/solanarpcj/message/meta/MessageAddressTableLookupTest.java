@@ -1,9 +1,8 @@
-package net.deanly.solanarpcj.message;
+package net.deanly.solanarpcj.message.meta;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.message.meta.MessageAddressTableLookup;
+import net.deanly.solanarpcj.account.PublicKey;
 
 import java.nio.ByteBuffer;
 import java.util.List;

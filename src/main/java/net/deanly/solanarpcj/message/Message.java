@@ -1,15 +1,17 @@
 package net.deanly.solanarpcj.message;
 
 import lombok.*;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.layout.Struct;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
+import net.deanly.solanarpcj.layout.field.BlockhashField;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructObjectField;
 import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.annotation.StructSequenceObjectField;
-import net.deanly.solanarpcj.layout.PublicKeyField;
-import net.deanly.solanarpcj.layout.ShortVecField;
+import net.deanly.solanarpcj.layout.field.PublicKeyField;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import net.deanly.solanarpcj.message.compiler.MessageCompiler;
 import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
@@ -22,7 +24,7 @@ import java.util.*;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Message implements VersionedMessage {
+public class Message extends Struct implements VersionedMessage {
 
     @StructObjectField(order = 1)
     protected MessageHeader header;
@@ -31,8 +33,8 @@ public class Message implements VersionedMessage {
     protected List<PublicKey> staticAccountKeys;
 
     @Setter
-    @StructField(order = 3, type = PublicKeyField.class)
-    protected PublicKey recentBlockhash;
+    @StructField(order = 3, type = BlockhashField.class)
+    protected String recentBlockhash;
 
     @StructSequenceObjectField(order = 4, lengthType = ShortVecField.class)
     protected List<MessageCompiledInstruction> instructions;
@@ -40,7 +42,7 @@ public class Message implements VersionedMessage {
     public Message(MessageHeader messageHeader, List<PublicKey> staticAccountKeys, String recentBlockhash, List<MessageCompiledInstruction> instructions) {
         this.header = messageHeader;
         this.staticAccountKeys = staticAccountKeys;
-        this.recentBlockhash = new PublicKey(recentBlockhash);
+        this.recentBlockhash = recentBlockhash;
         this.instructions = instructions;
     }
 

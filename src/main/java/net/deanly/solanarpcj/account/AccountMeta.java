@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

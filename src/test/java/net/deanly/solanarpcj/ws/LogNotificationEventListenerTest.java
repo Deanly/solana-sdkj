@@ -2,7 +2,7 @@ package net.deanly.solanarpcj.ws;
 
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.rpc.RpcClient;
 import net.deanly.solanarpcj.ws.listeners.LogNotificationEventListener;
 import org.junit.jupiter.api.AfterEach;

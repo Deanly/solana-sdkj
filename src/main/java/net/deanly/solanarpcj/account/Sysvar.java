@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.account;
 
 public class Sysvar {
     public static final PublicKey SYSVAR_RENT_ADDRESS = new PublicKey("SysvarRent111111111111111111111111111111111");

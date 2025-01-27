@@ -5,9 +5,9 @@ import org.bitcoinj.core.Base58;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.deanly.solanarpcj.core.Account;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.layout.ShortVecField;
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
 import net.deanly.solanarpcj.programs.SystemProgram;
@@ -129,7 +129,7 @@ public class MessageTest {
 
         assertEquals(header, message.getHeader(), "Message header mismatch!");
         assertEquals(accountKeys, message.getStaticAccountKeys(), "Account keys mismatch!");
-        assertEquals(recentBlockhash, message.getRecentBlockhash().toBase58(), "Recent blockhash mismatch!");
+        assertEquals(recentBlockhash, message.getRecentBlockhash(), "Recent blockhash mismatch!");
         assertEquals(instructions, message.getInstructions(), "Instructions mismatch!");
     }
 

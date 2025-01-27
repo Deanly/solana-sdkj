@@ -3,13 +3,13 @@ package net.deanly.solanarpcj.programs;
 import java.util.List;
 import java.util.Arrays;
 
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
-import net.deanly.solanarpcj.core.AccountMeta;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
+import net.deanly.solanarpcj.account.AccountMeta;
 
 import static org.bitcoinj.core.Utils.*;
-import static net.deanly.solanarpcj.core.Sysvar.RECENT_BLOCKHASHES;
-import static net.deanly.solanarpcj.core.Sysvar.SYSVAR_RENT_ADDRESS;
+import static net.deanly.solanarpcj.account.Sysvar.RECENT_BLOCKHASHES;
+import static net.deanly.solanarpcj.account.Sysvar.SYSVAR_RENT_ADDRESS;
 
 /**
  * Represents the System Program on the Solana blockchain.

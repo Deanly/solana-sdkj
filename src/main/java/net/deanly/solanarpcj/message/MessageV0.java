@@ -7,15 +7,15 @@ import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceObjectField;
 import net.deanly.structlayout.type.basic.UInt8Field;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
-import net.deanly.solanarpcj.layout.ShortVecField;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import net.deanly.solanarpcj.message.compiler.MessageCompiler;
 import net.deanly.solanarpcj.message.meta.LoadedAddresses;
 import net.deanly.solanarpcj.message.meta.MessageAddressTableLookup;
 import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
 import net.deanly.solanarpcj.message.meta.MessageHeader;
-import net.deanly.solanarpcj.alt.AddressLookupTableAccount;
+import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -105,7 +105,6 @@ public class MessageV0 extends Message implements VersionedMessage {
 
     @Override
     public byte[] serialize() {
-        StructLayout.debug(this);
         byte[] serializedData = StructLayout.encode(this);
 
         if (serializedData.length > PACKET_DATA_SIZE) {

@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.account;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;

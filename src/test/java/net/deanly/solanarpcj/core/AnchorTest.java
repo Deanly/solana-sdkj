@@ -1,5 +1,7 @@
 package net.deanly.solanarpcj.core;
 
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.transaction.Transaction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import static org.junit.jupiter.api.Assertions.*;

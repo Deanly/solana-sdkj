@@ -8,8 +8,8 @@ import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.type.basic.UInt8Field;
 import org.bitcoinj.core.Base58;
-import net.deanly.solanarpcj.layout.SVLBlobField;
-import net.deanly.solanarpcj.layout.ShortVecField;
+import net.deanly.solanarpcj.layout.field.SVLBlobField;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
 import net.deanly.solanarpcj.utils.ShortvecEncoding;
 
 import java.nio.ByteBuffer;

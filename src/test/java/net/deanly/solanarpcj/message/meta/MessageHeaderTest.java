@@ -1,7 +1,6 @@
-package net.deanly.solanarpcj.message;
+package net.deanly.solanarpcj.message.meta;
 
 import org.junit.jupiter.api.Test;
-import net.deanly.solanarpcj.message.meta.MessageHeader;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

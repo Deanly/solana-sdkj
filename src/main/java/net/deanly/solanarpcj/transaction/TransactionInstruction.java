@@ -1,6 +1,9 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.transaction;
 
 import lombok.Getter;
+import net.deanly.solanarpcj.account.AccountMeta;
+import net.deanly.solanarpcj.account.PublicKey;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

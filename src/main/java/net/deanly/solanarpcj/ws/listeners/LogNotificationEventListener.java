@@ -1,6 +1,6 @@
 package net.deanly.solanarpcj.ws.listeners;
 
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.rpc.RpcClient;
 import java.util.Map;
 import java.util.List;

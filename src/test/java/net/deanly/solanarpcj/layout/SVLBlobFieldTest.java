@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.layout;
 
+import net.deanly.solanarpcj.layout.field.SVLBlobField;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

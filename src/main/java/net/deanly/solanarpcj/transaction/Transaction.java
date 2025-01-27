@@ -1,10 +1,12 @@
-package net.deanly.solanarpcj.core;
+package net.deanly.solanarpcj.transaction;
 
+import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.account.PublicKey;
 import org.bitcoinj.core.Base58;
 import net.deanly.solanarpcj.message.MessageV0;
 import net.deanly.solanarpcj.message.VersionedMessage;
 import net.deanly.solanarpcj.message.Message;
-import net.deanly.solanarpcj.alt.AddressLookupTableAccount;
+import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
 import net.deanly.solanarpcj.utils.ShortvecEncoding;
 import net.deanly.solanarpcj.utils.TweetNaclFast;
 
@@ -238,7 +240,7 @@ public class Transaction {
             signatures.add(Base58.encode(signatureBytes));
         }
 
-        VersionedMessage message = VersionedMessage.deserialize(buffer);
+        VersionedMessage message = VersionedMessage.deserialize(buffer.array());
 
         Transaction transaction = new Transaction();
         transaction.message = message;

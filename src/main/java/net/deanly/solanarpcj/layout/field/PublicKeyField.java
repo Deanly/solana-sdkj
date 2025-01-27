@@ -1,8 +1,8 @@
-package net.deanly.solanarpcj.layout;
+package net.deanly.solanarpcj.layout.field;
 
 import net.deanly.structlayout.Field;
 import net.deanly.structlayout.type.FieldBase;
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 
 public class PublicKeyField extends FieldBase<PublicKey> implements Field<PublicKey> {
 
@@ -29,7 +29,7 @@ public class PublicKeyField extends FieldBase<PublicKey> implements Field<Public
     @Override
     public PublicKey decode(byte[] buffer, int offset) {
         if (buffer == null || buffer.length - offset < PUBLIC_KEY_LENGTH) {
-            throw new IllegalArgumentException("Buffer does not contain enough data for a PublicKey.");
+            throw new IllegalArgumentException("Buffer does not contain enough data for a PublicKey. remained: " + (buffer.length - offset));
         }
 
         byte[] publicKeyBytes = new byte[PUBLIC_KEY_LENGTH];

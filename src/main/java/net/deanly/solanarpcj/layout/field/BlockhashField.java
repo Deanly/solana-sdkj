@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.layout;
+package net.deanly.solanarpcj.layout.field;
 
 import net.deanly.structlayout.type.FieldBase;
 import org.bitcoinj.core.Base58;

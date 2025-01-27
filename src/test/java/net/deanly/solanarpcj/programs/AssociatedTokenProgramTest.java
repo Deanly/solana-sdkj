@@ -3,9 +3,9 @@ package net.deanly.solanarpcj.programs;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.deanly.solanarpcj.core.AccountMeta;
-import net.deanly.solanarpcj.core.PublicKey;
-import net.deanly.solanarpcj.core.TransactionInstruction;
+import net.deanly.solanarpcj.account.AccountMeta;
+import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.transaction.TransactionInstruction;
 
 import java.util.List;
 

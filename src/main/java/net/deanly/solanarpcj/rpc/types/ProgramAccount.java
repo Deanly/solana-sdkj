@@ -8,7 +8,7 @@ import com.squareup.moshi.Json;
 
 import lombok.Getter;
 import lombok.ToString;
-import net.deanly.solanarpcj.core.PublicKey;
+import net.deanly.solanarpcj.account.PublicKey;
 import net.deanly.solanarpcj.rpc.types.config.RpcSendTransactionConfig.Encoding;
 
 import org.bitcoinj.core.Base58;

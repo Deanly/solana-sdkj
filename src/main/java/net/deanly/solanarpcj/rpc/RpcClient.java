@@ -159,13 +159,22 @@ public class RpcClient {
         try {
             Response response = httpClient.newCall(request).execute();
             final String result = response.body().string();
-            RpcResponse<T> rpcResult = resultAdapter.fromJson(result);
+            RpcResponse<T> rpcResponse = resultAdapter.fromJson(result);
 
-            if (rpcResult == null || rpcResult.getError() != null) {
-                throw new RpcException(rpcResult != null ? rpcResult.getError().getMessage() : "RPC response is null");
+            // Validate RpcResponse for errors
+            if (rpcResponse == null) {
+                throw new RpcException("Failed to parse RpcResponse: Response is null");
             }
 
-            return rpcResult.getResult();
+            if (rpcResponse.getError() != null) {
+                RpcResponse.Error error = rpcResponse.getError();
+                throw new RpcException(
+                        "RPC Error: " + error.getMessage(),
+                        (int) error.getCode() // Convert long to Integer for RpcException
+                );
+            }
+
+            return rpcResponse.getResult();
         } catch (SSLHandshakeException e) {
             this.httpClient = new OkHttpClient.Builder().build();
             throw new RpcException("SSL Handshake failed: " + e.getMessage());

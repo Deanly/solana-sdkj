@@ -17,7 +17,7 @@ import net.deanly.structlayout.type.FieldBase;
 public class SVLBlobField extends FieldBase<byte[]> implements DynamicSpanField {
 
     public SVLBlobField() {
-        super(0);
+        super(0, byte[].class);
     }
 
     @Override

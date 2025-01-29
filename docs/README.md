@@ -128,7 +128,7 @@ final OrderBook bids = solUsdcMarket.getBidOrderBook();
 ### Send a Transaction with Memo Program
 
 ```java
-// Create account from private key
+// Create KeyPair from private key
 final Account feePayer = new Account(Base58.decode(new String(data)));
 final Transaction transaction = new Transaction();
 

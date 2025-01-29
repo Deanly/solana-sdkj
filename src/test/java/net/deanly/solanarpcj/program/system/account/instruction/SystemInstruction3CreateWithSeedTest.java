@@ -1,0 +1,60 @@
+package net.deanly.solanarpcj.program.system.account.instruction;
+
+import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
+import net.deanly.solanarpcj.crypto.PublicKey;
+import net.deanly.structlayout.StructLayout;
+import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class SystemInstruction3CreateWithSeedTest {
+
+    @Test
+    void testCreateWithSeedInstructionEncoding() throws Exception {
+        // Arrange: Input data for test
+        PublicKey payerAccount = new PublicKey("11111111111111111111111111111111");
+        PublicKey newAccount = new PublicKey("SecondPubey22222222222222222222222222222222");
+        PublicKey baseAccount = new PublicKey("ThirdPubkey33333333333333333333333333333333");
+        PublicKey ownerProgramId = new PublicKey("FourthPubke44444444444444444444444444444444");
+
+        String seed = "sample-seed";
+        long lamports = 1_000_000L;
+        long space = 2048L;
+
+        List<AccountMeta> keys = Arrays.asList(
+                new AccountMeta(payerAccount, true, true), // Funding account
+                new AccountMeta(newAccount, false, true)  // Created account
+        );
+
+        // Create instruction instance
+        SystemInstruction3CreateWithSeed instruction = new SystemInstruction3CreateWithSeed(
+                keys, baseAccount, seed, lamports, space, ownerProgramId
+        );
+
+        // Act: Encode the instruction
+        byte[] encodedData = instruction.getData();
+
+        // Assert: Validate encoding is correct
+        assertNotNull(encodedData);
+        // Calculate expected size: u32 (4) + PublicKey (32) + seed (13 with length prefix) + s64 (8) + s64 (8) + PublicKey (32)
+        assertEquals(97, encodedData.length);
+
+        // Decode the instruction back to verify round-trip
+        SystemInstruction3CreateWithSeed decodedInstruction = StructLayout.decode(
+                encodedData, SystemInstruction3CreateWithSeed.class
+        );
+
+        // Validate the decoded instruction matches the original
+        assertEquals(instruction.getBase(), decodedInstruction.getBase());
+        assertEquals(instruction.getSeed(), decodedInstruction.getSeed());
+        assertEquals(instruction.getLamports(), decodedInstruction.getLamports());
+        assertEquals(instruction.getSpace(), decodedInstruction.getSpace());
+        assertEquals(instruction.getProgramId(), decodedInstruction.getProgramId());
+        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
+        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
+        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
+    }
+}

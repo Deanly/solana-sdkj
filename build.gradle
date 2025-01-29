@@ -20,24 +20,15 @@ repositories {
 }
 
 dependencies {
-    // 메인 의존성
-    api('org.bitcoinj:bitcoinj-core:0.16.4') {
-        exclude group: 'com.google.protobuf', module: 'protobuf-javalite'
-        exclude group: 'com.google.guava', module: 'guava'
-        exclude group: 'org.bouncycastle', module: 'bcprov-jdk15to18'
-    }
     api 'org.bouncycastle:bcprov-jdk15to18:1.79'
-    api 'com.google.guava:guava:33.4.0-jre'
-    api 'com.google.protobuf:protobuf-javalite:4.29.2'
+//    api 'com.google.guava:guava:33.4.0-jre'
     api 'com.squareup.okhttp3:okhttp:4.12.0'
     api 'com.squareup.moshi:moshi:1.15.2'
     api 'com.squareup.moshi:moshi-adapters:1.15.2'
     api 'org.java-websocket:Java-WebSocket:1.6.0'
     api 'org.projectlombok:lombok:1.18.36'
-    api 'net.i2p.crypto:eddsa:0.3.0'
-    api 'com.fasterxml.jackson.core:jackson-core:2.18.2'
-    api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-    api 'com.syntifi.near:borshj:0.1.0'
+//    api 'com.fasterxml.jackson.core:jackson-core:2.18.2'
+//    api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
     implementation project(":struct-layout")
 //    implementation 'net.deanly:struct-layout:0.1.1'

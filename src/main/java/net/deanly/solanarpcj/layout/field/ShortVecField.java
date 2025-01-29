@@ -10,7 +10,7 @@ public class ShortVecField extends FieldBase<Integer> implements DynamicSpanFiel
 
     public ShortVecField() {
         // 기본 생성자: 초기 span은 0으로 설정
-        super(0);
+        super(0, Integer.class);
     }
 
     @Override

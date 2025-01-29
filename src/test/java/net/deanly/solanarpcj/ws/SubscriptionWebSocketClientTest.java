@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.ws;
 
+import net.deanly.solanarpcj.rpc.ws.SubscriptionWebSocketClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;

@@ -4,7 +4,7 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.crypto.PublicKey;
 
 import java.util.AbstractMap;
 

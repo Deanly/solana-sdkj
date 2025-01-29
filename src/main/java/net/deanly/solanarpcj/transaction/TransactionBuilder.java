@@ -1,6 +1,7 @@
 package net.deanly.solanarpcj.transaction;
 
-import net.deanly.solanarpcj.account.Account;
+import net.deanly.solanarpcj.crypto.KeyPair;
+import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,7 +67,7 @@ public class TransactionBuilder {
      * @throws NullPointerException if signers is null
      * @throws IllegalArgumentException if signers is empty
      */
-    public TransactionBuilder setSigners(List<Account> signers) {
+    public TransactionBuilder setSigners(List<KeyPair> signers) {
         Objects.requireNonNull(signers, "Signers list cannot be null");
         if (signers.isEmpty()) {
             throw new IllegalArgumentException("Signers list cannot be empty");

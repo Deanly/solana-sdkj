@@ -1,7 +1,7 @@
 package net.deanly.solanarpcj.rpc;
 
-import net.deanly.solanarpcj.account.Account;
-import net.deanly.solanarpcj.account.PublicKey;
+import net.deanly.solanarpcj.crypto.KeyPair;
+import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.transaction.Transaction;
 import net.deanly.solanarpcj.rpc.types.*;
 import net.deanly.solanarpcj.rpc.types.config.*;
@@ -9,8 +9,9 @@ import net.deanly.solanarpcj.rpc.types.RpcResultTypes.ValueLong;
 import net.deanly.solanarpcj.rpc.types.TokenResultObjects.TokenAccount;
 import net.deanly.solanarpcj.rpc.types.TokenResultObjects.TokenAmountInfo;
 import net.deanly.solanarpcj.rpc.types.config.RpcSendTransactionConfig.Encoding;
-import net.deanly.solanarpcj.ws.SubscriptionWebSocketClient;
-import net.deanly.solanarpcj.ws.listeners.NotificationEventListener;
+import net.deanly.solanarpcj.transaction.TransactionSignature;
+import net.deanly.solanarpcj.rpc.ws.SubscriptionWebSocketClient;
+import net.deanly.solanarpcj.rpc.ws.listeners.NotificationEventListener;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -52,16 +53,16 @@ public class RpcApi {
         return client.call("getRecentBlockhash", params, RecentBlockhash.class).getValue().getBlockhash();
     }
 
-    public String sendTransaction(Transaction transaction, Account signer, String recentBlockHash) throws
+    public TransactionSignature sendTransaction(Transaction transaction, KeyPair signer, String recentBlockHash) throws
             RpcException {
         return sendTransaction(transaction, Collections.singletonList(signer), recentBlockHash);
     }
 
-    public String sendTransaction(Transaction transaction, Account signer) throws RpcException {
+    public TransactionSignature sendTransaction(Transaction transaction, KeyPair signer) throws RpcException {
         return sendTransaction(transaction, Collections.singletonList(signer), null);
     }
 
-    public String sendTransaction(Transaction transaction) throws RpcException {
+    public TransactionSignature sendTransaction(Transaction transaction) throws RpcException {
         return sendTransaction(transaction, Collections.emptyList(), null);
     }
 
@@ -75,8 +76,8 @@ public class RpcApi {
      * @return The transaction ID as a string.
      * @throws RpcException If an error occurs during the RPC call.
      */
-    public String sendTransaction(Transaction transaction, List<Account> signers, String recentBlockHash,
-                                  RpcSendTransactionConfig rpcSendTransactionConfig)
+    public TransactionSignature sendTransaction(Transaction transaction, List<KeyPair> signers, String recentBlockHash,
+                                                RpcSendTransactionConfig rpcSendTransactionConfig)
             throws RpcException {
         if (recentBlockHash == null) {
             recentBlockHash = getLatestBlockhash().getValue().getBlockhash();
@@ -96,7 +97,7 @@ public class RpcApi {
         params.add(base64Trx);
         params.add(rpcSendTransactionConfig);
 
-        return client.call("sendTransaction", params, String.class);
+        return new TransactionSignature(client.call("sendTransaction", params, String.class));
     }
 
     /**
@@ -109,7 +110,7 @@ public class RpcApi {
      * @return the result of the transaction
      * @throws RpcException    if an error occurs during the RPC call
      */
-    public String sendTransaction(Transaction transaction, List<Account> signers, String recentBlockHash)
+    public TransactionSignature sendTransaction(Transaction transaction, List<KeyPair> signers, String recentBlockHash)
             throws RpcException {
         return sendTransaction(transaction, signers, recentBlockHash, new RpcSendTransactionConfig());
     }
@@ -122,7 +123,7 @@ public class RpcApi {
      * @return The transaction ID as a string.
      * @throws RpcException If an error occurs during the RPC call.
      */
-    public String sendRawTransaction(String encodeSerializedTransaction, RpcSendTransactionConfig rpcSendTransactionConfig)
+    public TransactionSignature sendRawTransaction(String encodeSerializedTransaction, RpcSendTransactionConfig rpcSendTransactionConfig)
             throws RpcException {
 
         List<Object> params = new ArrayList<>();
@@ -130,12 +131,12 @@ public class RpcApi {
         params.add(encodeSerializedTransaction);
         params.add(rpcSendTransactionConfig);
 
-        return client.call("sendTransaction", params, String.class);
+        return new TransactionSignature(client.call("sendTransaction", params, String.class));
     }
 
-    public void sendAndConfirmTransaction(Transaction transaction, List<Account> signers,
+    public void sendAndConfirmTransaction(Transaction transaction, List<KeyPair> signers,
                                           NotificationEventListener listener) throws RpcException {
-        String signature = sendTransaction(transaction, signers, null);
+        TransactionSignature signature = sendTransaction(transaction, signers, null);
 
         SubscriptionWebSocketClient subClient = SubscriptionWebSocketClient.getInstance(client.getEndpoint());
         subClient.signatureSubscribe(signature, listener);
@@ -143,7 +144,7 @@ public class RpcApi {
 
     public void sendAndConfirmRawTransaction(String encodeSerializedTransaction, RpcSendTransactionConfig rpcSendTransactionConfig,
                                              NotificationEventListener listener) throws RpcException {
-        String signature = sendRawTransaction(encodeSerializedTransaction, rpcSendTransactionConfig);
+        TransactionSignature signature = sendRawTransaction(encodeSerializedTransaction, rpcSendTransactionConfig);
 
         SubscriptionWebSocketClient subClient = SubscriptionWebSocketClient.getInstance(client.getEndpoint());
         subClient.signatureSubscribe(signature, listener);
@@ -164,13 +165,13 @@ public class RpcApi {
         return client.call("getBalance", params, ValueLong.class).getValue();
     }
 
-    public ConfirmedTransaction getTransaction(String signature) throws RpcException {
+    public ConfirmedTransaction getTransaction(TransactionSignature signature) throws RpcException {
         return getTransaction(signature, null);
     }
 
-    public ConfirmedTransaction getTransaction(String signature, Commitment commitment) throws RpcException {
+    public ConfirmedTransaction getTransaction(TransactionSignature signature, Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
-        params.add(signature);
+        params.add(signature.toString());
         Map<String, Object> parameterMap = new HashMap<>();
 
         if (commitment != null) {

@@ -1,9 +1,21 @@
 package net.deanly.solanarpcj.rpc;
 
+import lombok.Getter;
+
+@Getter
 public class RpcException extends Exception {
-    private final static long serialVersionUID = 8315999767009642193L;
+    private static final long serialVersionUID = 8315999767009642193L;
+
+    private final Integer errorCode;
 
     public RpcException(String message) {
         super(message);
+        this.errorCode = null; // No error code provided
     }
+
+    public RpcException(String message, Integer errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+    }
+
 }

@@ -1,16 +1,23 @@
 package net.deanly.solanarpcj.transaction;
 
-import net.deanly.solanarpcj.account.Account;
-import net.deanly.solanarpcj.account.PublicKey;
-import org.bitcoinj.core.Base58;
-import net.deanly.solanarpcj.message.MessageV0;
-import net.deanly.solanarpcj.message.VersionedMessage;
-import net.deanly.solanarpcj.message.Message;
-import net.deanly.solanarpcj.account.alt.AddressLookupTableAccount;
-import net.deanly.solanarpcj.utils.ShortvecEncoding;
-import net.deanly.solanarpcj.utils.TweetNaclFast;
+import net.deanly.solanarpcj.crypto.KeyPair;
+import net.deanly.solanarpcj.crypto.PublicKey;
+import net.deanly.solanarpcj.crypto.Ed25519Signer;
+import net.deanly.solanarpcj.crypto.Base58;
+import net.deanly.solanarpcj.layout.field.Base58Bytes64Field;
+import net.deanly.solanarpcj.layout.field.ShortVecField;
+import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
+import net.deanly.solanarpcj.transaction.message.MessageV0;
+import net.deanly.solanarpcj.transaction.message.VersionedMessage;
+import net.deanly.solanarpcj.transaction.message.Message;
+import net.deanly.solanarpcj.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solanarpcj.transaction.codec.ShortvecEncoding;
+import net.deanly.structlayout.StructLayout;
+import net.deanly.structlayout.annotation.StructObjectField;
+import net.deanly.structlayout.annotation.StructSequenceField;
 
 import java.nio.ByteBuffer;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,8 +34,13 @@ public class Transaction {
     private final List<AddressLookupTableAccount> addressTableLookups;
     private String recentBlockhash;
     private PublicKey feePayer;
+
+    @StructObjectField(order = 2)
     private VersionedMessage message;
+
     private byte[] serializedMessage;
+
+    @StructSequenceField(order = 1, elementType = Base58Bytes64Field.class, lengthType = ShortVecField.class)
     private final List<String> signatures;
 
     /**
@@ -90,7 +102,7 @@ public class Transaction {
      * @param signer The account to sign the transaction
      * @throws NullPointerException if the signer is null
      */
-    public void sign(Account signer) {
+    public void sign(KeyPair signer) {
         sign(List.of(Objects.requireNonNull(signer, "Signer cannot be null"))); // Add input validation
     }
 
@@ -100,7 +112,7 @@ public class Transaction {
      * @param signers The list of accounts to sign the transaction
      * @throws IllegalArgumentException if no signers are provided
      */
-    public void sign(List<Account> signers) {
+    public void sign(List<KeyPair> signers) {
         if (signers == null || signers.isEmpty()) {
             throw new IllegalArgumentException("No signers provided");
         }
@@ -117,13 +129,12 @@ public class Transaction {
         serializedMessage = message.serialize();
 
         signatures.clear();
-        for (Account signer : signers) {
+        for (KeyPair signer : signers) {
             try {
-                TweetNaclFast.Signature signatureProvider = new TweetNaclFast.Signature(new byte[0], signer.getSecretKey());
-                byte[] signature = signatureProvider.detached(serializedMessage);
+                byte[] signature = Ed25519Signer.sign(serializedMessage, signer.getPrivateKeyBytes());
                 signatures.add(Base58.encode(signature));
-            } catch (Exception e) {
-                throw new RuntimeException("Error signing transaction", e); // Improve exception handling
+            } catch (GeneralSecurityException e) {
+                throw new RuntimeException("Error signing transaction", e);
             }
         }
     }
@@ -230,22 +241,23 @@ public class Transaction {
      * Deserializes a transaction from a byte array.
      */
     public static Transaction deserialize(byte[] serializedTransaction) {
-        ByteBuffer buffer = ByteBuffer.wrap(serializedTransaction);
-
-        int signatureCount = ShortvecEncoding.decodeLength(buffer);
-        List<String> signatures = new ArrayList<>();
-        for (int i = 0; i < signatureCount; i++) {
-            byte[] signatureBytes = new byte[SIGNATURE_LENGTH];
-            buffer.get(signatureBytes);
-            signatures.add(Base58.encode(signatureBytes));
-        }
-
-        VersionedMessage message = VersionedMessage.deserialize(buffer.array());
-
-        Transaction transaction = new Transaction();
-        transaction.message = message;
-        transaction.signatures.addAll(signatures);
-        return transaction;
+//        ByteBuffer buffer = ByteBuffer.wrap(serializedTransaction);
+//
+//        int signatureCount = ShortvecEncoding.decodeLength(buffer);
+//        List<String> signatures = new ArrayList<>();
+//        for (int i = 0; i < signatureCount; i++) {
+//            byte[] signatureBytes = new byte[SIGNATURE_LENGTH];
+//            buffer.get(signatureBytes);
+//            signatures.add(Base58.encode(signatureBytes));
+//        }
+//
+//        VersionedMessage message = VersionedMessage.deserialize(buffer.array());
+//
+//        Transaction transaction = new Transaction();
+//        transaction.message = message;
+//        transaction.signatures.addAll(signatures);
+//        return transaction;
+        return StructLayout.decode(serializedTransaction, Transaction.class);
     }
 
     @Override

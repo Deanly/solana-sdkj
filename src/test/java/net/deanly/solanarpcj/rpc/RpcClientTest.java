@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.rpc;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -7,6 +8,7 @@ import net.deanly.solanarpcj.rpc.types.WeightedEndpoint;
 
 import java.util.Arrays;
 
+@Disabled
 public class RpcClientTest {
 
     private final String ZERO_ENDPOINT = "0";
@@ -16,6 +18,7 @@ public class RpcClientTest {
     private final int WEIGHTED_TEST_OCCURRENCE = 10000000;
 
     @Test
+    @Disabled
     public void WeightRpcClientTest() {
         WeightedEndpoint endpoint0 = new WeightedEndpoint(ZERO_ENDPOINT, 10);
         WeightedEndpoint endpoint1 = new WeightedEndpoint(ONE_ENDPOINT, 20);

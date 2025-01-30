@@ -1,6 +1,7 @@
 package net.deanly.solanarpcj.ws;
 
 import net.deanly.solanarpcj.rpc.ws.SubscriptionWebSocketClient;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Test class for SubscriptionWebSocketClient using a real devnet connection
  */
+@Disabled
 class SubscriptionWebSocketClientTest {
 
     private static final String DEVNET_WS_URL = "wss://api.devnet.solana.com";

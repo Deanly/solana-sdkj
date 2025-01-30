@@ -21,14 +21,11 @@ repositories {
 
 dependencies {
     api 'org.bouncycastle:bcprov-jdk15to18:1.79'
-//    api 'com.google.guava:guava:33.4.0-jre'
     api 'com.squareup.okhttp3:okhttp:4.12.0'
     api 'com.squareup.moshi:moshi:1.15.2'
     api 'com.squareup.moshi:moshi-adapters:1.15.2'
     api 'org.java-websocket:Java-WebSocket:1.6.0'
     api 'org.projectlombok:lombok:1.18.36'
-//    api 'com.fasterxml.jackson.core:jackson-core:2.18.2'
-//    api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 
     implementation project(":struct-layout")
 //    implementation 'net.deanly:struct-layout:0.1.1'
@@ -45,12 +42,16 @@ dependencies {
     testImplementation 'org.slf4j:slf4j-api:2.0.16'
     testRuntimeOnly 'ch.qos.logback:logback-classic:1.4.12'
     testImplementation 'org.mockito:mockito-core:5.14.2'
+    testImplementation 'org.javassist:javassist:3.30.2-GA'
 }
 
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'    // UTF-8 인코딩 설정
+    options.encoding = 'UTF-8'
 }
 
 tasks.test {
-    useJUnitPlatform()            // JUnit 5 사용
+    useJUnitPlatform()
+    jvmArgs += [
+            "--add-opens", "java.base/java.lang=ALL-UNNAMED"
+    ]
 }

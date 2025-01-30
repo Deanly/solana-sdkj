@@ -168,4 +168,30 @@ public class PublicKeyTest {
         assertTrue(pda.getNonce() >= 0 && pda.getNonce() <= 255);
     }
 
+    @Test
+    public void testValidEd25519Key() {
+        String validBase58Key = "8VBafTNv1F8k5Bg7DTVwhitw3MGAMTmekHsgLuMJxLC8";
+        PublicKey key = new PublicKey(validBase58Key);
+
+        assertTrue(key.isOnCurve());
+        assertNotNull(key.toByteArray());
+        assertEquals(validBase58Key, key.toBase58());
+    }
+
+    @Test
+    public void testOffCurveKey() {
+        String offCurveBase58Key = "11111111111111111111111111111111";
+        PublicKey key = new PublicKey(offCurveBase58Key);
+
+        assertFalse(key.isOnCurve()); // Curve 위에 있지 않음
+        assertNotNull(key.toByteArray());
+        assertEquals(offCurveBase58Key, key.toBase58());
+    }
+
+    @Test
+    public void testInvalidKeyLength() {
+        String tooShortKey = "12345678";
+        assertThrows(IllegalArgumentException.class, () -> new PublicKey(tooShortKey));
+    }
+
 }

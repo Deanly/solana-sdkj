@@ -50,7 +50,8 @@ public class PublicKeyGenerator {
     private static String adjustInputTo32Bytes(String input) {
         while (true) {
             // Decode the input into bytes
-            byte[] decodedBytes = decodeBase58(input);
+            byte[] decodedBytes = Base58.decode(input);
+            System.out.println("Input: " + decodedBytes.length + " bytes - " + input);
 
             if (decodedBytes.length == PUBLIC_KEY_LENGTH) {
                 // If the byte array is exactly 32 bytes, stop adjusting
@@ -133,12 +134,12 @@ public class PublicKeyGenerator {
     public void test() {
         // Example usages
         String dummyKey1 = createDummyPublicKey("HelloWor1d");
-        System.out.println("Dummy PublicKey 1: " + dummyKey1 + ", bytes: " + decodeBase58(dummyKey1).length);
+        System.out.println("Dummy PublicKey 1: " + dummyKey1 + ", bytes: " + Base58.decode(dummyKey1).length);
 
         String dummyKey2 = createDummyPublicKey("ThisIsAReallyLongStringThatShouldBeTruncatedOrPaddedToFit32Bytes");
-        System.out.println("Dummy PublicKey 2: " + dummyKey2 + ", bytes: " + decodeBase58(dummyKey2).length);
+        System.out.println("Dummy PublicKey 2: " + dummyKey2 + ", bytes: " + Base58.decode(dummyKey2).length);
 
         String dummyKey3 = createDummyPublicKey("123");
-        System.out.println("Dummy PublicKey 3: " + dummyKey3 + ", bytes: " + decodeBase58(dummyKey3).length);
+        System.out.println("Dummy PublicKey 3: " + dummyKey3 + ", bytes: " + Base58.decode(dummyKey3).length);
     }
 }

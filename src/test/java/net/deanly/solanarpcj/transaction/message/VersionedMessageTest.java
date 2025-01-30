@@ -1,9 +1,9 @@
-package net.deanly.solanarpcj.message;
+package net.deanly.solanarpcj.transaction.message;
 
-import net.deanly.solanarpcj.account.PublicKey;
-import net.deanly.solanarpcj.message.meta.MessageAddressTableLookup;
-import net.deanly.solanarpcj.message.meta.MessageCompiledInstruction;
-import net.deanly.solanarpcj.message.meta.MessageHeader;
+import net.deanly.solanarpcj.crypto.PublicKey;
+import net.deanly.solanarpcj.transaction.message.meta.MessageAddressTableLookup;
+import net.deanly.solanarpcj.transaction.message.meta.MessageCompiledInstruction;
+import net.deanly.solanarpcj.transaction.message.meta.MessageHeader;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 

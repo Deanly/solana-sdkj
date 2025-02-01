@@ -14,10 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Represents the UiAmountToAmount instruction (index 24) for the Solana Token Program.
- * Converts a UI-friendly formatted token amount to a raw amount (`u64`).
- */
+ /// Represents the UiAmountToAmount instruction (index 24) for the Solana Token Program.
+ /// Converts a UI-friendly formatted token amount to a raw amount (`u64`).
+ ///
+ /// Convert a `UiAmount` of tokens to a little-endian `u64` raw Amount,
+ /// using the given mint. In this version of the program, the mint can
+ /// only specify the number of decimals.
+ ///
+ /// Return data can be fetched using `sol_get_return_data` and deserializing
+ /// the return data as a little-endian `u64`.
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,10 +42,9 @@ public class TokenInstruction24UiAmountToAmount extends SplTokenProgram.Base imp
     @StructField(order = 2, type = UTF8StringField.class)
     private String uiAmount;
 
-    /**
-     * The list of accounts required for this instruction.
-     * This is set via the setKeys() method.
-     */
+    /// Accounts expected by this instruction:
+    ///
+    ///   0. `[]` The mint to calculate for
     private List<AccountMeta> keys = new ArrayList<>();
 
     /**
@@ -48,8 +52,10 @@ public class TokenInstruction24UiAmountToAmount extends SplTokenProgram.Base imp
      *
      * @param mint The PublicKey of the mint account.
      */
-    public void setKeys(@NonNull PublicKey mint) {
-        Objects.requireNonNull(mint, "Mint PublicKey cannot be null");
+    public void setKeys(PublicKey mint) {
+        if (mint == null) {
+            throw new IllegalArgumentException("Mint PublicKey cannot be null");
+        }
 
         // Configure the mint account: read-only and a non-signer.
         this.keys = new ArrayList<>();

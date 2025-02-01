@@ -84,8 +84,8 @@ public class SystemInstruction9AllocateWithSeed extends SystemProgram.Base imple
 
         // Set the keys (order and flags based on Typescript implementation)
         this.keys = List.of(
-                new AccountMeta(accountPubkey, true, false), // Account to allocate (writable, not signer)
-                new AccountMeta(basePubkey, false, true)    // Base public key (signer, not writable)
+                new AccountMeta(accountPubkey, false, true), // Account to allocate (writable, not signer)
+                new AccountMeta(basePubkey, true, false)    // Base public key (signer, not writable)
         );
     }
 

@@ -6,7 +6,7 @@ import lombok.ToString;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.layout.Struct;
 import net.deanly.solanarpcj.layout.field.AccountStateEnumField;
-import net.deanly.solanarpcj.layout.field.PublicKeyCOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solanarpcj.layout.field.PublicKeyField;
 import net.deanly.solanarpcj.layout.field.UInt64LECOptionField;
 import net.deanly.solanarpcj.program.spl.token.basic.type.AccountStateEnum;
@@ -32,7 +32,7 @@ public class AccountState extends Struct {
     @StructField(order = 3, type = UInt64LEField.class)
     BigInteger amount; // 보유한 토큰 수량 (u64 - 8 bytes)
 
-    @StructField(order = 4, type = PublicKeyCOptionField.class)
+    @StructField(order = 4, type = PublicKeyBorshOptionField.class)
     PublicKey delegate; // (Optional) 위임된 토큰 계정 (32 bytes, COption)
 
     @StructField(order = 5, type = AccountStateEnumField.class)
@@ -44,7 +44,7 @@ public class AccountState extends Struct {
     @StructField(order = 7, type = UInt64LEField.class)
     BigInteger delegatedAmount; // 위임된 토큰 수량 (8 bytes)
 
-    @StructField(order = 8, type = PublicKeyCOptionField.class)
+    @StructField(order = 8, type = PublicKeyBorshOptionField.class)
     PublicKey closeAuthority; // (Optional) 계정을 닫을 수 있는 사용자 권한 (32 bytes, COption)
 
     public static AccountState unpack(byte[] bytes) {

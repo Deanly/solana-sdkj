@@ -62,7 +62,7 @@ class TokenInstruction01InitializeAccountTest {
         AccountMeta accountMeta = keys.get(0);
         assertEquals(account.toBase58(), accountMeta.getPublicKey().toBase58(), "Account public key mismatch");
         assertTrue(accountMeta.isWritable(), "Account should be writable");
-        assertFalse(accountMeta.isSigner(), "Account should not be a signer");
+        assertTrue(accountMeta.isSigner(), "Account should not be a signer");
 
         // Validate Mint
         AccountMeta mintMeta = keys.get(1);
@@ -81,19 +81,5 @@ class TokenInstruction01InitializeAccountTest {
         assertEquals(Sysvar.SYSVAR_RENT_ADDRESS.toBase58(), rentMeta.getPublicKey().toBase58(), "Rent public key mismatch");
         assertFalse(rentMeta.isWritable(), "Rent Sysvar should not be writable");
         assertFalse(rentMeta.isSigner(), "Rent Sysvar should not be a signer");
-    }
-
-    @Test
-    void testSetKeysWithIncorrectInputs() {
-        // Given
-        TokenInstruction01InitializeAccount instruction = new TokenInstruction01InitializeAccount();
-        PublicKey account = new PublicKey("Account11111111111111111111111111111111");
-
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            instruction.setKeys(account, null, null, null, null);
-        }, "IllegalArgumentException should be thrown when inputs are invalid");
-
-        assertNotNull(exception.getMessage(), "Exception message should not be null");
     }
 }

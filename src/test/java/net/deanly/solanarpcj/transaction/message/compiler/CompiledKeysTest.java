@@ -9,6 +9,7 @@ import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
 import net.deanly.solanarpcj.transaction.message.meta.LoadedAddresses;
 import net.deanly.solanarpcj.transaction.message.meta.MessageAddressTableLookup;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ class CompiledKeysTest {
         PublicKey programId = new PublicKey("SecondPubey22222222222222222222222222222222");
         PublicKey accountKey = new PublicKey("ThirdPubkey33333333333333333333333333333333");
 
-        AccountMeta accountMeta = new AccountMeta(accountKey, false, true);
+        AccountMeta accountMeta = new AccountMeta(accountKey, true, false);
         TransactionInstruction instruction = new TransactionInstructionImpl(
                 programId, Collections.singletonList(accountMeta), new byte[]{}
         );
@@ -88,7 +89,7 @@ class CompiledKeysTest {
     @Test
     void testCompileThrowsIfPayerIsNull() {
         PublicKey programId = new PublicKey("SecondPubey22222222222222222222222222222222");
-        AccountMeta accountMeta = new AccountMeta(programId, false, true);
+        AccountMeta accountMeta = new AccountMeta(programId, true, false);
         TransactionInstruction instruction = new TransactionInstructionImpl(
                 programId, Collections.singletonList(accountMeta), new byte[]{}
         );
@@ -136,7 +137,7 @@ class CompiledKeysTest {
 
         AddressLookupTableAccount.State atlState = new AddressLookupTableAccount.State(
                 1, // typeIndex
-                Long.MAX_VALUE, // deactivationSlot
+                new BigInteger("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
                 0, // lastExtendedSlot
                 0, // lastExtendedStartIndex
                 null, // 권한(authority): 현재는 없으므로 null

@@ -24,7 +24,8 @@ class ATLInstruction2ExtendLookupTableTest {
 
         // Create instruction
         ATLInstruction2ExtendLookupTable instruction = new ATLInstruction2ExtendLookupTable();
-        instruction.setKeys(lookupTable, authority, payer, addresses);
+        instruction.setKeys(lookupTable, authority, payer);
+        instruction.setAddresses(addresses);
 
         // Validate instruction data
         byte[] encodedData = instruction.getData();
@@ -39,7 +40,7 @@ class ATLInstruction2ExtendLookupTableTest {
         assertEquals(addresses, decodedInstruction.getAddresses());
 
         // Validate keys
-        assertEquals(3, instruction.getKeys().size());
+        assertEquals(4, instruction.getKeys().size());
 
         // Validate Lookup Table key
         assertEquals(lookupTable.toBase58(), instruction.getKeys().get(0).getPublicKey().toBase58());

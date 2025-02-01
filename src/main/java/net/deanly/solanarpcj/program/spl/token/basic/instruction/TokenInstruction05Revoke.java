@@ -52,12 +52,12 @@ public class TokenInstruction05Revoke extends SplTokenProgram.Base implements Tr
         this.keys.clear();
 
         // Configure AccountMetas
-        this.keys.add(new AccountMeta(source, true, false)); // Source: Writable, not signer.
-        this.keys.add(new AccountMeta(owner, false, true)); // Owner: Read-only, signer.
+        this.keys.add(new AccountMeta(source, false, true)); // Source: Writable, not signer.
+        this.keys.add(new AccountMeta(owner, true, false)); // Owner: Read-only, signer.
 
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // MultiSigners: Read-only, signer.
+                this.keys.add(new AccountMeta(signer, true, false)); // MultiSigners: Read-only, signer.
             }
         }
     }

@@ -24,9 +24,12 @@ class SystemInstruction8AllocateTest {
         long space = 4096L; // Allocate 4096 bytes of space
 
         // Create instruction instance
-        SystemInstruction8Allocate instruction = new SystemInstruction8Allocate(
-                keys, space
+        SystemInstruction8Allocate instruction = SystemInstruction8Allocate.create(
+                targetAccount, space
         );
+
+        assertEquals(1, instruction.getKeys().size());
+        assertEquals(targetAccount, instruction.getKeys().get(0).getPublicKey());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -43,7 +46,5 @@ class SystemInstruction8AllocateTest {
 
         // Validate the decoded instruction matches the original
         assertEquals(instruction.getSpace(), decodedInstruction.getSpace());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
     }
 }

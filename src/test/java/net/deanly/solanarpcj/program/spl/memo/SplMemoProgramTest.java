@@ -7,6 +7,7 @@ import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class SplMemoProgramTest {
 
@@ -15,7 +16,7 @@ public class SplMemoProgramTest {
         PublicKey account = new PublicKey("11111111111111111111111111111111");
         String memo = "Test memo";
 
-        TransactionInstruction instruction = SplMemoProgram.write(account, memo);
+        TransactionInstruction instruction = SplMemoProgram.write(memo, List.of(account));
 
         assertNotNull(instruction);
         assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId());
@@ -28,19 +29,19 @@ public class SplMemoProgramTest {
 
     @Test
     public void testWriteUtf8_NullAccount() {
-        assertThrows(IllegalArgumentException.class, () -> SplMemoProgram.write(null, "Test memo"));
+        SplMemoProgram.write("Test memo", null);
     }
 
     @Test
     public void testWriteUtf8_NullMemo() {
         PublicKey account = new PublicKey("11111111111111111111111111111111");
-        assertThrows(IllegalArgumentException.class, () -> SplMemoProgram.write(account, null));
+        assertThrows(IllegalArgumentException.class, () -> SplMemoProgram.write(null, List.of(account)));
     }
 
     @Test
     public void testWriteUtf8_EmptyMemo() {
         PublicKey account = new PublicKey("11111111111111111111111111111111");
-        assertThrows(IllegalArgumentException.class, () -> SplMemoProgram.write(account, ""));
+        assertThrows(IllegalArgumentException.class, () -> SplMemoProgram.write("", List.of(account)));
     }
 
     @Test
@@ -48,7 +49,7 @@ public class SplMemoProgramTest {
         PublicKey account = new PublicKey("11111111111111111111111111111111");
         String longMemo = String.join("", java.util.Collections.nCopies(1000, "A"));
 
-        TransactionInstruction instruction = SplMemoProgram.write(account, longMemo);
+        TransactionInstruction instruction = SplMemoProgram.write(longMemo, List.of(account));
 
         assertNotNull(instruction);
         assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId());

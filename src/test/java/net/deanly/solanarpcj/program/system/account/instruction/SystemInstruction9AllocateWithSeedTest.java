@@ -26,9 +26,13 @@ class SystemInstruction9AllocateWithSeedTest {
         );
 
         // Create instruction instance
-        SystemInstruction9AllocateWithSeed instruction = new SystemInstruction9AllocateWithSeed(
-                keys, base, seed, space, programId
+        SystemInstruction9AllocateWithSeed instruction = SystemInstruction9AllocateWithSeed.create(
+                derivedAccount, base, seed, space, programId
         );
+
+        assertEquals(2, instruction.getKeys().size());
+        assertEquals(derivedAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(base, instruction.getKeys().get(1).getPublicKey());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -49,7 +53,5 @@ class SystemInstruction9AllocateWithSeedTest {
         assertEquals(instruction.getSeed(), decodedInstruction.getSeed());
         assertEquals(instruction.getSpace(), decodedInstruction.getSpace());
         assertEquals(instruction.getProgramId(), decodedInstruction.getProgramId());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
     }
 }

@@ -60,7 +60,7 @@ public class SystemInstruction2Transfer extends SystemProgram.Base implements Tr
         // Configure account metadata based on Typescript
         this.keys = List.of(
                 new AccountMeta(fromAccount, true, true), // sender (signer, writable)
-                new AccountMeta(toAccount, true, false)  // receiver (non-signer, writable)
+                new AccountMeta(toAccount, false, true)  // receiver (non-signer, writable)
         );
     }
 

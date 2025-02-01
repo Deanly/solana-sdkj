@@ -45,7 +45,7 @@ public class TokenInstruction17SyncNative extends SplTokenProgram.Base implement
 
         // Set keys with correct isWritable and isSigner flags
         this.keys = Collections.singletonList(
-                new AccountMeta(nativeAccount, true, false)  // Writable native account; not a signer
+                new AccountMeta(nativeAccount, false, true)  // Writable native account; not a signer
         );
     }
 

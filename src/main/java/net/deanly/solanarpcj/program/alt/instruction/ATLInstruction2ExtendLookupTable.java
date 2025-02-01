@@ -2,6 +2,7 @@ package net.deanly.solanarpcj.program.alt.instruction;
 
 import lombok.*;
 import net.deanly.solanarpcj.program.alt.AddressLookupTableProgram;
+import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.layout.field.PublicKeyField;
@@ -34,22 +35,47 @@ public class ATLInstruction2ExtendLookupTable extends AddressLookupTableProgram.
     private List<AccountMeta> keys; // Accounts involved in the transaction
 
     /**
-     * Sets the accounts required for the ExtendLookupTable instruction.
+     * Sets the keys for the ExtendLookupTable instruction.
      *
-     * @param lookupTable The public key of the lookup table to extend (Writable)
-     * @param authority   The public key of the authority (Signatory)
-     * @param payer       The public key of the payer (Optional, Writable and Signatory)
-     * @param addresses   The list of public keys to add to the lookup table
+     * @param lookupTable The public key of the lookup table to extend (Writable).
+     * @param authority   The public key of the authority (Signatory).
+     * @param payer       Optional. The public key of the payer (Writable and Signatory).
      */
-    public void setKeys(PublicKey lookupTable, PublicKey authority, PublicKey payer, List<PublicKey> addresses) {
-        this.addresses = new ArrayList<>(addresses); // Add addresses to the instruction
+    public void setKeys(PublicKey lookupTable, PublicKey authority, PublicKey payer) {
+        // Validation: Ensure major keys are not null
+        if (lookupTable == null) {
+            throw new IllegalArgumentException("LookupTable public key cannot be null.");
+        }
+        if (authority == null) {
+            throw new IllegalArgumentException("Authority public key cannot be null.");
+        }
 
         this.keys = new ArrayList<>();
-        this.keys.add(new AccountMeta(lookupTable, true, false)); // Lookup Table (Writable, Non-Signatory)
-        this.keys.add(new AccountMeta(authority, false, true));  // Authority (Signatory, Non-Writable)
+        this.keys.add(new AccountMeta(lookupTable, false, true)); // Lookup Table (Writable, Non-Signatory)
+        this.keys.add(new AccountMeta(authority, true, false));  // Authority (Non-Writable, Signatory)
         if (payer != null) {
-            this.keys.add(new AccountMeta(payer, true, true));   // Payer (Optional)
+            this.keys.add(new AccountMeta(payer, true, true));   // Payer (Writable, Signatory if provided)
+            this.keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false));
         }
+    }
+
+    /**
+     * Sets the addresses for the instruction.
+     *
+     * @param addresses The list of public keys to add to the lookup table.
+     */
+    public void setAddresses(List<PublicKey> addresses) {
+        // Validation: Ensure addresses are not null or empty
+        if (addresses == null || addresses.isEmpty()) {
+            throw new IllegalArgumentException("Addresses must be a non-empty list.");
+        }
+
+        // Optional: Maximum allowed addresses (example: 256)
+        if (addresses.size() > 256) {
+            throw new IllegalArgumentException("Addresses list exceeds maximum allowed size of 256.");
+        }
+
+        this.addresses = new ArrayList<>(addresses);
     }
 
     public byte[] getData() {
@@ -60,6 +86,26 @@ public class ATLInstruction2ExtendLookupTable extends AddressLookupTableProgram.
         ATLInstruction2ExtendLookupTable instruction =
                 StructLayout.decode(data, ATLInstruction2ExtendLookupTable.class);
         this.addresses = instruction.getAddresses();
-        this.keys = instruction.getKeys();
+    }
+
+    /**
+     * Static factory for creating a new instruction.
+     *
+     * @param lookupTable The public key of the lookup table to extend (Writable).
+     * @param authority   The public key of the authority (Signatory).
+     * @param payer       Optional. The public key of the payer (Writable and Signatory).
+     * @param addresses   The list of public keys to add to the lookup table.
+     * @return An instance of the instruction.
+     */
+    public static ATLInstruction2ExtendLookupTable create(
+            @NonNull PublicKey lookupTable,
+            @NonNull PublicKey authority,
+            PublicKey payer,
+            @NonNull List<PublicKey> addresses
+    ) {
+        ATLInstruction2ExtendLookupTable instance = new ATLInstruction2ExtendLookupTable();
+        instance.setKeys(lookupTable, authority, payer);      // Set keys
+        instance.setAddresses(addresses);                    // Set addresses
+        return instance;
     }
 }

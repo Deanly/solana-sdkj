@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.program.system.account.instruction;
 
+import net.deanly.solanarpcj.program.system.Sysvar;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
@@ -20,15 +21,21 @@ class SystemInstruction6InitializeNonceAccountTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(nonceAccount, true, true), // Nonce account
-                new AccountMeta(authorityAccount, false, true) // Authority account
+                new AccountMeta(authorityAccount, true, false) // Authority account
         );
 
         PublicKey authority = new PublicKey("ThirdPubkey33333333333333333333333333333333");
 
         // Create instruction instance
-        SystemInstruction6InitializeNonceAccount instruction = new SystemInstruction6InitializeNonceAccount(
-                keys, authority
+        SystemInstruction6InitializeNonceAccount instruction = SystemInstruction6InitializeNonceAccount.create(
+                nonceAccount, authorityAccount
         );
+
+        assertEquals(3, instruction.getKeys().size());
+        assertEquals(nonceAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, instruction.getKeys().get(1).getPublicKey());
+        assertEquals(Sysvar.SYSVAR_RENT_ADDRESS, instruction.getKeys().get(2).getPublicKey());
+        assertEquals(authorityAccount, instruction.getAuthority());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -45,8 +52,5 @@ class SystemInstruction6InitializeNonceAccountTest {
 
         // Validate the decoded instruction matches the original
         assertEquals(instruction.getAuthority(), decodedInstruction.getAuthority());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
-        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
     }
 }

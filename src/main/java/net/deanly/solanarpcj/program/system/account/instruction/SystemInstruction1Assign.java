@@ -40,7 +40,7 @@ public class SystemInstruction1Assign extends SystemProgram.Base implements Tran
     private List<AccountMeta> keys; // Accounts used for this instruction
 
     @StructField(order = 2, type = PublicKeyField.class)
-    private PublicKey programId; // The new owner program ID for the account
+    private PublicKey ownerProgramId; // The new owner program ID for the account
 
     @Override
     public byte[] getData() {
@@ -50,7 +50,7 @@ public class SystemInstruction1Assign extends SystemProgram.Base implements Tran
     public void setData(byte[] data) {
         SystemInstruction1Assign instruction = StructLayout.decode(data, SystemInstruction1Assign.class);
         this.keys = instruction.getKeys();
-        this.programId = instruction.getProgramId();
+        this.ownerProgramId = instruction.getProgramId();
     }
 
     /**
@@ -73,18 +73,18 @@ public class SystemInstruction1Assign extends SystemProgram.Base implements Tran
      * Static factory method to create a new `SystemInstruction1Assign` instance.
      *
      * @param owner     The public key of the account to assign a new owner.
-     * @param programId The public key of the program to assign as the owner.
+     * @param ownerProgramId The public key of the program to assign as the owner.
      * @return A fully initialized `SystemInstruction1Assign` object.
      */
-    public static SystemInstruction1Assign create(PublicKey owner, PublicKey programId) {
-        if (owner == null || programId == null) {
+    public static SystemInstruction1Assign create(PublicKey owner, PublicKey ownerProgramId) {
+        if (owner == null || ownerProgramId == null) {
             throw new IllegalArgumentException("Public key parameters cannot be null.");
         }
 
         // Creating a new instruction instance
         SystemInstruction1Assign instruction = new SystemInstruction1Assign();
         instruction.setKeys(owner);
-        instruction.setProgramId(programId);
+        instruction.setOwnerProgramId(ownerProgramId);
         return instruction;
     }
 

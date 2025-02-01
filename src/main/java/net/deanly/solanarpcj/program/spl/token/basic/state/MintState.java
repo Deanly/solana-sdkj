@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.layout.Struct;
-import net.deanly.solanarpcj.layout.field.PublicKeyCOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt64LEField;
@@ -20,7 +20,7 @@ import java.math.BigInteger;
 public class MintState extends Struct {
     public static final int BYTES_LENGTH = 82;
 
-    @StructField(order = 1, type = PublicKeyCOptionField.class)
+    @StructField(order = 1, type = PublicKeyBorshOptionField.class)
     PublicKey mintAuthority; // (Optional) Mint 권한 (32 bytes)
 
     @StructField(order = 2, type = UInt64LEField.class)
@@ -32,7 +32,7 @@ public class MintState extends Struct {
     @StructField(order = 4, type = UInt8Field.class)
     int isInitialized; // 초기화 여부 (1 byte, bool)
 
-    @StructField(order = 5, type = PublicKeyCOptionField.class)
+    @StructField(order = 5, type = PublicKeyBorshOptionField.class)
     PublicKey freezeAuthority; // (Optional) 동결 권한 (32 bytes)
 
     public static MintState unpack(byte[] bytes) {

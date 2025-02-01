@@ -7,6 +7,7 @@ import net.deanly.solanarpcj.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solanarpcj.transaction.message.meta.MessageHeader;
 import net.deanly.solanarpcj.program.alt.state.AddressLookupTableAccount;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,7 +88,7 @@ class KeyHolderTest {
         // AddressLookupTableAccount with a State containing one address
         AddressLookupTableAccount.State atlState = new AddressLookupTableAccount.State(
                 1, // typeIndex
-                Long.MAX_VALUE, // deactivationSlot
+                new BigInteger("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
                 0, // lastExtendedSlot
                 0, // lastExtendedStartIndex
                 null, // authority
@@ -117,7 +118,7 @@ class KeyHolderTest {
         // Empty AddressLookupTableAccount (no addresses)
         PublicKey atlKey = new PublicKey("8ZbeNDwpRSDrLZzjFxh46T6vAZisDjTheoTUGmJnFTVL");
         AddressLookupTableAccount.State emptyState = new AddressLookupTableAccount.State(
-                1, Long.MAX_VALUE, 0, 0, null, List.of() // Empty address list
+                1,new BigInteger("FFFFFFFFFFFFFFFF", 16), 0, 0, null, List.of() // Empty address list
         );
         AddressLookupTableAccount emptyAtl = new AddressLookupTableAccount(atlKey, emptyState);
 

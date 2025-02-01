@@ -35,7 +35,7 @@ public class BPFLoaderProgram extends Program {
     public static TransactionInstruction initializeBuffer(final PublicKey newAccount,
                                                           final PublicKey bufferAuthority) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(newAccount, false, true));
+        keys.add(new AccountMeta(newAccount, true, false));
         if (bufferAuthority != null) {
             keys.add(new AccountMeta(bufferAuthority, false, false));
         }
@@ -74,8 +74,8 @@ public class BPFLoaderProgram extends Program {
                                                final long offset,
                                                final byte[] data) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(writeableBuffer, false, true));
-        keys.add(new AccountMeta(bufferAuthority, true, false));
+        keys.add(new AccountMeta(writeableBuffer, true, false));
+        keys.add(new AccountMeta(bufferAuthority, false, true));
 
         ByteBuffer instructionData = ByteBuffer.allocate(5 + data.length).order(ByteOrder.LITTLE_ENDIAN);
         instructionData.put((byte) 1); // Instruction index for Write
@@ -104,13 +104,13 @@ public class BPFLoaderProgram extends Program {
                                                               final long maxDataLen) {
         final List<AccountMeta> keys = new ArrayList<>();
         keys.add(new AccountMeta(payer, true, true));
-        keys.add(new AccountMeta(programData, false, true));
-        keys.add(new AccountMeta(program, false, true));
-        keys.add(new AccountMeta(buffer, false, true));
+        keys.add(new AccountMeta(programData, true, false));
+        keys.add(new AccountMeta(program, true, false));
+        keys.add(new AccountMeta(buffer, true, false));
         keys.add(new AccountMeta(Sysvar.SYSVAR_RENT_ADDRESS, false, false));
         keys.add(new AccountMeta(Sysvar.SYSVAR_CLOCK_ADDRESS, false, false));
         keys.add(new AccountMeta(SYSTEM_PROGRAM_ID, false, false));
-        keys.add(new AccountMeta(programAuthority, true, false));
+        keys.add(new AccountMeta(programAuthority, false, true));
 
         ByteBuffer data = ByteBuffer.allocate(9).order(ByteOrder.LITTLE_ENDIAN);
         data.put((byte) 2); // Instruction index for DeployWithMaxDataLen
@@ -135,13 +135,13 @@ public class BPFLoaderProgram extends Program {
                                                  final PublicKey spillAccount,
                                                  final PublicKey programAuthority) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(programData, false, true));
-        keys.add(new AccountMeta(program, false, true));
-        keys.add(new AccountMeta(buffer, false, true));
-        keys.add(new AccountMeta(spillAccount, false, true));
+        keys.add(new AccountMeta(programData, true, false));
+        keys.add(new AccountMeta(program, true, false));
+        keys.add(new AccountMeta(buffer, true, false));
+        keys.add(new AccountMeta(spillAccount, true, false));
         keys.add(new AccountMeta(Sysvar.SYSVAR_RENT_ADDRESS, false, false));
         keys.add(new AccountMeta(Sysvar.SYSVAR_CLOCK_ADDRESS, false, false));
-        keys.add(new AccountMeta(programAuthority, true, false));
+        keys.add(new AccountMeta(programAuthority, false, true));
 
         ByteBuffer data = ByteBuffer.allocate(1).order(ByteOrder.LITTLE_ENDIAN);
         data.put((byte) 3); // Instruction index for Upgrade
@@ -161,8 +161,8 @@ public class BPFLoaderProgram extends Program {
                                                       final PublicKey currentAuthority,
                                                       final PublicKey newAuthority) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(account, false, true));
-        keys.add(new AccountMeta(currentAuthority, true, false));
+        keys.add(new AccountMeta(account, true, false));
+        keys.add(new AccountMeta(currentAuthority, false, true));
         if (newAuthority != null) {
             keys.add(new AccountMeta(newAuthority, false, false));
         }
@@ -187,13 +187,13 @@ public class BPFLoaderProgram extends Program {
                                                final PublicKey authority,
                                                final PublicKey programAccount) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(account, false, true));
-        keys.add(new AccountMeta(recipient, false, true));
+        keys.add(new AccountMeta(account, true, false));
+        keys.add(new AccountMeta(recipient, true, false));
         if (authority != null) {
-            keys.add(new AccountMeta(authority, true, false));
+            keys.add(new AccountMeta(authority, false, true));
         }
         if (programAccount != null) {
-            keys.add(new AccountMeta(programAccount, false, true));
+            keys.add(new AccountMeta(programAccount, true, false));
         }
 
         ByteBuffer data = ByteBuffer.allocate(1).order(ByteOrder.LITTLE_ENDIAN);
@@ -216,8 +216,8 @@ public class BPFLoaderProgram extends Program {
                                                        final PublicKey payer,
                                                        final int additionalBytes) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(programData, false, true));
-        keys.add(new AccountMeta(program, false, true));
+        keys.add(new AccountMeta(programData, true, false));
+        keys.add(new AccountMeta(program, true, false));
         keys.add(new AccountMeta(SYSTEM_PROGRAM_ID, false, false));
         if (payer != null) {
             keys.add(new AccountMeta(payer, true, true));
@@ -242,9 +242,9 @@ public class BPFLoaderProgram extends Program {
                                                              final PublicKey currentAuthority,
                                                              final PublicKey newAuthority) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(account, false, true));
-        keys.add(new AccountMeta(currentAuthority, true, false));
-        keys.add(new AccountMeta(newAuthority, true, false));
+        keys.add(new AccountMeta(account, true, false));
+        keys.add(new AccountMeta(currentAuthority, false, true));
+        keys.add(new AccountMeta(newAuthority, false, true));
 
         ByteBuffer data = ByteBuffer.allocate(1).order(ByteOrder.LITTLE_ENDIAN);
         data.put((byte) 7); // Instruction index for SetAuthorityChecked

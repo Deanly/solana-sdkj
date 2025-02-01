@@ -78,9 +78,9 @@ public class SplAssociatedTokenInstruction2RecoverNested extends SplAssociatedTo
         this.keys.clear();
 
         // Populate account meta information in correct Solana order
-        this.keys.add(new AccountMeta(nestedAssociatedAccountAddress, true, false)); // Writable
+        this.keys.add(new AccountMeta(nestedAssociatedAccountAddress, false, true)); // Writable
         this.keys.add(new AccountMeta(nestedTokenMintAddress, false, false)); // ReadOnly
-        this.keys.add(new AccountMeta(destinationAssociatedAccountAddress, true, false)); // Writable
+        this.keys.add(new AccountMeta(destinationAssociatedAccountAddress, false, true)); // Writable
         this.keys.add(new AccountMeta(ownerAssociatedAccountAddress, false, false)); // ReadOnly
         this.keys.add(new AccountMeta(ownerTokenMintAddress, false, false)); // ReadOnly
         this.keys.add(new AccountMeta(walletAddress, true, true)); // Signer & Writable

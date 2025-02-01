@@ -2,9 +2,11 @@ package net.deanly.solanarpcj.program.system.account.instruction;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyField;
+import net.deanly.solanarpcj.layout.field.PublicKeyNullableField;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
-import net.deanly.solanarpcj.layout.field.PublicKeyField;
 import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -40,7 +42,7 @@ public class SystemInstruction7AuthorizeNonceAccount extends SystemProgram.Base 
 
     private List<AccountMeta> keys; // Accounts used for this instruction (nonce account and authorities)
 
-    @StructField(order = 2, type = PublicKeyField.class)
+    @StructField(order = 2, type = PublicKeyNullableField.class)
     private PublicKey newAuthority; // The new authority public key for the nonce account
 
     @Override
@@ -71,8 +73,8 @@ public class SystemInstruction7AuthorizeNonceAccount extends SystemProgram.Base 
 
         // Set accounts as defined in the TypeScript counterpart
         this.keys = List.of(
-                new AccountMeta(nonceAccount, true, false), // Writable nonce account
-                new AccountMeta(currentAuthority, false, true) // Signer authority account
+                new AccountMeta(nonceAccount, false, true), // Writable nonce account
+                new AccountMeta(currentAuthority, true, false) // Signer authority account
         );
     }
 
@@ -82,11 +84,11 @@ public class SystemInstruction7AuthorizeNonceAccount extends SystemProgram.Base 
      *
      * @param nonceAccount The PublicKey of the nonce account to authorize.
      * @param currentAuthority The PublicKey of the current nonce authority.
-     * @param newAuthority The PublicKey to set as the new authority.
+     * @param newAuthority Optiona, The PublicKey to set as the new authority. If null to remove authority.
      * @return Configured instance of {@code SystemInstruction7AuthorizeNonceAccount}.
      */
     public static SystemInstruction7AuthorizeNonceAccount create(PublicKey nonceAccount, PublicKey currentAuthority, PublicKey newAuthority) {
-        if (nonceAccount == null || currentAuthority == null || newAuthority == null) {
+        if (nonceAccount == null || currentAuthority == null) {
             throw new IllegalArgumentException("All PublicKey parameters must be provided.");
         }
 

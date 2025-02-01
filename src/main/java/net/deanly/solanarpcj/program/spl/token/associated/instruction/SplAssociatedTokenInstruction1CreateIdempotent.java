@@ -61,7 +61,7 @@ public class SplAssociatedTokenInstruction1CreateIdempotent extends SplAssociate
         this.keys.clear();
         PublicKey ata = findAssociatedTokenAddress(owner, mint);
         this.keys.add(new AccountMeta(payer, true, true)); // payer: writable & signer
-        this.keys.add(new AccountMeta(ata, true, false)); // ata: writable
+        this.keys.add(new AccountMeta(ata, false, true)); // ata: writable
         this.keys.add(new AccountMeta(owner, false, false)); // owner: readonly
         this.keys.add(new AccountMeta(mint, false, false)); // mint: readonly
         this.keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false)); // systemProgram: readonly

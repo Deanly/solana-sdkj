@@ -13,19 +13,13 @@ import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TokenInstruction15BurnChecked represents the BurnChecked instruction for index 15
- * in the Token Program. This instruction burns (destroys) an amount of tokens
- * from a specified account while validating the number of decimals for the token.
- *
- * Accounts expected:
- *   0. `[writable]` The account to burn tokens from.
- *   1. `[signer]` The account's owner (single owner).
- *   2. `[]` The token mint.
- *   Multisignature owner:
- *     1. `[]` The multisignature owner account.
- *     2+ `[signer]` M signer accounts.
- */
+/// Burns tokens by removing them from an account.  `BurnChecked` does not
+/// support accounts associated with the native mint, use `CloseAccount`
+/// instead.
+///
+/// This instruction differs from Burn in that the decimals value is checked
+/// by the caller. This may be useful when creating transactions offline or
+/// within a hardware wallet.
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,6 +35,18 @@ public class TokenInstruction15BurnChecked extends SplTokenProgram.Base implemen
     @StructField(order = 3, type = UInt8Field.class)
     private int decimals; // Number of decimals for token validation.
 
+     /// Accounts expected by this instruction:
+     ///
+     ///   * Single owner/delegate
+     ///   0. `[writable]` The account to burn from.
+     ///   1. `[writable]` The token mint.
+     ///   2. `[signer]` The account's owner/delegate.
+     ///
+     ///   * Multisignature owner/delegate
+     ///   0. `[writable]` The account to burn from.
+     ///   1. `[writable]` The token mint.
+     ///   2. `[]` The account's multisignature owner/delegate.
+     ///   3. ..`3+M` `[signer]` M signer accounts.
     private List<AccountMeta> keys = new ArrayList<>(); // List of accounts required for this instruction.
 
     /**
@@ -60,14 +66,14 @@ public class TokenInstruction15BurnChecked extends SplTokenProgram.Base implemen
         this.keys = new ArrayList<>();
 
         // Add the required accounts
-        this.keys.add(new AccountMeta(account, true, false)); // Writable token account (no signer)
-        this.keys.add(new AccountMeta(mint, false, false));   // Read-only mint account (no signer)
-        this.keys.add(new AccountMeta(authority, false, multiSigners == null || multiSigners.isEmpty())); // Authority
+        this.keys.add(new AccountMeta(account, false, true)); // Writable token account (no signer)
+        this.keys.add(new AccountMeta(mint, false, true));   // Read-only mint account (no signer)
+        this.keys.add(new AccountMeta(authority, multiSigners == null || multiSigners.isEmpty(), false)); // Authority
 
         // Add multiSigners (if provided)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // MultiSigner: Read-only and signer
+                this.keys.add(new AccountMeta(signer, true, false)); // MultiSigner: Read-only and signer
             }
         }
     }

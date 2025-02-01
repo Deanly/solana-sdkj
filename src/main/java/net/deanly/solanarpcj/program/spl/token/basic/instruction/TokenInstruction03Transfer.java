@@ -82,15 +82,17 @@ public class TokenInstruction03Transfer extends SplTokenProgram.Base implements 
 
         // Build account metadata
         List<AccountMeta> accountMetas = new ArrayList<>();
-        accountMetas.add(new AccountMeta(source, true, false)); // Source: Writable, not signer.
-        accountMetas.add(new AccountMeta(destination, true, false)); // Destination: Writable, not signer.
-        accountMetas.add(new AccountMeta(authority, false, true)); // Authority: Read-only, signer.
+        accountMetas.add(new AccountMeta(source, false, true)); // Source: Writable, not signer.
+        accountMetas.add(new AccountMeta(destination, false, true)); // Destination: Writable, not signer.
 
         // Add additional multisigners
         if (multiSigners != null && !multiSigners.isEmpty()) {
+            accountMetas.add(AccountMeta.roleReadOnlyNoSigner(authority)); // Authority: Read-only, not signer.
             for (PublicKey signer : multiSigners) {
-                accountMetas.add(new AccountMeta(signer, false, true)); // All signers: Read-only, signer.
+                accountMetas.add(new AccountMeta(signer, true, false)); // All signers: Read-only, signer.
             }
+        } else {
+            accountMetas.add(AccountMeta.roleReadOnlySigner(authority)); // Authority: Read-only, signer.
         }
 
         this.keys = accountMetas;

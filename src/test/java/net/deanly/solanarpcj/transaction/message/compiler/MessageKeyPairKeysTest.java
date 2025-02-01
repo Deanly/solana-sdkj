@@ -113,7 +113,7 @@ public class MessageKeyPairKeysTest {
 
         TransactionInstruction instruction = new TransactionInstructionImpl(
                 new PublicKey("ThirdPubkey33333333333333333333333333333333"),
-                List.of(new AccountMeta(new PublicKey("11111111111111111111111111111111"), false, true)),
+                List.of(new AccountMeta(new PublicKey("11111111111111111111111111111111"), true, false)),
                 new byte[] { 1, 2, 3 }
         );
 

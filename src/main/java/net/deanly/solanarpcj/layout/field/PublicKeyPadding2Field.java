@@ -35,19 +35,6 @@ public class PublicKeyPadding2Field extends FieldBase<PublicKey> implements Fiel
         // Step 2: Read the full 34 bytes but only use the first 32 bytes after the first byte
         byte[] publicKeyBytes = Arrays.copyOfRange(buffer, offset, offset + PUBLIC_KEY_EFFECTIVE_SIZE);
 
-        // Check if the PublicKey is 0x00 (empty)
-        boolean isAllZero = true;
-        for (byte b : publicKeyBytes) {
-            if (b != 0) {
-                isAllZero = false;
-                break;
-            }
-        }
-
-        if (isAllZero) {
-            return null; // Return null for empty PublicKey
-        }
-
         return new PublicKey(publicKeyBytes);
     }
 

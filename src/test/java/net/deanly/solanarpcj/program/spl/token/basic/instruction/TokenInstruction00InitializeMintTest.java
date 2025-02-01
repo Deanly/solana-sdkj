@@ -33,7 +33,7 @@ class TokenInstruction00InitializeMintTest {
 
         // Then (Validate encoding)
         assertNotNull(encodedData, "Encoded data should not be null");
-        assertEquals(36, encodedData.length, "Encoded data length should match expected size");
+        assertEquals(67, encodedData.length, "Encoded data length should match expected size");
 
         TokenInstruction00InitializeMint decoded = StructLayout.decode(encodedData, TokenInstruction00InitializeMint.class);
 

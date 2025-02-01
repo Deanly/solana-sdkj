@@ -18,7 +18,7 @@ public class SharedMemoryProgram extends Program {
                                                           byte[] data,
                                                           int offset) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(accountToWrite, false, true));
+        keys.add(new AccountMeta(accountToWrite, true, false));
 
         ByteBuffer result = ByteBuffer.allocate(8 + data.length);
         result.order(ByteOrder.LITTLE_ENDIAN);

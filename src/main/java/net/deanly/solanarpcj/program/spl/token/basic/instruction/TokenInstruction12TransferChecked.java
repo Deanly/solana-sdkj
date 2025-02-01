@@ -14,18 +14,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TokenInstruction12TransferChecked represents the TransferChecked instruction for index 12
- * in the Token Program. It transfers a specified amount of tokens while validating the number
- * of decimals for the amount matches the token mint's decimals.
- *
- * Accounts expected:
- *   0. `[writable]` The source account (must be pre-filled with sufficient balance).
- *   1. `[writable]` The destination account.
- *   2. `[]` The token mint.
- *   3. `[signer]` The owner of the source account (single owner).
- *   Multisignature owner:
- *     3. `[]` The multisignature owner account.
- *     4+ `[signer]` M signer accounts.
+ * <p>
+ * Transfers tokens from one account to another either directly or via a
+ * delegate.  If this account is associated with the native mint then equal
+ * amounts of SOL and Tokens will be transferred to the destination
+ * account.
+ * </p>
+ * <p>
+ * This instruction differs from Transfer in that the token mint and
+ * decimals value is checked by the caller.  This may be useful when
+ * creating transactions offline or within a hardware wallet.
+ * </p>
+ * <pre>
+ * The `TransferChecked` instruction requires a specific set of accounts to be
+ * configured:
+ * - A writable source account containing the tokens to transfer.
+ * - A read-only mint account representing the token's mint.
+ * - A writable destination account to receive the tokens.
+ * - An authority account representing the owner or delegate of the source account.
+ * - Optionally, a list of multisignature signer accounts in cases where a
+ *   multisignature authority is used for the source account.
+ * </pre>
  */
 @Getter
 @NoArgsConstructor
@@ -44,6 +53,18 @@ public class TokenInstruction12TransferChecked extends SplTokenProgram.Base impl
     @StructField(order = 3, type = UInt8Field.class)
     private int decimals; // Number of decimals the transfer is validated against.
 
+    /**
+     * <pre>
+     * Accounts expected:
+     *   0. `[writable]` The source account (must be pre-filled with sufficient balance).
+     *   1. `[writable]` The destination account.
+     *   2. `[]` The token mint.
+     *   3. `[signer]` The owner of the source account (single owner).
+     *   Multisignature owner:
+     *     3. `[]` The multisignature owner account.
+     *     4+ `[signer]` M signer accounts.
+     * </pre>
+     */
     @Setter
     private List<AccountMeta> keys = new ArrayList<>(); // List of accounts required for this instruction.
 
@@ -57,7 +78,7 @@ public class TokenInstruction12TransferChecked extends SplTokenProgram.Base impl
      * @param authority    The owner/delegate of the source account (read-only).
      * @param multiSigners Optional: A list of multisignature signer accounts.
      */
-    public void setKeys(PublicKey source, PublicKey mint, PublicKey destination, PublicKey authority, List<PublicKey> multiSigners) {
+    public void setKeys(PublicKey source, PublicKey destination, PublicKey mint, PublicKey authority, List<PublicKey> multiSigners) {
         // Validate inputs
         if (source == null || mint == null || destination == null || authority == null) {
             throw new IllegalArgumentException("Source, mint, destination, and authority must not be null.");
@@ -66,15 +87,15 @@ public class TokenInstruction12TransferChecked extends SplTokenProgram.Base impl
         this.keys = new ArrayList<>();
 
         // Add required accounts
-        this.keys.add(new AccountMeta(source, true, false));    // Source: writable, not signer
+        this.keys.add(new AccountMeta(source, false, true));    // Source: writable, not signer
+        this.keys.add(new AccountMeta(destination, false, true)); // Destination: writable, not signer
         this.keys.add(new AccountMeta(mint, false, false));     // Mint: read-only, not signer
-        this.keys.add(new AccountMeta(destination, true, false)); // Destination: writable, not signer
-        this.keys.add(new AccountMeta(authority, false, multiSigners == null || multiSigners.isEmpty())); // Authority: read-only, signer if no multisigners
+        this.keys.add(new AccountMeta(authority, multiSigners == null || multiSigners.isEmpty(), false)); // Authority: read-only, signer if no multisigners
 
         // Add multisigners (if any exist)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // Multisigners: read-only, signer
+                this.keys.add(new AccountMeta(signer, true, false)); // Multisigners: read-only, signer
             }
         }
     }
@@ -114,8 +135,8 @@ public class TokenInstruction12TransferChecked extends SplTokenProgram.Base impl
      */
     public static TokenInstruction12TransferChecked create(
             PublicKey source,
-            PublicKey mint,
             PublicKey destination,
+            PublicKey mint,
             PublicKey authority,
             long amount,
             int decimals,
@@ -136,7 +157,7 @@ public class TokenInstruction12TransferChecked extends SplTokenProgram.Base impl
         TokenInstruction12TransferChecked instruction = new TokenInstruction12TransferChecked();
         instruction.setAmount(amount);
         instruction.setDecimals(decimals);
-        instruction.setKeys(source, mint, destination, authority, multiSigners);
+        instruction.setKeys(source, destination, mint, authority, multiSigners);
         return instruction;
     }
 }

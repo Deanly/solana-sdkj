@@ -31,9 +31,9 @@ public class ATLInstruction4CloseLookupTable extends AddressLookupTableProgram.B
      */
     public void setKeys(PublicKey lookupTable, PublicKey authority, PublicKey recipient) {
         this.keys = List.of(
-                new AccountMeta(lookupTable, true, false),  // Lookup Table (Writable, Not Signer)
-                new AccountMeta(authority, false, true),   // Authority (Signer, Not Writable)
-                new AccountMeta(recipient, true, false)    // Recipient (Writable, Not Signer)
+                new AccountMeta(lookupTable, false, true),  // Lookup Table (Writable, Not Signer)
+                new AccountMeta(authority, true, false),   // Authority (Signer, Not Writable)
+                new AccountMeta(recipient, false, true)    // Recipient (Writable, Not Signer)
         );
     }
 
@@ -65,5 +65,23 @@ public class ATLInstruction4CloseLookupTable extends AddressLookupTableProgram.B
     @Override
     public List<AccountMeta> getKeys() {
         return this.keys;
+    }
+
+    /**
+     * Creates a new instance of ATLInstruction4CloseLookupTable with the specified accounts.
+     *
+     * @param lookupTable The public key of the lookup table to close. This must be writable and is not a signer.
+     * @param authority The public key of the authority account responsible for the close operation. This must be a signer and is not writable.
+     * @param recipient The public key of the recipient account that will receive lamports. This must be writable and is not a signer.
+     * @return A configured ATLInstruction4CloseLookupTable object representing the CloseLookupTable instruction.
+     */
+    public static ATLInstruction4CloseLookupTable create(
+            @NonNull PublicKey lookupTable,
+            @NonNull PublicKey authority,
+            @NonNull PublicKey recipient
+    ) {
+        ATLInstruction4CloseLookupTable instruction = new ATLInstruction4CloseLookupTable();
+        instruction.setKeys(lookupTable, authority, recipient);
+        return instruction;
     }
 }

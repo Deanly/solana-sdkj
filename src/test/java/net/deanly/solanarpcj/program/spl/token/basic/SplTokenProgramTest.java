@@ -28,7 +28,7 @@ public class SplTokenProgramTest {
         PublicKey mintAuthority = new PublicKey("FuLFkNQzNEAzZ2dEgXVUqVVLxJYLYhbSgpZf9RVVXZuT");
         PublicKey freezeAuthority = new PublicKey("HNGVuL5kqjDehw7KR63w9gxow32sX6xzRNgLb8GkbwCM");
 
-        TransactionInstruction instruction = SplTokenProgram.initializeMint(mintPubkey, decimals, mintAuthority, freezeAuthority, null);
+        TransactionInstruction instruction = SplTokenProgram.initializeMint(mintPubkey, mintAuthority, decimals, freezeAuthority, null);
 
         assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(2, instruction.getKeys().size());
@@ -58,7 +58,7 @@ public class SplTokenProgramTest {
         );
         int m = 2;
 
-        TransactionInstruction instruction = SplTokenProgram.initializeMultisig(multisigPubkey, signerPubkeys, Sysvar.SYSVAR_RENT_ADDRESS, null);
+        TransactionInstruction instruction = SplTokenProgram.initializeMultisig(multisigPubkey, signerPubkeys, Sysvar.SYSVAR_RENT_ADDRESS);
 
         assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(4, instruction.getKeys().size());

@@ -64,9 +64,9 @@ public class SystemInstruction4AdvanceNonceAccount extends SystemProgram.Base im
         }
 
         this.keys = List.of(
-                new AccountMeta(nonceAccount, true, true), // Nonce account: writable, signer
-                new AccountMeta(authorityAccount, false, true), // Authority account: signer, not writable
-                new AccountMeta(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, false, false) // Recent blockhash sysvar
+                new AccountMeta(nonceAccount, false, true), // Nonce account: writable, non-signer
+                new AccountMeta(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, false, false), // Recent blockhash sysvar
+                new AccountMeta(authorityAccount, true, false) // Authority account: signer, not writable
         );
     }
 

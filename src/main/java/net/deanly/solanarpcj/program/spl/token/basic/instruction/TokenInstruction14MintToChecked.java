@@ -60,14 +60,14 @@ public class TokenInstruction14MintToChecked extends SplTokenProgram.Base implem
         this.keys = new ArrayList<>();
 
         // Add required accounts
-        this.keys.add(new AccountMeta(mint, true, false)); // Mint: writable, not signer
-        this.keys.add(new AccountMeta(token, true, false)); // Token: writable, not signer
-        this.keys.add(new AccountMeta(mintAuthority, false, multiSigners == null || multiSigners.isEmpty())); // MintAuthority: readonly, signer if single
+        this.keys.add(new AccountMeta(mint, false, true)); // Mint: writable, not signer
+        this.keys.add(new AccountMeta(token, false, true)); // Token: writable, not signer
+        this.keys.add(new AccountMeta(mintAuthority, multiSigners == null || multiSigners.isEmpty(), false)); // MintAuthority: readonly, signer if single
 
         // Add multisigners (if provided)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // Multisigners: readonly, signer
+                this.keys.add(new AccountMeta(signer, true, false)); // Multisigners: readonly, signer
             }
         }
     }

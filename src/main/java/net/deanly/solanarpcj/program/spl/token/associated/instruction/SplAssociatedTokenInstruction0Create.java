@@ -70,7 +70,7 @@ public class SplAssociatedTokenInstruction0Create extends SplAssociatedTokenProg
 
         // Add keys to the instruction in the expected order
         this.keys.add(new AccountMeta(payer, true, true)); // Payer: Signer & Writable
-        this.keys.add(new AccountMeta(ata, true, false)); // Associated token account: Writable, not signer
+        this.keys.add(new AccountMeta(ata, false, true)); // Associated token account: Writable, not signer
         this.keys.add(new AccountMeta(owner, false, false)); // Wallet address: Readonly, not signer
         this.keys.add(new AccountMeta(mint, false, false)); // Token mint: Readonly, not signer
         this.keys.add(new AccountMeta(SystemProgram.PROGRAM_ID, false, false)); // System program: Readonly, not signer

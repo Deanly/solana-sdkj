@@ -25,7 +25,7 @@ class TokenInstruction02InitializeMultisigTest {
         PublicKey signer2 = new PublicKey("Signer2222222222222222222222222222222");
         PublicKey signer3 = new PublicKey("Signer3333333333333333333333333333333");
 
-        instruction.setKeys(multisigAccount, List.of(signer1, signer2, signer3), Sysvar.SYSVAR_RENT_ADDRESS, null);
+        instruction.setKeys(multisigAccount, List.of(signer1, signer2, signer3), Sysvar.SYSVAR_RENT_ADDRESS);
 
         // When
         byte[] encodedData = instruction.getData();
@@ -50,7 +50,7 @@ class TokenInstruction02InitializeMultisigTest {
         PublicKey signer3 = new PublicKey("Signer3333333333333333333333333333333");
 
         // Set keys with multisig account and signers
-        instruction.setKeys(multisigAccount, List.of(signer1, signer2, signer3), null, null);
+        instruction.setKeys(multisigAccount, List.of(signer1, signer2, signer3), null);
 
         // When
         List<AccountMeta> keys = instruction.getKeys();
@@ -96,8 +96,8 @@ class TokenInstruction02InitializeMultisigTest {
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            instruction.setKeys(multisigAccount, List.of(), null, null); // Pass empty signerKeys list
+            instruction.setKeys(multisigAccount, List.of(), null); // Pass empty signerKeys list
         });
-        assertEquals("The number of signers (M) must be between 1 and 11.", exception.getMessage(), "Exception message mismatch");
+        assertEquals("Invalid number of signer keys. Must be between 1 and 11.", exception.getMessage(), "Exception message mismatch");
     }
 }

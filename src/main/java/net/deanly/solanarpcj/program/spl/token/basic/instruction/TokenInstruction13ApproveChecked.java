@@ -63,15 +63,15 @@ public class TokenInstruction13ApproveChecked extends SplTokenProgram.Base imple
         this.keys = new ArrayList<>();
 
         // Add required accounts
-        this.keys.add(new AccountMeta(source, true, false));     // Source: writable, not signer
+        this.keys.add(new AccountMeta(source, false, true));     // Source: writable, not signer
         this.keys.add(new AccountMeta(mint, false, false));      // Mint: readonly, not signer
         this.keys.add(new AccountMeta(delegate, false, false));  // Delegate: readonly, not signer
-        this.keys.add(new AccountMeta(owner, false, multiSigners == null || multiSigners.isEmpty())); // Owner: readonly, signer if no multisigners
+        this.keys.add(new AccountMeta(owner, multiSigners == null || multiSigners.isEmpty(), false)); // Owner: readonly, signer if no multisigners
 
         // Add multisigners (if provided)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // Multisigners: readonly, signer
+                this.keys.add(new AccountMeta(signer, true, false)); // Multisigners: readonly, signer
             }
         }
     }

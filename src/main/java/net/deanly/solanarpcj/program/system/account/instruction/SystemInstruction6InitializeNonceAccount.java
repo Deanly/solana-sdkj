@@ -57,16 +57,14 @@ public class SystemInstruction6InitializeNonceAccount extends SystemProgram.Base
      * Configures the accounts involved in this instruction.
      *
      * @param nonceAccount    The nonce account (must be writable).
-     * @param authorityAccount The account with signing authority over the nonce account.
      */
-    public void setKeys(PublicKey nonceAccount, PublicKey authorityAccount) {
-        if (nonceAccount == null || authorityAccount == null) {
-            throw new IllegalArgumentException("Both nonceAccount and authorityAccount must be provided.");
+    public void setKeys(PublicKey nonceAccount) {
+        if (nonceAccount == null) {
+            throw new IllegalArgumentException("Both nonceAccount must be provided.");
         }
 
         this.keys = List.of(
-                new AccountMeta(nonceAccount, true, false), // Nonce account: Writable, not signer
-                new AccountMeta(authorityAccount, false, true), // Authority account: Signer, not writable
+                new AccountMeta(nonceAccount, false, true), // Nonce account: Writable, not signer
                 new AccountMeta(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, false, false), // Recent blockhashes sysvar
                 new AccountMeta(Sysvar.SYSVAR_RENT_ADDRESS, false, false) // Rent sysvar
         );
@@ -87,7 +85,7 @@ public class SystemInstruction6InitializeNonceAccount extends SystemProgram.Base
 
         SystemInstruction6InitializeNonceAccount instruction = new SystemInstruction6InitializeNonceAccount();
         instruction.setAuthority(authorityAccount); // Set the authority
-        instruction.setKeys(nonceAccount, authorityAccount); // Configure accounts
+        instruction.setKeys(nonceAccount); // Configure accounts
         return instruction;
     }
 }

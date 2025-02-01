@@ -2,7 +2,6 @@ package net.deanly.solanarpcj.program.alt;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.eq;
 
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
@@ -21,7 +20,7 @@ public class AddressLookupTableProgramTest {
      */
     @Test
     public void testCreateLookupTable() {
-        TransactionInstruction instruction = AddressLookupTableProgram.createLookupTable(AUTHORITY, PAYER, RECENT_SLOT, 254);
+        TransactionInstruction instruction = AddressLookupTableProgram.createLookupTable(AUTHORITY, PAYER, RECENT_SLOT);
         assertNotNull(instruction);
         assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(4, instruction.getKeys().size()); // Check number of keys

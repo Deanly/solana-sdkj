@@ -2,10 +2,12 @@ package net.deanly.solanarpcj.crypto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.deanly.solanarpcj.program.pda.ProgramDerivedAddress;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -15,9 +17,9 @@ import java.util.List;
 @NoArgsConstructor
 public class PublicKey {
     public static final int PUBLIC_KEY_LENGTH = 32;
+    public static final PublicKey DEFAULT = new PublicKey("11111111111111111111111111111111"); // None
 
-    @Getter
-    private final byte[] rawPublicKey = new byte[32];
+    private final byte[] rawPublicKey = new byte[PUBLIC_KEY_LENGTH];
 
     @Getter
     private boolean isOnCurve;
@@ -31,6 +33,13 @@ public class PublicKey {
      * @throws IllegalArgumentException If the provided string cannot be decoded or fails validation.
      */
     public PublicKey(String pubkey) {
+        if (pubkey == null) {
+            pubkey = DEFAULT.toBase58();
+        }
+        else if (isTestModeEnabled()) {
+            pubkey = applyTestModeTransformation(pubkey);
+        }
+
         byte[] decoded = Base58.decode(pubkey);
         validateAndStore(decoded);
     }
@@ -175,17 +184,6 @@ public class PublicKey {
         }
     }
 
-    @Getter
-    public static class ProgramDerivedAddress {
-        private PublicKey address;
-        private int nonce;
-
-        public ProgramDerivedAddress(PublicKey address, int nonce) {
-            this.address = address;
-            this.nonce = nonce;
-        }
-    }
-
     public static ProgramDerivedAddress findProgramAddress(List<byte[]> seeds, PublicKey programId) {
         for (int nonce = 255; nonce >= 0; nonce--) {
             try {
@@ -202,5 +200,32 @@ public class PublicKey {
 
     public static PublicKey valueOf(String publicKey) {
         return new PublicKey(publicKey);
+    }
+
+    private String applyTestModeTransformation(String pubkey) {
+        try {
+            // Reflectively access the PublicKeyGenerator.createDummyPublicKey method
+            Class<?> generatorClass = Class.forName("net.deanly.solanarpcj.crypto.PublicKeyGenerator");
+            Method generateMethod = generatorClass.getDeclaredMethod("createDummyPublicKey", String.class);
+
+            return (String) generateMethod.invoke(null, pubkey);
+        } catch (Exception e) {
+            System.out.println("Failed to apply test mode transformation: " + e.getMessage());
+            return pubkey;
+        }
+    }
+
+    private static Boolean isTestMode = null;
+    private static boolean isTestModeEnabled() {
+        if (isTestMode == null) {
+            // Perform reflection-based check to determine if the test class exists in the runtime
+            try {
+                Class.forName("net.deanly.solanarpcj.crypto.PublicKeyGenerator");
+                isTestMode = true; // Class exists, indicating test mode
+            } catch (ClassNotFoundException e) {
+                isTestMode = false; // Class does not exist, normal mode
+            }
+        }
+        return isTestMode;
     }
 }

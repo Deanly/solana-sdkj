@@ -58,14 +58,14 @@ public class TokenInstruction11ThawAccount extends SplTokenProgram.Base implemen
         this.keys = new ArrayList<>();
 
         // Add required accounts
-        this.keys.add(new AccountMeta(accountToThaw, true, false));   // Account to thaw: writable, not signer
+        this.keys.add(new AccountMeta(accountToThaw, false, true));   // Account to thaw: writable, not signer
         this.keys.add(new AccountMeta(mint, false, false));          // Mint: read-only, not signer
-        this.keys.add(new AccountMeta(freezeAuthority, false, multiSigners == null || multiSigners.isEmpty())); // Freeze authority: read-only, signer if no multisigners
+        this.keys.add(new AccountMeta(freezeAuthority, multiSigners == null || multiSigners.isEmpty(), false)); // Freeze authority: read-only, signer if no multisigners
 
         // Add multisigners (if any exist)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // Multisigners: read-only, signer
+                this.keys.add(new AccountMeta(signer, true, false)); // Multisigners: read-only, signer
             }
         }
     }

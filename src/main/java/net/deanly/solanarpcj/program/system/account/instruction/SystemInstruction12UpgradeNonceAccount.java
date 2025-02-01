@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Represents a System program UpgradeNonceAccount instruction in the Solana blockchain.
  * This instruction upgrades a nonce account for specific system purposes.
+ * <a href="https://github.com/solana-labs/solana/issues/25787">issue</a>
  *
  * Fields:
  * - {@code instruction}: Constant index (12) representing the UpgradeNonceAccount instruction.
@@ -25,7 +26,6 @@ import java.util.List;
  * - {@code getData()}: Encodes the instruction fields to a byte array.
  * - {@code setData(byte[] data)}: Decodes the given byte array to populate this instruction's attributes.
  */
-
 @Slf4j
 @Getter
 @Setter
@@ -52,18 +52,15 @@ public class SystemInstruction12UpgradeNonceAccount extends SystemProgram.Base i
      * Sets the keys for this instruction. This must strictly follow the Typescript configuration.
      *
      * @param nonceAccount      The nonce account public key.
-     * @param authorityAccount  The authority account public key.
      */
-    public void setKeys(PublicKey nonceAccount, PublicKey authorityAccount) {
+    public void setKeys(PublicKey nonceAccount) {
         // Ensure all parameters are non-null
-        if (nonceAccount == null || authorityAccount == null) {
+        if (nonceAccount == null) {
             throw new IllegalArgumentException("PublicKeys cannot be null.");
         }
 
         this.keys = List.of(
-                new AccountMeta(nonceAccount, true, false), // Nonce account (Writable, Non-signer)
-                new AccountMeta(authorityAccount, false, true), // Authority account (Read-only, Signer)
-                new AccountMeta(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, false, false) // Recent blockhashes sysvar (Read-only, Non-signer)
+                new AccountMeta(nonceAccount, false, true) // Nonce account (Writable, Non-signer)
         );
     }
 
@@ -72,21 +69,19 @@ public class SystemInstruction12UpgradeNonceAccount extends SystemProgram.Base i
      * with all required fields.
      *
      * @param nonceAccount      The nonce account public key.
-     * @param authorityAccount  The authority account public key.
      * @return A new and fully initialized instance.
      */
     public static SystemInstruction12UpgradeNonceAccount create(
-            PublicKey nonceAccount,
-            PublicKey authorityAccount
+            PublicKey nonceAccount
     ) {
         // Validation
-        if (nonceAccount == null || authorityAccount == null) {
+        if (nonceAccount == null) {
             throw new IllegalArgumentException("PublicKeys cannot be null.");
         }
 
         // Create the instruction instance
         SystemInstruction12UpgradeNonceAccount instruction = new SystemInstruction12UpgradeNonceAccount();
-        instruction.setKeys(nonceAccount, authorityAccount);
+        instruction.setKeys(nonceAccount);
         return instruction;
     }
 }

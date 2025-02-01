@@ -38,10 +38,10 @@ public class SystemInstruction8Allocate extends SystemProgram.Base implements Tr
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 8; // Instruction index (8), directly defined as required
 
-    private List<AccountMeta> keys; // Accounts used for this instruction (target account)
-
     @StructField(order = 2, type = Int64LEField.class)
     private long space; // The amount of space to allocate in bytes for the account
+
+    private List<AccountMeta> keys; // Accounts used for this instruction (target account)
 
     @Override
     public byte[] getData() {

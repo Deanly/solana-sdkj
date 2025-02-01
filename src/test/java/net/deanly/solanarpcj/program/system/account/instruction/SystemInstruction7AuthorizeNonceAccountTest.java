@@ -21,15 +21,18 @@ class SystemInstruction7AuthorizeNonceAccountTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(nonceAccount, true, true), // Nonce account
-                new AccountMeta(oldAuthorityAccount, true, false) // Old authority account
+                new AccountMeta(oldAuthorityAccount, false, true) // Old authority account
         );
-
-        PublicKey newAuthority = newAuthorityAccount;
 
         // Create instruction instance
-        SystemInstruction7AuthorizeNonceAccount instruction = new SystemInstruction7AuthorizeNonceAccount(
-                keys, newAuthority
+        SystemInstruction7AuthorizeNonceAccount instruction = SystemInstruction7AuthorizeNonceAccount.create(
+                nonceAccount, oldAuthorityAccount, newAuthorityAccount
         );
+
+        assertEquals(2, instruction.getKeys().size());
+        assertEquals(nonceAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(oldAuthorityAccount, instruction.getKeys().get(1).getPublicKey());
+        assertEquals(newAuthorityAccount, instruction.getNewAuthority());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -46,8 +49,38 @@ class SystemInstruction7AuthorizeNonceAccountTest {
 
         // Validate the decoded instruction matches the original
         assertEquals(instruction.getNewAuthority(), decodedInstruction.getNewAuthority());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
-        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
+    }
+
+    @Test
+    void testAuthorizeNonceAccountWithoutNew() throws Exception {
+        // Arrange: Input data for test
+        PublicKey nonceAccount = new PublicKey("11111111111111111111111111111111");
+        PublicKey oldAuthorityAccount = new PublicKey("SecondPubey22222222222222222222222222222222");
+
+        // Create instruction instance
+        SystemInstruction7AuthorizeNonceAccount instruction = SystemInstruction7AuthorizeNonceAccount.create(
+                nonceAccount, oldAuthorityAccount, null
+        );
+
+        assertEquals(2, instruction.getKeys().size());
+        assertEquals(nonceAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(oldAuthorityAccount, instruction.getKeys().get(1).getPublicKey());
+        assertEquals(null, instruction.getNewAuthority());
+
+        // Act: Encode the instruction
+        byte[] encodedData = instruction.getData();
+
+        // Assert: Validate encoding is correct
+        assertNotNull(encodedData);
+        // Expected size: u32 (4 bytes - instruction index) + PublicKey (32 bytes)
+        assertEquals(36, encodedData.length);
+
+        // Decode the instruction back to verify round-trip
+        SystemInstruction7AuthorizeNonceAccount decodedInstruction = StructLayout.decode(
+                encodedData, SystemInstruction7AuthorizeNonceAccount.class
+        );
+
+        // Validate the decoded instruction matches the original
+        assertEquals(instruction.getNewAuthority(), decodedInstruction.getNewAuthority());
     }
 }

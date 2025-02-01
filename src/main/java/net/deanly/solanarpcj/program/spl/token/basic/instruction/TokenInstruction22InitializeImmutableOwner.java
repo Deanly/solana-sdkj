@@ -43,7 +43,7 @@ public class TokenInstruction22InitializeImmutableOwner extends SplTokenProgram.
 
         // Configure the account as writable and not a signer.
         this.keys = new ArrayList<>();
-        this.keys.add(new AccountMeta(account, true, false));
+        this.keys.add(new AccountMeta(account, false, true));
     }
 
     /**

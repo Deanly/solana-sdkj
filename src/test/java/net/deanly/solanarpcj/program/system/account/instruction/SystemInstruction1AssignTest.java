@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.program.system.account.instruction;
 
+import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
@@ -24,6 +25,11 @@ class SystemInstruction1AssignTest {
 
         SystemInstruction1Assign instruction = new SystemInstruction1Assign(keys, newProgramId);
 
+        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(newProgramId, instruction.getOwnerProgramId());
+        assertEquals(1, instruction.getKeys().size());
+        assertEquals(account, instruction.getKeys().get(0).getPublicKey());
+
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
 
@@ -36,7 +42,5 @@ class SystemInstruction1AssignTest {
 
         // Assert: Ensure decoded instruction matches original
         assertEquals(instruction.getProgramId(), decodedInstruction.getProgramId());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
     }
 }

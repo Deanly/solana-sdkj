@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.program.system.account.instruction;
 
+import net.deanly.solanarpcj.program.system.Sysvar;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
@@ -20,11 +21,18 @@ class SystemInstruction4AdvanceNonceAccountTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(nonceAccount, true, true), // Nonce account
-                new AccountMeta(authorityAccount, false, true) // Authority account
+                new AccountMeta(authorityAccount, true, false) // Authority account
         );
 
         // Create instruction instance
-        SystemInstruction4AdvanceNonceAccount instruction = new SystemInstruction4AdvanceNonceAccount(keys);
+        SystemInstruction4AdvanceNonceAccount instruction = SystemInstruction4AdvanceNonceAccount.create(
+                nonceAccount, authorityAccount
+        );
+
+        assertEquals(3, instruction.getKeys().size());
+        assertEquals(nonceAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, instruction.getKeys().get(1).getPublicKey());
+        assertEquals(authorityAccount, instruction.getKeys().get(2).getPublicKey());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -36,10 +44,5 @@ class SystemInstruction4AdvanceNonceAccountTest {
 
         // Decode the instruction back to verify round-trip
         SystemInstruction4AdvanceNonceAccount decodedInstruction = StructLayout.decode(encodedData, SystemInstruction4AdvanceNonceAccount.class);
-
-        // Validate the decoded instruction matches the original
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
-        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
     }
 }

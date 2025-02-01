@@ -1,5 +1,7 @@
 package net.deanly.solanarpcj.program.spl.token.associated.instruction;
 
+import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
+import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,11 @@ public class SplAssociatedTokenInstruction0CreateTest {
     public void testCreateInstruction() {
         // Test PublicKey mock objects
         PublicKey payer = new PublicKey("ExamplePayerPublicKey");
-        PublicKey associatedTokenAccount = new PublicKey("ExampleAssociatedTokenAccount");
+        PublicKey associatedTokenAccount = new PublicKey("6rpG9aVgqoQ5hdWsBvu7VgBScFpGrJ6jh6NAX7HDS7h6");
         PublicKey owner = new PublicKey("ExampleOwnerPublicKey");
         PublicKey mint = new PublicKey("ExampleMintPublicKey");
-        PublicKey systemProgram = new PublicKey("ExampleSystemProgramPublicKey");
-        PublicKey tokenProgram = new PublicKey("ExampleTokenProgramPublicKey");
+        PublicKey systemProgram = SystemProgram.PROGRAM_ID;
+        PublicKey tokenProgram = SplTokenProgram.PROGRAM_ID;
 
         // Create instruction
         SplAssociatedTokenInstruction0Create instruction =

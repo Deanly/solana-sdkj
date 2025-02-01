@@ -1,5 +1,6 @@
 package net.deanly.solanarpcj.program.system.account.instruction;
 
+import net.deanly.solanarpcj.program.system.Sysvar;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
@@ -21,16 +22,23 @@ class SystemInstruction5WithdrawNonceAccountTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(nonceAccount, true, true), // Nonce account
-                new AccountMeta(authorityAccount, true, false), // Authority account
-                new AccountMeta(destinationAccount, false, true) // Destination account
+                new AccountMeta(authorityAccount, false, true), // Authority account
+                new AccountMeta(destinationAccount, true, false) // Destination account
         );
 
         long lamports = 500_000L;
 
         // Create instruction instance
-        SystemInstruction5WithdrawNonceAccount instruction = new SystemInstruction5WithdrawNonceAccount(
-                keys, lamports
+        SystemInstruction5WithdrawNonceAccount instruction = SystemInstruction5WithdrawNonceAccount.create(
+                nonceAccount, authorityAccount, destinationAccount, lamports
         );
+
+        assertEquals(5, instruction.getKeys().size());
+        assertEquals(nonceAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(destinationAccount, instruction.getKeys().get(1).getPublicKey());
+        assertEquals(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, instruction.getKeys().get(2).getPublicKey());
+        assertEquals(Sysvar.SYSVAR_RENT_ADDRESS, instruction.getKeys().get(3).getPublicKey());
+        assertEquals(authorityAccount, instruction.getKeys().get(4).getPublicKey());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -47,9 +55,5 @@ class SystemInstruction5WithdrawNonceAccountTest {
 
         // Validate the decoded instruction matches the original
         assertEquals(instruction.getLamports(), decodedInstruction.getLamports());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
-        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
-        assertEquals(instruction.getKeys().get(2).getPublicKey(), decodedInstruction.getKeys().get(2).getPublicKey());
     }
 }

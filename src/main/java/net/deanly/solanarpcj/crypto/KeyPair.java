@@ -1,7 +1,6 @@
 package net.deanly.solanarpcj.crypto;
 
 import lombok.Getter;
-import net.deanly.solanarpcj.crypto.Base58;
 import net.deanly.solanarpcj.crypto.bip.HDKey;
 import net.deanly.solanarpcj.crypto.bip.HDKeyDerivation;
 import net.deanly.solanarpcj.crypto.bip.MnemonicGenerator;
@@ -53,8 +52,20 @@ public class KeyPair {
         return new PrivateKey(privateKeyParams.getEncoded());
     }
 
-    public byte[] getPrivateKeyBytes() {
-        return privateKeyParams.getEncoded();
+    /**
+     * Returns the full 64-byte private key (private scalar + public key).
+     *
+     * @return The 64-byte private key.
+     */
+    public byte[] toByteArray() {
+        byte[] privateScalar = privateKeyParams.getEncoded(); // 32 bytes
+        byte[] publicKeyBytes = publicKey.toByteArray(); // 32 bytes
+
+        byte[] fullKey = new byte[64];
+        System.arraycopy(privateScalar, 0, fullKey, 0, 32);
+        System.arraycopy(publicKeyBytes, 0, fullKey, 32, 32);
+
+        return fullKey;
     }
 
     public String getPublicKeyBase58() {
@@ -62,7 +73,7 @@ public class KeyPair {
     }
 
     public String getPrivateKeyBase58() {
-        return Base58.encode(getPrivateKeyBytes());
+        return Base58.encode(toByteArray());
     }
 
     public static KeyPair fromMnemonic(List<String> words, String passphrase) {
@@ -81,7 +92,7 @@ public class KeyPair {
     public String toString() {
         return "KeyPair{" +
                 "publicKey=" + getPublicKeyBase58() +
-                ", privateKey=" + getPrivateKeyBase58() +
+                ", privateKey=****" +
                 '}';
     }
 }

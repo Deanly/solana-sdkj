@@ -59,7 +59,7 @@ public class TokenInstruction16InitializeAccount2 extends SplTokenProgram.Base i
 
         // Set keys using JavaScript's isWritable and isSigner logic
         this.keys = new ArrayList<>();
-        this.keys.add(new AccountMeta(account, true, false));  // Writable account to initialize
+        this.keys.add(new AccountMeta(account, false, true));  // Writable account to initialize
         this.keys.add(new AccountMeta(mint, false, false));    // Read-only mint
         this.keys.add(new AccountMeta(rent, false, false));    // Read-only Rent sysvar
     }

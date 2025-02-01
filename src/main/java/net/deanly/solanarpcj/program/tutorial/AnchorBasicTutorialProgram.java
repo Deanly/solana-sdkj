@@ -30,7 +30,7 @@ public class AnchorBasicTutorialProgram extends Program {
      */
     public static TransactionInstruction initialize(KeyPair caller) {
         final List<AccountMeta> keys = new ArrayList<>();
-        keys.add(new AccountMeta(caller.getPublicKey(),true, false));
+        keys.add(new AccountMeta(caller.getPublicKey(), false, true));
 
         byte[] transactionData = encodeInitializeData();
 

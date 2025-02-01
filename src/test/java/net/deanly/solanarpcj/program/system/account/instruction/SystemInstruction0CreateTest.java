@@ -21,7 +21,7 @@ class SystemInstruction0CreateTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(fromAccount, true, true), // Payer (funding account)
-                new AccountMeta(newAccount, true, false) // New account
+                new AccountMeta(newAccount, false, true) // New account
         );
 
         long lamports = 1_000_000;

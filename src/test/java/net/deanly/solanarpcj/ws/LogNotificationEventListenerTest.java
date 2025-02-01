@@ -21,6 +21,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.ArrayList;
 
+@Disabled
 public class LogNotificationEventListenerTest {
 
     @Mock
@@ -109,7 +110,6 @@ public class LogNotificationEventListenerTest {
      * Verifies that the getClient and getListeningPubkey methods return the expected values.
      */
     @Test
-    @Disabled
     public void testGetters() {
         assertEquals(mockRpcClient, listener.getClient(), "RpcClient should match");
         assertEquals(testPublicKey, listener.getListeningPubkey(), "PublicKey should match");

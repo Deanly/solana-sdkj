@@ -10,6 +10,7 @@ import net.deanly.solanarpcj.transaction.instruction.TransactionInstruction;
 import net.deanly.solanarpcj.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solanarpcj.program.alt.state.AddressLookupTableAccount;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -53,7 +54,7 @@ class MessageCompilerTest {
         PublicKey accountKey2 = new PublicKey("FourthPubke44444444444444444444444444444444");
 
         AccountMeta accountMeta1 = new AccountMeta(accountKey1, true, true); // Writable account
-        AccountMeta accountMeta2 = new AccountMeta(accountKey2, true, false); // Writable account
+        AccountMeta accountMeta2 = new AccountMeta(accountKey2, false, true); // Writable account
         TransactionInstruction instruction = new TransactionInstructionImpl(
                 programId, List.of(accountMeta1, accountMeta2), new byte[]{}
         );
@@ -67,7 +68,7 @@ class MessageCompilerTest {
                 new PublicKey("ThirdPubkey33333333333333333333333333333333"),
                 new AddressLookupTableAccount.State(
                         1,
-                        0xFFFFFFFFFFFFFFFFL,
+                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,
@@ -166,7 +167,7 @@ class MessageCompilerTest {
                 new PublicKey("FourthPubke44444444444444444444444444444444"),
                 new AddressLookupTableAccount.State(
                         1,
-                        0xFFFFFFFFFFFFFFFFL,
+                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,
@@ -204,7 +205,7 @@ class MessageCompilerTest {
         PublicKey programId = new PublicKey("SecondProgram111111111111111111111111111111");
 
         PublicKey accountKey = new PublicKey("SecondPubey22222222222222222222222222222222");
-        AccountMeta accountMeta = new AccountMeta(accountKey, false, true);
+        AccountMeta accountMeta = new AccountMeta(accountKey, true, false);
 
         TransactionInstruction instruction = new TransactionInstructionImpl(
                 programId, List.of(accountMeta), new byte[]{}
@@ -218,7 +219,7 @@ class MessageCompilerTest {
                 new PublicKey("FourthPubke44444444444444444444444444444444"),
                 new AddressLookupTableAccount.State(
                         1,
-                        0xFFFFFFFFFFFFFFFFL,
+                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,

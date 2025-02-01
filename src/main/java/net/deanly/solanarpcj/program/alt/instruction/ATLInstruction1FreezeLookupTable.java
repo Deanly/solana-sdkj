@@ -31,7 +31,7 @@ public class ATLInstruction1FreezeLookupTable extends AddressLookupTableProgram.
     public void setKeys(PublicKey lookupTable, PublicKey authority) {
         this.keys = List.of(
                 new AccountMeta(lookupTable, true, true), // Lookup Table (Writable)
-                new AccountMeta(authority, false, true) // Authority (Signer, Not Writable)
+                new AccountMeta(authority, true, false) // Authority (Signer, Not Writable)
         );
     }
 
@@ -39,8 +39,24 @@ public class ATLInstruction1FreezeLookupTable extends AddressLookupTableProgram.
         return StructLayout.encode(this);
     }
 
-    public void setData(byte[] data) {
-        ATLInstruction1FreezeLookupTable instruction = StructLayout.decode(data, ATLInstruction1FreezeLookupTable.class);
-        this.keys = instruction.getKeys();
+    /**
+     * Creates a new instance of {@code ATLInstruction1FreezeLookupTable} configured
+     * for the FreezeLookupTable operation with the specified lookup table and authority.
+     *
+     * @param lookupTable The public key of the lookup table to be frozen (cannot be null).
+     * @param authority The public key of the authority responsible for the FreezeLookupTable operation (cannot be null).
+     * @return A new instance of {@code ATLInstruction1FreezeLookupTable} with the specified keys set.
+     * @throws IllegalArgumentException If either {@code lookupTable} or {@code authority} is null.
+     */
+    public static ATLInstruction1FreezeLookupTable create(
+            @NonNull PublicKey lookupTable,
+            @NonNull PublicKey authority) {
+        // Input validation
+        if (authority == null || authority == null) {
+            throw new IllegalArgumentException("LookupTable and authority cannot be null.");
+        }
+        ATLInstruction1FreezeLookupTable instruction = new ATLInstruction1FreezeLookupTable();
+        instruction.setKeys(lookupTable, authority);
+        return instruction;
     }
 }

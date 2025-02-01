@@ -130,12 +130,12 @@ public class Transaction {
 
         signatures.clear();
         for (KeyPair signer : signers) {
-            try {
-                byte[] signature = Ed25519Signer.sign(serializedMessage, signer.getPrivateKeyBytes());
+//            try {
+                byte[] signature = Ed25519Signer.sign(serializedMessage, signer.toByteArray());
                 signatures.add(Base58.encode(signature));
-            } catch (GeneralSecurityException e) {
-                throw new RuntimeException("Error signing transaction", e);
-            }
+//            } catch (GeneralSecurityException e) {
+//                throw new RuntimeException("Error signing transaction", e);
+//            }
         }
     }
 

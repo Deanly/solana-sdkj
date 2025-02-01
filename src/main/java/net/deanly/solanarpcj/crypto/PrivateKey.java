@@ -31,4 +31,9 @@ public class PrivateKey {
         Arrays.fill(encoded, (byte) 0);
         this.isCleared = true;
     }
+
+    @Override
+    public String toString() {
+        return "PublicKey{***}";
+    }
 }

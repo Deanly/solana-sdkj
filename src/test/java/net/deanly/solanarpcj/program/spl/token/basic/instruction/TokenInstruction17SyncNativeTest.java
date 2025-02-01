@@ -1,17 +1,10 @@
 package net.deanly.solanarpcj.program.spl.token.basic.instruction;
 
 import net.deanly.solanarpcj.crypto.PublicKey;
-import net.deanly.solanarpcj.crypto.PublicKeyTransformer;
-import net.deanly.solanarpcj.program.spl.token.basic.instruction.TokenInstruction17SyncNative;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class TokenInstruction17SyncNativeTest {
-    @BeforeAll
-    public static void initializeTransformer() {
-        PublicKeyTransformer.transform();
-    }
 
     @Test
     public void testSyncNative() {

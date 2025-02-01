@@ -1,10 +1,13 @@
 package net.deanly.solanarpcj.program.spl.token.associated.instruction;
 
+import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SplAssociatedTokenInstruction2RecoverNestedTest {
 
@@ -16,7 +19,7 @@ public class SplAssociatedTokenInstruction2RecoverNestedTest {
         PublicKey ownerAssociatedAccount = new PublicKey("OwnerAccountKey");
         PublicKey ownerTokenMint = new PublicKey("OwnerMintKey");
         PublicKey walletKey = new PublicKey("WalletKey");
-        PublicKey tokenProgramKey = new PublicKey("TokenProgramKey");
+        PublicKey tokenProgramKey = SplTokenProgram.PROGRAM_ID;
 
         // Create instruction
         SplAssociatedTokenInstruction2RecoverNested instruction =
@@ -31,13 +34,19 @@ public class SplAssociatedTokenInstruction2RecoverNestedTest {
 
         // Validate set keys
         List<AccountMeta> keys = instruction.getKeys();
-        assert keys.size() == 7;
-        assert keys.get(0).getPublicKey().toString().equals("NestedAccountPublicKey");
-        assert keys.get(6).getPublicKey().toString().equals("TokenProgramKey");
+        assertEquals(7, keys.size());
+        assertEquals(2, instruction.getDiscriminator(), "Discriminator should match expected value.");
+        assertEquals(walletKey, keys.get(5).getPublicKey(), "Wallet key should match expected value.");
+        assertEquals(ownerTokenMint, keys.get(4).getPublicKey(), "Owner token mint key should match expected value.");
+        assertEquals(ownerAssociatedAccount, keys.get(3).getPublicKey(), "Owner associated account key should match expected value.");
+        assertEquals(destinationAccount, keys.get(2).getPublicKey(), "Destination account key should match expected value.");
+        assertEquals(nestedTokenMint, keys.get(1).getPublicKey(), "Nested token mint key should match expected value.");
+        assertEquals(nestedAssociatedAccount, keys.get(0).getPublicKey(), "Nested associated account key should match expected value.");
+        assertEquals(tokenProgramKey, keys.get(6).getPublicKey(), "Token program key should match expected value.");
 
         // Validate data encoding
         byte[] encodedData = instruction.getData();
-        assert encodedData.length == 1; // Discriminator only
-        assert encodedData[0] == 2; // Discriminator value matches
+        assertEquals(1, encodedData.length, "Data length should match expected value.");
+        assertEquals(2, encodedData[0], "Data value should match expected value.");
     }
 }

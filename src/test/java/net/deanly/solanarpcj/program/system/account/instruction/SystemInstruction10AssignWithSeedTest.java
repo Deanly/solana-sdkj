@@ -20,14 +20,14 @@ class SystemInstruction10AssignWithSeedTest {
         String seed = "unique-seed";
         PublicKey programId = new PublicKey("ThirdPubkey33333333333333333333333333333333");
 
-        List<AccountMeta> keys = Collections.singletonList(
-                new AccountMeta(derivedAccount, true, true) // Derived account
+        // Create instruction instance
+        SystemInstruction10AssignWithSeed instruction = SystemInstruction10AssignWithSeed.create(
+                derivedAccount, base, seed, programId
         );
 
-        // Create instruction instance
-        SystemInstruction10AssignWithSeed instruction = new SystemInstruction10AssignWithSeed(
-                keys, base, seed, programId
-        );
+        assertEquals(2, instruction.getKeys().size());
+        assertEquals(derivedAccount, instruction.getKeys().get(0).getPublicKey());
+        assertEquals(base, instruction.getKeys().get(1).getPublicKey());
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -46,7 +46,5 @@ class SystemInstruction10AssignWithSeedTest {
         assertEquals(instruction.getBase(), decodedInstruction.getBase());
         assertEquals(instruction.getSeed(), decodedInstruction.getSeed());
         assertEquals(instruction.getProgramId(), decodedInstruction.getProgramId());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
     }
 }

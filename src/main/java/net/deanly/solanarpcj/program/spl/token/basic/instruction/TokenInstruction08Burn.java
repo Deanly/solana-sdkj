@@ -63,14 +63,14 @@ public class TokenInstruction08Burn extends SplTokenProgram.Base implements Tran
 
         // Initialize keys
         keys = new ArrayList<>();
-        keys.add(new AccountMeta(account, true, false));            // Account: writable, not signer
-        keys.add(new AccountMeta(mint, true, false));              // Mint: writable, not signer
-        keys.add(new AccountMeta(authority, false, true));         // Authority: signer, read-only
+        keys.add(new AccountMeta(account, false, true));            // Account: writable, not signer
+        keys.add(new AccountMeta(mint, false, true));              // Mint: writable, not signer
+        keys.add(new AccountMeta(authority, true, false));         // Authority: signer, read-only
 
         // Add multiSigners if any
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                keys.add(new AccountMeta(signer, false, true));    // Multi-signers: signer, read-only
+                keys.add(new AccountMeta(signer, true, false));    // Multi-signers: signer, read-only
             }
         }
     }

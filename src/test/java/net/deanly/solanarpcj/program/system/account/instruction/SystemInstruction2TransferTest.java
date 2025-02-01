@@ -20,13 +20,17 @@ class SystemInstruction2TransferTest {
 
         List<AccountMeta> keys = Arrays.asList(
                 new AccountMeta(fromAccount, true, true), // Sender account
-                new AccountMeta(toAccount, false, true)  // Receiver account
+                new AccountMeta(toAccount, true, false)  // Receiver account
         );
 
         long lamports = 1_000_000L;
 
         // Create instruction instance
         SystemInstruction2Transfer instruction = new SystemInstruction2Transfer(keys, lamports);
+
+        assertEquals(instruction.getKeys().size(), 2);
+        assertEquals(instruction.getKeys().get(0).getPublicKey(), fromAccount);
+        assertEquals(instruction.getKeys().get(1).getPublicKey(), toAccount);
 
         // Act: Encode the instruction
         byte[] encodedData = instruction.getData();
@@ -40,8 +44,5 @@ class SystemInstruction2TransferTest {
 
         // Validate the decoded instruction matches the original
         assertEquals(instruction.getLamports(), decodedInstruction.getLamports());
-        assertEquals(instruction.getKeys().size(), decodedInstruction.getKeys().size());
-        assertEquals(instruction.getKeys().get(0).getPublicKey(), decodedInstruction.getKeys().get(0).getPublicKey());
-        assertEquals(instruction.getKeys().get(1).getPublicKey(), decodedInstruction.getKeys().get(1).getPublicKey());
     }
 }

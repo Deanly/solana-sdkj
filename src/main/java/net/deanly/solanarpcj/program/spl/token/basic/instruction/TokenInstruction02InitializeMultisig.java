@@ -46,7 +46,6 @@ public class TokenInstruction02InitializeMultisig extends SplTokenProgram.Base i
      *   2+ `[signer]` The signer accounts.
      * </pre>
      */
-
     @Setter
     private List<AccountMeta> keys = new ArrayList<>(); // List of accounts required for this instruction.
 
@@ -56,30 +55,26 @@ public class TokenInstruction02InitializeMultisig extends SplTokenProgram.Base i
      * @param multisigAccount The multisig account to initialize. Writable, non-signer.
      * @param signerKeys List of public keys for the signers. Writable, signer.
      * @param rent Optional rent sysvar. Defaults to SysvarRent if null.
-     * @param additionalAccounts Optional additional accounts to include.
      */
     public void setKeys(
             @NonNull PublicKey multisigAccount,
             @NonNull List<PublicKey> signerKeys,
-            PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            PublicKey rent
     ) {
+        if (signerKeys.isEmpty() || signerKeys.size() > 11) {
+            throw new IllegalArgumentException("Invalid number of signer keys. Must be between 1 and 11.");
+        }
         if (rent == null) {
             rent = Sysvar.SYSVAR_RENT_ADDRESS; // Default Rent account
         }
 
         // Keys 구성
         this.keys = new ArrayList<>();
-        this.keys.add(new AccountMeta(multisigAccount, true, false)); // Multisig: Writable, Non-Signer
+        this.keys.add(new AccountMeta(multisigAccount, false, true)); // Multisig: Writable, Non-Signer
         this.keys.add(new AccountMeta(rent, false, false));          // Rent: Read-Only, Non-Signer
 
         // Signers
-        signerKeys.forEach(signer -> this.keys.add(new AccountMeta(signer, true, true))); // Signers: Writable, Signer
-
-        // Remaining (optional) accounts
-        if (additionalAccounts != null && !additionalAccounts.isEmpty()) {
-            this.keys.addAll(additionalAccounts);
-        }
+        signerKeys.forEach(signer -> this.keys.add(AccountMeta.roleReadOnlySigner(signer))); // Signers: Writable, Signer
 
         // Automatically set `m` if not explicitly defined
         this.m = signerKeys.size();
@@ -101,14 +96,12 @@ public class TokenInstruction02InitializeMultisig extends SplTokenProgram.Base i
      * @param multisigAccount The multisig account to initialize. Writable, non-signer.
      * @param signerKeys List of public keys for the signers.
      * @param rent Optional rent sysvar. Defaults to the SysvarRent.
-     * @param additionalAccounts Optional additional accounts to include.
      * @return A fully configured TokenInstruction02InitializeMultisig instance.
      */
     public static TokenInstruction02InitializeMultisig create(
             @NonNull PublicKey multisigAccount,
             @NonNull List<PublicKey> signerKeys,
-            PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            PublicKey rent
     ) {
         // Validate inputs
         validateInputs(multisigAccount, signerKeys);
@@ -117,7 +110,7 @@ public class TokenInstruction02InitializeMultisig extends SplTokenProgram.Base i
         TokenInstruction02InitializeMultisig instruction = new TokenInstruction02InitializeMultisig();
 
         // Set keys and additional remaining accounts
-        instruction.setKeys(multisigAccount, signerKeys, rent, additionalAccounts);
+        instruction.setKeys(multisigAccount, signerKeys, rent);
 
         return instruction;
     }

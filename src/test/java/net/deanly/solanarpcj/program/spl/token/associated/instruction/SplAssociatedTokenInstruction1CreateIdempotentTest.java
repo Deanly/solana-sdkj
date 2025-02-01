@@ -1,5 +1,7 @@
 package net.deanly.solanarpcj.program.spl.token.associated.instruction;
 
+import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
+import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import org.junit.jupiter.api.Test;
@@ -14,11 +16,11 @@ public class SplAssociatedTokenInstruction1CreateIdempotentTest {
     public void testCreateInstruction() {
         // Define mock objects for PublicKeys
         PublicKey payer = new PublicKey("DummyPayerPublicKey");
-        PublicKey ata = new PublicKey("DummyATAPublicKey");
+        PublicKey ata = new PublicKey("6M8tvLDtG47BmPJj1nn1tkUpcHm4o2jDDqeZWkRp2amR");
         PublicKey owner = new PublicKey("DummyOwnerPublicKey");
         PublicKey mint = new PublicKey("DummyMintPublicKey");
-        PublicKey systemProgram = new PublicKey("DummySystemProgram");
-        PublicKey tokenProgram = new PublicKey("DummyTokenProgram");
+        PublicKey systemProgram = SystemProgram.PROGRAM_ID;
+        PublicKey tokenProgram = SplTokenProgram.PROGRAM_ID;
 
         // Generate the instruction
         SplAssociatedTokenInstruction1CreateIdempotent instruction =

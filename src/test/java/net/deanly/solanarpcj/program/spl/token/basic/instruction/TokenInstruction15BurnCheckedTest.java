@@ -30,10 +30,10 @@ public class TokenInstruction15BurnCheckedTest {
 
         Assertions.assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         Assertions.assertTrue(instruction.getKeys().get(0).isWritable());
-        Assertions.assertEquals(owner, instruction.getKeys().get(1).getPublicKey());
-        Assertions.assertTrue(instruction.getKeys().get(1).isSigner());
-        Assertions.assertEquals(mint, instruction.getKeys().get(2).getPublicKey());
-        Assertions.assertFalse(instruction.getKeys().get(2).isWritable());
+        Assertions.assertEquals(mint, instruction.getKeys().get(1).getPublicKey());
+        Assertions.assertTrue(instruction.getKeys().get(1).isWritable());
+        Assertions.assertEquals(owner, instruction.getKeys().get(2).getPublicKey());
+        Assertions.assertTrue(instruction.getKeys().get(2).isSigner());
 
         // Verify encoded data
         byte[] encoded = instruction.getData();
@@ -64,9 +64,9 @@ public class TokenInstruction15BurnCheckedTest {
 
         Assertions.assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         Assertions.assertTrue(instruction.getKeys().get(0).isWritable());
-        Assertions.assertEquals(multisig, instruction.getKeys().get(1).getPublicKey());
-        Assertions.assertFalse(instruction.getKeys().get(1).isWritable());
-        Assertions.assertEquals(mint, instruction.getKeys().get(2).getPublicKey());
+        Assertions.assertEquals(mint, instruction.getKeys().get(1).getPublicKey());
+        Assertions.assertTrue(instruction.getKeys().get(1).isWritable());
+        Assertions.assertEquals(multisig, instruction.getKeys().get(2).getPublicKey());
         Assertions.assertFalse(instruction.getKeys().get(2).isWritable());
         Assertions.assertEquals(signer1, instruction.getKeys().get(3).getPublicKey());
         Assertions.assertTrue(instruction.getKeys().get(3).isSigner());

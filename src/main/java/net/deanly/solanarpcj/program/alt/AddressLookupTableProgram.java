@@ -23,14 +23,9 @@ public abstract class AddressLookupTableProgram {
     public static ATLInstruction0CreateLookupTable createLookupTable(
             @NonNull PublicKey authority,
             @NonNull PublicKey payer,
-            long recentSlot,
-            int bumpSeed
+            long recentSlot
     ) {
-        ATLInstruction0CreateLookupTable instruction = new ATLInstruction0CreateLookupTable();
-        instruction.setRecentSlot(recentSlot);
-        instruction.setBumpSeed(bumpSeed);
-        instruction.setKeys(authority, payer);
-        return instruction;
+        return ATLInstruction0CreateLookupTable.create(authority, payer, recentSlot);
     }
 
     /**
@@ -40,9 +35,7 @@ public abstract class AddressLookupTableProgram {
             @NonNull PublicKey lookupTable,
             @NonNull PublicKey authority
     ) {
-        ATLInstruction1FreezeLookupTable instruction = new ATLInstruction1FreezeLookupTable();
-        instruction.setKeys(lookupTable, authority);
-        return instruction;
+        return ATLInstruction1FreezeLookupTable.create(lookupTable, authority);
     }
 
     /**
@@ -54,9 +47,7 @@ public abstract class AddressLookupTableProgram {
             PublicKey payer,
             @NonNull List<PublicKey> addresses
     ) {
-        ATLInstruction2ExtendLookupTable instruction = new ATLInstruction2ExtendLookupTable();
-        instruction.setKeys(lookupTable, authority, payer, addresses);
-        return instruction;
+        return ATLInstruction2ExtendLookupTable.create(lookupTable, authority, payer, addresses);
     }
 
     /**
@@ -66,9 +57,7 @@ public abstract class AddressLookupTableProgram {
             @NonNull PublicKey lookupTable,
             @NonNull PublicKey authority
     ) {
-        ATLInstruction3DeactivateLookupTable instruction = new ATLInstruction3DeactivateLookupTable();
-        instruction.setKeys(lookupTable, authority);
-        return instruction;
+        return ATLInstruction3DeactivateLookupTable.create(lookupTable, authority);
     }
 
     /**
@@ -79,8 +68,6 @@ public abstract class AddressLookupTableProgram {
             @NonNull PublicKey authority,
             @NonNull PublicKey recipient
     ) {
-        ATLInstruction4CloseLookupTable instruction = new ATLInstruction4CloseLookupTable();
-        instruction.setKeys(lookupTable, authority, recipient);
-        return instruction;
+        return ATLInstruction4CloseLookupTable.create(lookupTable, authority, recipient);
     }
 }

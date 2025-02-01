@@ -58,14 +58,14 @@ public class TokenInstruction09CloseAccount extends SplTokenProgram.Base impleme
 
         // Initialize keys
         keys = new ArrayList<>();
-        keys.add(new AccountMeta(accountToClose, true, false));     // Account to close: writable, not signer
-        keys.add(new AccountMeta(destination, true, false));        // Destination: writable, not signer
-        keys.add(new AccountMeta(owner, false, true));             // Owner: read-only, signer
+        keys.add(new AccountMeta(accountToClose, false, true));     // Account to close: writable, not signer
+        keys.add(new AccountMeta(destination, false, true));        // Destination: writable, not signer
+        keys.add(new AccountMeta(owner, true, false));             // Owner: read-only, signer
 
         // Add multiSigners if provided
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                keys.add(new AccountMeta(signer, false, true));    // Multi-signers: read-only, signer
+                keys.add(new AccountMeta(signer, true, false));    // Multi-signers: read-only, signer
             }
         }
     }

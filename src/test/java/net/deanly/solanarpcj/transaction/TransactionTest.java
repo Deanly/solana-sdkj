@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import net.deanly.solanarpcj.crypto.KeyPair;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.program.spl.memo.SplMemoProgram;
+import net.deanly.solanarpcj.program.spl.memo.instruction.SplMemoInstructionWrite;
 import net.deanly.solanarpcj.program.system.account.SystemProgram;
 
+import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,19 +44,28 @@ public class TransactionTest {
     @Test
     public void transactionBuilderTest() {
         final String memo = "Test memo";
+        SplMemoInstructionWrite instruction = SplMemoProgram.write(
+                memo,
+                List.of(signer.getPublicKey())
+        );
+        instruction.setProgramId(SplMemoProgram.PROGRAM_ID_OLD);
         final Transaction transaction = new TransactionBuilder()
-                .addInstruction(
-                        SplMemoProgram.write(
-                                signer.getPublicKey(),
-                                memo
-                        )
-                )
+                .addInstruction(instruction)
                 .setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
                 .setSigners(List.of(signer))
                 .build();
 
+        StructLayout.debug(transaction);
+
+        String expectedBase64 = "AV6w4Af9PSHhNsTSal4vlPF7Su9QXgCVyfDChHImJITLcS5BlNotKFeMoGw87VwjS3eNA2JCL+MEoReynCNbWAoBAAECBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwFSlNQ+F3IgtYUpVZyeIopbd8eq6vQpgZ4iEky9O72oMviiMGZlPAy5mIJT92z865aQ2ipBrulSCScEzmEJkX1AQEBAAlUZXN0IG1lbW8=";
+        byte[] expectedBytes = Base64.getDecoder().decode(expectedBase64);
+//        Transaction decodedTransaction = StructLayout.decode(expectedBytes, Transaction.class);
+
+//        StructLayout.debug(decodedTransaction);
+        StructLayout.debug(expectedBytes);
+
         assertEquals(
-                "AV6w4Af9PSHhNsTSal4vlPF7Su9QXgCVyfDChHImJITLcS5BlNotKFeMoGw87VwjS3eNA2JCL+MEoReynCNbWAoBAAECBhrZ0FOHFUhTft4+JhhJo9+3/QL6vHWyI8jkatuFPQwFSlNQ+F3IgtYUpVZyeIopbd8eq6vQpgZ4iEky9O72oMviiMGZlPAy5mIJT92z865aQ2ipBrulSCScEzmEJkX1AQEBAAlUZXN0IG1lbW8=",
+                expectedBase64,
                 Base64.getEncoder().encodeToString(transaction.serialize())
         );
     }

@@ -64,14 +64,14 @@ public class TokenInstruction04Approve extends SplTokenProgram.Base implements T
         this.keys.clear();
 
         // Add required keys (source, delegate, owner)
-        this.keys.add(new AccountMeta(source, true, false)); // Source: Writable, not signer.
+        this.keys.add(new AccountMeta(source, false, true)); // Source: Writable, not signer.
         this.keys.add(new AccountMeta(delegate, false, false)); // Delegate: Read-only, not signer.
-        this.keys.add(new AccountMeta(owner, false, true)); // Owner: Read-only, signer.
+        this.keys.add(new AccountMeta(owner, true, false)); // Owner: Read-only, signer.
 
         // Add additional multi-signers
         if (multiSigners != null) {
             for (PublicKey signer : multiSigners) {
-                this.keys.add(new AccountMeta(signer, false, true)); // Each signer: Read-only, signer.
+                this.keys.add(new AccountMeta(signer, true, false)); // Each signer: Read-only, signer.
             }
         }
     }

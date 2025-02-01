@@ -11,6 +11,7 @@ import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.type.advanced.NoneField;
 import net.deanly.structlayout.type.basic.*;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,13 +22,15 @@ public class AddressLookupTableAccount {
     private static final int TYPE_INDEX = 1;
     private static final int PUBLIC_KEY_SIZE = 32;
     private static final int LOOKUP_TABLE_META_SIZE = 56;
-    private static final long U64_MAX = 0xFFFFFFFFFFFFFFFFL;
+    private static final long U64_MAX_LONG = 0xFFFFFFFFFFFFFFFFL;
+    private static final BigInteger U64_MAX_BIGINT = UInt64LEField.UINT64_MAX;
 
     private final PublicKey key;
     private final State state;
 
     public boolean isActive() {
-        return this.state.deactivationSlot == U64_MAX;
+//        return this.state.deactivationSlot == U64_MAX;
+        return this.state.deactivationSlot.equals(U64_MAX_BIGINT);
     }
 
     public static AddressLookupTableAccount deserialize(PublicKey key, byte[] data) {
@@ -102,7 +105,7 @@ public class AddressLookupTableAccount {
         long typeIndex;
 
         @StructField(order = 2, type = UInt64LEField.class)
-        long deactivationSlot;
+        BigInteger deactivationSlot;
 
         @StructField(order = 3, type = UInt64LEField.class)
         long lastExtendedSlot;
@@ -119,7 +122,7 @@ public class AddressLookupTableAccount {
         @StructSequenceField(order = 7, elementType = PublicKeyField.class, lengthType = NoneField.class)
         List<PublicKey> addresses;
 
-        public State(int typeIndex, long deactivationSlot, long lastExtendedSlot, int lastExtendedStartIndex, PublicKey authority, List<PublicKey> addresses) {
+        public State(int typeIndex, BigInteger deactivationSlot, long lastExtendedSlot, int lastExtendedStartIndex, PublicKey authority, List<PublicKey> addresses) {
             this.typeIndex = typeIndex;
             this.deactivationSlot = deactivationSlot;
             this.lastExtendedSlot = lastExtendedSlot;

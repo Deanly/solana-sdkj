@@ -58,14 +58,14 @@ public class TokenInstruction10FreezeAccount extends SplTokenProgram.Base implem
         this.keys = new ArrayList<>();
 
         // Add required accounts
-        keys.add(new AccountMeta(accountToFreeze, true, false));   // Account to freeze: writable, not signer
+        keys.add(new AccountMeta(accountToFreeze, false, true));   // Account to freeze: writable, not signer
         keys.add(new AccountMeta(mint, false, false));            // Mint: read-only, not signer
-        keys.add(new AccountMeta(freezeAuthority, false, multiSigners == null || multiSigners.isEmpty())); // Freeze authority: read-only, signer if no multisigners
+        keys.add(new AccountMeta(freezeAuthority, multiSigners == null || multiSigners.isEmpty(), false)); // Freeze authority: read-only, signer if no multisigners
 
         // Add multisigners (if any exist)
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                keys.add(new AccountMeta(signer, false, true));   // Multisignature signers: read-only, signer
+                keys.add(new AccountMeta(signer, true, false));   // Multisignature signers: read-only, signer
             }
         }
     }

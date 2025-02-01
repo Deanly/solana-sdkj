@@ -2,6 +2,7 @@ package net.deanly.solanarpcj.program.alt.instruction;
 
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.program.system.Sysvar;
+import net.deanly.solanarpcj.program.system.account.SystemProgram;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +21,7 @@ public class ATLInstruction0CreateLookupTableTest {
         // Create instruction
         ATLInstruction0CreateLookupTable instruction = new ATLInstruction0CreateLookupTable();
         instruction.setRecentSlot(recentSlot);
-        instruction.setBumpSeed(bumpSeed);
-        instruction.setKeys(authority, payer);
+        instruction.setKeys(authority, payer, recentSlot);
 
         // Validate instruction data
         byte[] encodedData = instruction.getData();
@@ -32,7 +32,7 @@ public class ATLInstruction0CreateLookupTableTest {
 
         // Validate keys
         assertEquals(4, instruction.getKeys().size());
-        assertEquals("Derived address", instruction.getKeys().get(0).getPublicKey().toBase58()); // Replace "Derived address" appropriately
+        assertEquals("8SukFg2JSCWfCes7XJBB6nwWdXyDuGDW53owC4QcdAXW", instruction.getKeys().get(0).getPublicKey().toBase58());
         assertTrue(instruction.getKeys().get(0).isWritable());
         assertFalse(instruction.getKeys().get(0).isSigner());
 
@@ -44,7 +44,7 @@ public class ATLInstruction0CreateLookupTableTest {
         assertTrue(instruction.getKeys().get(2).isWritable());
         assertTrue(instruction.getKeys().get(2).isSigner());
 
-        assertEquals(Sysvar.SYSVAR_CLOCK_ADDRESS.toBase58(), instruction.getKeys().get(3).getPublicKey().toBase58());
+        assertEquals(SystemProgram.PROGRAM_ID, instruction.getKeys().get(3).getPublicKey());
         assertFalse(instruction.getKeys().get(3).isWritable());
         assertFalse(instruction.getKeys().get(3).isSigner());
     }

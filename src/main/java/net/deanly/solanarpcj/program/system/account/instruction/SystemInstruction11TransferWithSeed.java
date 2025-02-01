@@ -42,19 +42,18 @@ public class SystemInstruction11TransferWithSeed extends SystemProgram.Base impl
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 11; // Instruction index (11) for TransferWithSeed
 
-    private List<AccountMeta> keys; // Accounts involved in the transaction (source, destination)
-
     @StructField(order = 2, type = UInt64LEField.class)
     private long lamports; // Amount of lamports to transfer (u64 format)
 
     @StructField(order = 3, type = RustStringField.class)
     private String seed; // Seed string for deriving the source account
 
-//    @StructField(order = 4, type = PublicKeyField.class)
-//    private PublicKey base; // Base public key for the source account derivation
-
-    @StructField(order = 5, type = PublicKeyField.class)
+    @StructField(order = 4, type = PublicKeyField.class)
     private PublicKey programId; // Program ID to which the derived source account is assigned
+
+
+    private List<AccountMeta> keys; // Accounts involved in the transaction (source, destination)
+
 
     @Override
     public byte[] getData() {
@@ -67,9 +66,9 @@ public class SystemInstruction11TransferWithSeed extends SystemProgram.Base impl
      */
     public void setKeys(PublicKey fromPubkey, PublicKey basePubkey, PublicKey toPubkey) {
         this.keys = List.of(
-                new AccountMeta(fromPubkey, true, true),   // Sender (Writable, Signer)
-                new AccountMeta(basePubkey, false, true), // Base (Read-only, Signer)
-                new AccountMeta(toPubkey, true, false)    // Receiver (Writable, Non-signer)
+                new AccountMeta(fromPubkey, false, true),   // Sender (Writable, Non-Signer)
+                new AccountMeta(basePubkey, true, false), // Base (Read-only, Signer)
+                new AccountMeta(toPubkey, false, true)    // Receiver (Writable, Non-signer)
         );
     }
 

@@ -21,13 +21,13 @@ public class SplTokenProgram {
     }
 
     public static TokenInstruction00InitializeMint initializeMint(
+            @NonNull PublicKey mint,
             @NonNull PublicKey mintAuthority,
             int decimals,
-            @NonNull PublicKey mint,
             PublicKey freezeAuthority,
             PublicKey rentAccount
     ) {
-        return TokenInstruction00InitializeMint.create(mintAuthority, decimals, mint, freezeAuthority, rentAccount);
+        return TokenInstruction00InitializeMint.create(mint, mintAuthority, decimals, freezeAuthority, rentAccount);
     }
 
     public static TokenInstruction01InitializeAccount initializeAccount(
@@ -35,7 +35,7 @@ public class SplTokenProgram {
             @NonNull PublicKey mint,
             @NonNull PublicKey owner,
             PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            List<PublicKey> additionalAccounts
     ) {
         return TokenInstruction01InitializeAccount.create(account, mint, owner, rent, additionalAccounts);
     }
@@ -43,10 +43,9 @@ public class SplTokenProgram {
     public static TokenInstruction02InitializeMultisig initializeMultisig(
             @NonNull PublicKey multisigAccount,
             @NonNull List<PublicKey> signerKeys,
-            PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            PublicKey rent
     ) {
-        return TokenInstruction02InitializeMultisig.create(multisigAccount, signerKeys, rent, additionalAccounts);
+        return TokenInstruction02InitializeMultisig.create(multisigAccount, signerKeys, rent);
     }
 
     public static TokenInstruction03Transfer transfer(
@@ -143,7 +142,7 @@ public class SplTokenProgram {
             int decimals,
             List<PublicKey> multiSigners
     ) {
-        return TokenInstruction12TransferChecked.create(source, mint, destination, authority, amount, decimals, multiSigners);
+        return TokenInstruction12TransferChecked.create(source, destination, mint, authority, amount, decimals, multiSigners);
     }
 
     public static TokenInstruction13ApproveChecked approveChecked(

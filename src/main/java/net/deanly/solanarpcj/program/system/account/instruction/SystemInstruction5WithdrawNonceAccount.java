@@ -72,11 +72,11 @@ public class SystemInstruction5WithdrawNonceAccount extends SystemProgram.Base i
         }
 
         this.keys = List.of(
-                new AccountMeta(nonceAccount, true, false), // Nonce account: Writable, not signer
-                new AccountMeta(destinationAccount, true, false), // Destination account: Writable, not signer
-                new AccountMeta(authorityAccount, false, true), // Authority account: Signer, not writable
+                new AccountMeta(nonceAccount, false, true), // Nonce account: Writable, not signer
+                new AccountMeta(destinationAccount, false, true), // Destination account: Writable, not signer
                 new AccountMeta(Sysvar.SYSVAR_RECENT_BLOCKHASHES_ADDRESS, false, false), // Recent blockhashes sysvar
-                new AccountMeta(Sysvar.SYSVAR_RENT_ADDRESS, false, false) // Rent sysvar
+                new AccountMeta(Sysvar.SYSVAR_RENT_ADDRESS, false, false), // Rent sysvar
+                new AccountMeta(authorityAccount, true, false) // Authority account: Signer, not writable
         );
     }
 

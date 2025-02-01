@@ -3,7 +3,7 @@ package net.deanly.solanarpcj.program.spl.token.basic.instruction;
 import lombok.*;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
-import net.deanly.solanarpcj.layout.field.PublicKeyCOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -54,7 +54,7 @@ public class TokenInstruction20InitializeMint2 extends SplTokenProgram.Base impl
     private PublicKey mintAuthority; // The authority to mint tokens.
 
     @Setter
-    @StructField(order = 4, type = PublicKeyCOptionField.class)
+    @StructField(order = 4, type = PublicKeyBorshOptionField.class)
     private PublicKey freezeAuthority; // The authority to freeze accounts (optional).
 
     /**
@@ -77,7 +77,7 @@ public class TokenInstruction20InitializeMint2 extends SplTokenProgram.Base impl
 
         // Initialize accounts (only mint here).
         this.keys = new ArrayList<>();
-        this.keys.add(new AccountMeta(mint, true, false)); // Mint is writable, not a signer.
+        this.keys.add(new AccountMeta(mint, false, true)); // Mint is writable, not a signer.
     }
 
     /**

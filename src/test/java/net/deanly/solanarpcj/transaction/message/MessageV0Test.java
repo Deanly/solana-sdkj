@@ -26,8 +26,8 @@ class MessageV0Test {
         PublicKey programId = new PublicKey("11111111111111111111111111111111");
         AccountMeta meta = new AccountMeta(
                 new PublicKey("SecondPubey22222222222222222222222222222222"),
-                true,    // signer
-                false    // writable
+                false, true    // signer
+                // writable
         );
 
         byte[] data = new byte[]{1, 2, 3};

@@ -51,8 +51,6 @@ public class PublicKeyGenerator {
         while (true) {
             // Decode the input into bytes
             byte[] decodedBytes = Base58.decode(input);
-            System.out.println("Input: " + decodedBytes.length + " bytes - " + input);
-
             if (decodedBytes.length == PUBLIC_KEY_LENGTH) {
                 // If the byte array is exactly 32 bytes, stop adjusting
                 return input;
@@ -132,7 +130,6 @@ public class PublicKeyGenerator {
 
     @Test
     public void test() {
-        // Example usages
         String dummyKey1 = createDummyPublicKey("HelloWor1d");
         System.out.println("Dummy PublicKey 1: " + dummyKey1 + ", bytes: " + Base58.decode(dummyKey1).length);
 

@@ -45,12 +45,11 @@ public class TokenInstruction01InitializeAccount extends SplTokenProgram.Base im
             @NonNull PublicKey mint,
             @NonNull PublicKey owner,
             PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            List<PublicKey> additionalAccounts
     ) {
         // Defaults for rent (if null)
         rent = (rent != null) ? rent : Sysvar.SYSVAR_RENT_ADDRESS;
 
-        // JavaScript 기준의 정확한 설정 반영
         this.keys = new ArrayList<>(Arrays.asList(
                 new AccountMeta(account, true, true),   // Account: Writable, Signer
                 new AccountMeta(mint, false, false),   // Mint: Read-Only, Non-Signer
@@ -58,8 +57,8 @@ public class TokenInstruction01InitializeAccount extends SplTokenProgram.Base im
                 new AccountMeta(rent, false, false)    // Rent: Read-Only, Non-Signer
         ));
 
-        if (additionalAccounts != null && !additionalAccounts.isEmpty()) {
-            this.keys.addAll(additionalAccounts); // Add additional accounts if provided
+        if (additionalAccounts != null) {
+            this.keys.addAll(additionalAccounts.stream().map(AccountMeta::roleReadOnlySigner).toList());
         }
     }
 
@@ -88,7 +87,7 @@ public class TokenInstruction01InitializeAccount extends SplTokenProgram.Base im
             @NonNull PublicKey mint,
             @NonNull PublicKey owner,
             PublicKey rent,
-            List<AccountMeta> additionalAccounts
+            List<PublicKey> additionalAccounts
     ) {
         // Validate inputs
         validateInputs(account, mint, owner);

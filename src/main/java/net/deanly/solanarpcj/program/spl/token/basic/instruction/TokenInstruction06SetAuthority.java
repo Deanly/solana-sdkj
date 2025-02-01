@@ -4,7 +4,7 @@ import lombok.*;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.layout.field.AuthorityTypeField;
-import net.deanly.solanarpcj.layout.field.PublicKeyCOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
 import net.deanly.solanarpcj.program.spl.token.basic.type.AuthorityType;
 import net.deanly.structlayout.StructLayout;
@@ -44,7 +44,7 @@ public class TokenInstruction06SetAuthority extends SplTokenProgram.Base impleme
     private AuthorityType authorityType; // The type of the authority being updated.
 
     @Setter
-    @StructField(order = 3, type = PublicKeyCOptionField.class)
+    @StructField(order = 3, type = PublicKeyBorshOptionField.class)
     private PublicKey newAuthority; // The new authority to be set, null for withdrawing authority.
 
     @Setter
@@ -66,13 +66,13 @@ public class TokenInstruction06SetAuthority extends SplTokenProgram.Base impleme
         // Initialize keys
         keys = new ArrayList<>();
         // Add owned account: writable, not signer
-        keys.add(new AccountMeta(account, true, false));
+        keys.add(new AccountMeta(account, false, true));
         // Add owner: read-only, signer
-        keys.add(new AccountMeta(owner, false, true));
+        keys.add(new AccountMeta(owner, true, false));
         // Add multi-signers: read-only, signers
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                keys.add(new AccountMeta(signer, false, true));
+                keys.add(new AccountMeta(signer, true, false));
             }
         }
     }

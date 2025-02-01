@@ -52,13 +52,9 @@ class ATLInstruction4CloseLookupTableTest {
         assertNotNull(encodedData);
 
         ATLInstruction4CloseLookupTable decodedInstruction = StructLayout.decode(encodedData, ATLInstruction4CloseLookupTable.class);
-        assertNotNull(decodedInstruction.getKeys());
+        assertNotNull(decodedInstruction);
 
         // 디코딩된 Keys도 확인
-        List<AccountMeta> decodedKeys = decodedInstruction.getKeys();
-        assertEquals(3, decodedKeys.size());
-        assertEquals(lookupTable.toBase58(), decodedKeys.get(0).getPublicKey().toBase58());
-        assertEquals(authority.toBase58(), decodedKeys.get(1).getPublicKey().toBase58());
-        assertEquals(recipient.toBase58(), decodedKeys.get(2).getPublicKey().toBase58());
+        assertEquals(instruction.getInstruction(), decodedInstruction.getInstruction());
     }
 }

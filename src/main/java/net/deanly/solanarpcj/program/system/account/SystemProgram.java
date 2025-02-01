@@ -21,8 +21,8 @@ public class SystemProgram {
     }
 
     /** Assign Instruction (1) */
-    public static SystemInstruction1Assign assign(PublicKey account, PublicKey programId) {
-        return SystemInstruction1Assign.create(account, programId);
+    public static SystemInstruction1Assign assign(PublicKey account, PublicKey ownerProgramId) {
+        return SystemInstruction1Assign.create(account, ownerProgramId);
     }
 
     /** Transfer Instruction (2) */
@@ -31,8 +31,8 @@ public class SystemProgram {
     }
 
     /** Create With Seed Instruction (3) */
-    public static SystemInstruction3CreateWithSeed createWithSeed(PublicKey fundingAccount, PublicKey baseAccount, String seed, PublicKey newAccount, long lamports, long space, PublicKey ownerProgramId) {
-        return SystemInstruction3CreateWithSeed.create(fundingAccount, baseAccount, seed, lamports, space, ownerProgramId, newAccount);
+    public static SystemInstruction3CreateWithSeed createWithSeed(PublicKey fromAccount, PublicKey newAccount, PublicKey baseAccount, String seed, long lamports, long space, PublicKey ownerProgramId) {
+        return SystemInstruction3CreateWithSeed.create(fromAccount, baseAccount, newAccount, seed, lamports, space, ownerProgramId);
     }
 
     /** Advance Nonce Account Instruction (4) */
@@ -66,8 +66,8 @@ public class SystemProgram {
     }
 
     /** Assign With Seed Instruction (10) */
-    public static SystemInstruction10AssignWithSeed assignWithSeed(PublicKey account, PublicKey baseAccount, String seed, PublicKey programId) {
-        return SystemInstruction10AssignWithSeed.create(account, baseAccount, seed, programId);
+    public static SystemInstruction10AssignWithSeed assignWithSeed(PublicKey account, PublicKey baseAccount, String seed, PublicKey ownerProgramId) {
+        return SystemInstruction10AssignWithSeed.create(account, baseAccount, seed, ownerProgramId);
     }
 
     /** Transfer With Seed Instruction (11) */
@@ -76,7 +76,7 @@ public class SystemProgram {
     }
 
     /** Upgrade Nonce Account Instruction (12) */
-    public static SystemInstruction12UpgradeNonceAccount upgradeNonceAccount(PublicKey nonceAccount, PublicKey authorityAccount) {
-        return SystemInstruction12UpgradeNonceAccount.create(nonceAccount, authorityAccount);
+    public static SystemInstruction12UpgradeNonceAccount upgradeNonceAccount(PublicKey nonceAccount) {
+        return SystemInstruction12UpgradeNonceAccount.create(nonceAccount);
     }
 }

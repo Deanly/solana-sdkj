@@ -4,7 +4,7 @@ import lombok.*;
 import net.deanly.solanarpcj.program.system.Sysvar;
 import net.deanly.solanarpcj.transaction.instruction.AccountMeta;
 import net.deanly.solanarpcj.crypto.PublicKey;
-import net.deanly.solanarpcj.layout.field.PublicKeyCOptionField;
+import net.deanly.solanarpcj.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solanarpcj.layout.field.PublicKeyField;
 import net.deanly.solanarpcj.program.spl.token.basic.SplTokenProgram;
 import net.deanly.structlayout.StructLayout;
@@ -47,7 +47,7 @@ public class TokenInstruction00InitializeMint extends SplTokenProgram.Base imple
     @NonNull
     private PublicKey mintAuthority; // The authority that controls minting of new tokens.
 
-    @StructField(order = 4, type = PublicKeyCOptionField.class)
+    @StructField(order = 4, type = PublicKeyBorshOptionField.class)
     private PublicKey freezeAuthority; // The authority that can freeze accounts (optional).
 
     private List<AccountMeta> keys = new ArrayList<>();
@@ -63,7 +63,7 @@ public class TokenInstruction00InitializeMint extends SplTokenProgram.Base imple
 
         // Configure accounts based on JavaScript logic.
         this.keys = Arrays.asList(
-                new AccountMeta(mint, true, false), // Mint account: isWritable=true, isSigner=false
+                new AccountMeta(mint, false, true), // Mint account: isWritable=true, isSigner=false
                 new AccountMeta(rentAccount, false, false) // Rent account: isWritable=false, isSigner=false
         );
     }
@@ -96,9 +96,9 @@ public class TokenInstruction00InitializeMint extends SplTokenProgram.Base imple
      * @return A fully configured TokenInstruction00InitializeMint instance.
      */
     public static TokenInstruction00InitializeMint create(
+            @NonNull PublicKey mint,
             @NonNull PublicKey mintAuthority,
             int decimals,
-            @NonNull PublicKey mint,
             PublicKey freezeAuthority,
             PublicKey rentAccount
     ) {

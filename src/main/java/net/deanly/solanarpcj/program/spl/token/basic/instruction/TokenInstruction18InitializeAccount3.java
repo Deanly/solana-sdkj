@@ -52,7 +52,7 @@ public class TokenInstruction18InitializeAccount3 extends SplTokenProgram.Base i
 
         // Define `keys` ensuring the rules for `WritableAccount` and `ReadonlyAccount`
         this.keys = Arrays.asList(
-                new AccountMeta(account, true, false), // Writable account; not a signer
+                new AccountMeta(account, false, true), // Writable account; not a signer
                 new AccountMeta(mint, false, false)   // Read-only mint; not a signer
         );
     }

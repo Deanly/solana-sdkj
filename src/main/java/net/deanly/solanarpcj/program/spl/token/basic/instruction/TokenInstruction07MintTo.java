@@ -66,14 +66,14 @@ public class TokenInstruction07MintTo extends SplTokenProgram.Base implements Tr
 
         // Initialize keys
         keys = new ArrayList<>();
-        keys.add(new AccountMeta(mint, true, false));           // Mint: writable, not signer
-        keys.add(new AccountMeta(destination, true, false));    // Destination: writable, not signer
-        keys.add(new AccountMeta(mintAuthority, false, true));  // Mint authority: signer, read-only
+        keys.add(new AccountMeta(mint, false, true));           // Mint: writable, not signer
+        keys.add(new AccountMeta(destination, false, true));    // Destination: writable, not signer
+        keys.add(new AccountMeta(mintAuthority, true, false));  // Mint authority: signer, read-only
 
         // Add multiSigners if provided
         if (multiSigners != null && !multiSigners.isEmpty()) {
             for (PublicKey signer : multiSigners) {
-                keys.add(new AccountMeta(signer, false, true)); // Signers: signer, read-only
+                keys.add(new AccountMeta(signer, true, false)); // Signers: signer, read-only
             }
         }
     }

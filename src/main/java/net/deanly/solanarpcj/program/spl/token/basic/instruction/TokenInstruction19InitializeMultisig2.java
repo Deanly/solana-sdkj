@@ -16,10 +16,6 @@ import java.util.List;
 /**
  * Represents the InitializeMultisig2 instruction (index 19) for the Token Program.
  * This initializes a multisignature token account without requiring the Rent sysvar to be provided.
- *
- * Accounts expected:
- * 0. `[writable]` The multisignature account to initialize.
- * 1+ `[signer]` N public keys for the signers (minimum 1 and maximum 11).
  */
 @Getter
 @NoArgsConstructor
@@ -34,6 +30,11 @@ public class TokenInstruction19InitializeMultisig2 extends SplTokenProgram.Base 
     @StructField(order = 2, type = UInt8Field.class)
     private int m; // Number of required signers.
 
+    /// Accounts expected by this instruction:
+    ///
+    ///   0. `[writable]` The multisignature account to initialize.
+    ///   1. ..`1+N` `[]` The signer accounts, must equal to N where `1 <= N <=
+    ///      11`.
     @Setter
     private List<AccountMeta> keys = new ArrayList<>(); // Account metadata for the instruction.
 
@@ -47,12 +48,15 @@ public class TokenInstruction19InitializeMultisig2 extends SplTokenProgram.Base 
         if (multisig == null || signers == null || signers.isEmpty()) {
             throw new IllegalArgumentException("Multisig account and signers must not be null or empty.");
         }
+        if (signers.size() > 11) {
+            throw new IllegalArgumentException("Number of signers must be less than or equal to 11.");
+        }
 
         // Initialize keys for the multisig and signers
         keys = new ArrayList<>();
-        keys.add(new AccountMeta(multisig, true, false)); // Multisig account; writable, not a signer.
+        keys.add(new AccountMeta(multisig, false, true)); // Multisig account; writable, not a signer.
         for (PublicKey signer : signers) {
-            keys.add(new AccountMeta(signer, false, true)); // Signers; not writable, must be signers.
+            keys.add(new AccountMeta(signer, true, false)); // Signers; not writable, must be signers.
         }
 
         if (this.m < 1) {

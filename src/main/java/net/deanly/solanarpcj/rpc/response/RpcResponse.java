@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.rpc.types;
+package net.deanly.solanarpcj.rpc.response;
 
 import com.squareup.moshi.Json;
 import lombok.Getter;
@@ -22,11 +22,18 @@ public class RpcResponse<T> {
     private String jsonrpc;
 
     @Json(name = "result")
-    private T result;
+    private RpcResultObject<T> result;
 
     @Json(name = "error")
     private Error error;
 
     @Json(name = "id")
     private String id;
+
+    public T getValue() {
+        if (result != null) {
+            return result.getValue();
+        }
+        return null;
+    }
 }

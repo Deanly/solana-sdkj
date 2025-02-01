@@ -9,7 +9,6 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solanarpcj.crypto.PublicKey;
-import net.deanly.solanarpcj.rpc.types.config.RpcSendTransactionConfig.Encoding;
 
 import net.deanly.solanarpcj.crypto.Base58;
 

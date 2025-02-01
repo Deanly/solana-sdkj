@@ -1,8 +1,8 @@
-package net.deanly.solanarpcj.rpc.types.config;
+package net.deanly.solanarpcj.rpc.config;
+
+import net.deanly.solanarpcj.rpc.types.Encoding;
 
 import java.util.List;
-
-import net.deanly.solanarpcj.rpc.types.config.RpcSendTransactionConfig.Encoding;
 
 public class ProgramAccountConfig {
 

@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.rpc.types.config;
+package net.deanly.solanarpcj.rpc.types;
 
 public enum Commitment {
 
@@ -18,6 +18,11 @@ public enum Commitment {
     }
 
     public String getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
         return value;
     }
 }

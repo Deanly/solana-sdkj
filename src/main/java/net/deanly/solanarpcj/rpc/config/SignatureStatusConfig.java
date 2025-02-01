@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.rpc.types.config;
+package net.deanly.solanarpcj.rpc.config;
 
 import com.squareup.moshi.Json;
 import lombok.AllArgsConstructor;

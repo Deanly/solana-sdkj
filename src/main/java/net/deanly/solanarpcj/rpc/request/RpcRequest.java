@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.rpc.types;
+package net.deanly.solanarpcj.rpc.request;
 
 import java.util.List;
 import java.util.UUID;

@@ -3,6 +3,7 @@ package net.deanly.solanarpcj.rpc.types;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solanarpcj.rpc.response.RpcResultObject;
 
 @Getter
 @ToString

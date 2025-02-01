@@ -7,15 +7,17 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 
-import net.deanly.solanarpcj.rpc.types.RpcRequest;
-import net.deanly.solanarpcj.rpc.types.RpcResponse;
+import net.deanly.solanarpcj.rpc.request.RpcRequest;
+import net.deanly.solanarpcj.rpc.response.RpcResponse;
 import net.deanly.solanarpcj.rpc.types.WeightedEndpoint;
 
 import javax.net.ssl.*;
@@ -143,25 +145,25 @@ public class RpcClient {
      *
      * @param method the RPC method to call
      * @param params the parameters for the RPC method
-     * @param clazz  the class type of the expected result
+     * @param responseType  the type of the expected result
      * @return the result of the RPC call
      * @throws RpcException if an error occurs during the RPC call
      */
-    public <T> T call(String method, List<Object> params, Class<T> clazz) throws RpcException {
+    public <T> T call(String method, List<Object> params, Type responseType) throws RpcException {
         RpcRequest rpcRequest = new RpcRequest(method, params);
 
         JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
-        JsonAdapter<RpcResponse<T>> resultAdapter = moshi.adapter(Types.newParameterizedType(RpcResponse.class, clazz));
+        JsonAdapter<RpcResponse<T>> resultAdapter = moshi.adapter(Types.newParameterizedType(RpcResponse.class, responseType));
 
         Request request = new Request.Builder().url(getEndpoint())
-                .post(RequestBody.create(rpcRequestJsonAdapter.toJson(rpcRequest), JSON)).build();
+                .post(RequestBody.create(rpcRequestJsonAdapter.toJson(rpcRequest), JSON))
+                .build();
 
         try {
             Response response = httpClient.newCall(request).execute();
-            final String result = response.body().string();
+            final String result = Objects.requireNonNull(response.body()).string();
             RpcResponse<T> rpcResponse = resultAdapter.fromJson(result);
 
-            // Validate RpcResponse for errors
             if (rpcResponse == null) {
                 throw new RpcException("Failed to parse RpcResponse: Response is null");
             }
@@ -174,7 +176,7 @@ public class RpcClient {
                 );
             }
 
-            return rpcResponse.getResult();
+            return rpcResponse.getResult().getValue();
         } catch (SSLHandshakeException e) {
             this.httpClient = new OkHttpClient.Builder().build();
             throw new RpcException("SSL Handshake failed: " + e.getMessage());

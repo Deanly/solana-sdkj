@@ -1,5 +1,8 @@
 package net.deanly.solanarpcj.transaction;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import net.deanly.solanarpcj.crypto.KeyPair;
 import net.deanly.solanarpcj.crypto.PublicKey;
 import net.deanly.solanarpcj.crypto.Ed25519Signer;
@@ -26,22 +29,21 @@ import java.util.Objects;
  * Represents a Solana transaction.
  * This class allows for building, signing, and serializing transactions.
  */
+@Getter
 public class Transaction {
 
     public static final int SIGNATURE_LENGTH = 64;
+
+    @StructSequenceField(order = 1, elementType = Base58Bytes64Field.class, lengthType = ShortVecField.class)
+    private final List<String> signatures;
+
+    @StructObjectField(order = 2)
+    private VersionedMessage message;
 
     private final List<TransactionInstruction> instructions;
     private final List<AddressLookupTableAccount> addressTableLookups;
     private String recentBlockhash;
     private PublicKey feePayer;
-
-    @StructObjectField(order = 2)
-    private VersionedMessage message;
-
-    private byte[] serializedMessage;
-
-    @StructSequenceField(order = 1, elementType = Base58Bytes64Field.class, lengthType = ShortVecField.class)
-    private final List<String> signatures;
 
     /**
      * Constructs a new Transaction instance.
@@ -87,6 +89,15 @@ public class Transaction {
     }
 
     /**
+     * Sets the fee payer for the transaction.
+     *
+     * @param feePayer The public key of the account responsible for paying the transaction fee. Must not be null.
+     */
+    public void setFeePayer(@NonNull PublicKey feePayer) {
+        this.feePayer = feePayer;
+    }
+
+    /**
      * Sets the recent blockhash for the transaction.
      *
      * @param recentBlockhash The recent blockhash to set
@@ -126,16 +137,12 @@ public class Transaction {
             compile();
         }
 
-        serializedMessage = message.serialize();
+        byte[] serializedMessage = message.serialize();
 
         signatures.clear();
         for (KeyPair signer : signers) {
-//            try {
-                byte[] signature = Ed25519Signer.sign(serializedMessage, signer.toByteArray());
-                signatures.add(Base58.encode(signature));
-//            } catch (GeneralSecurityException e) {
-//                throw new RuntimeException("Error signing transaction", e);
-//            }
+            byte[] signature = Ed25519Signer.sign(serializedMessage, signer.toByteArray());
+            signatures.add(Base58.encode(signature));
         }
     }
 
@@ -218,23 +225,26 @@ public class Transaction {
         if (message == null) {
             compile();
         }
-        if (serializedMessage == null) {
-            serializedMessage = message.serialize();
-        }
 
-        int signatureCount = signatures.size();
-        byte[] signatureCountEncoded = ShortvecEncoding.encodeLength(signatureCount);
+        return StructLayout.encode(this);
 
-        int totalSize = signatureCountEncoded.length + signatureCount * SIGNATURE_LENGTH + serializedMessage.length;
-        ByteBuffer buffer = ByteBuffer.allocate(totalSize);
-
-        buffer.put(signatureCountEncoded);
-        for (String signature : signatures) {
-            buffer.put(Base58.decode(signature));
-        }
-        buffer.put(serializedMessage);
-
-        return buffer.array();
+//        if (serializedMessage == null) {
+//            serializedMessage = message.serialize();
+//        }
+//
+//        int signatureCount = signatures.size();
+//        byte[] signatureCountEncoded = ShortvecEncoding.encodeLength(signatureCount);
+//
+//        int totalSize = signatureCountEncoded.length + signatureCount * SIGNATURE_LENGTH + serializedMessage.length;
+//        ByteBuffer buffer = ByteBuffer.allocate(totalSize);
+//
+//        buffer.put(signatureCountEncoded);
+//        for (String signature : signatures) {
+//            buffer.put(Base58.decode(signature));
+//        }
+//        buffer.put(serializedMessage);
+//
+//        return buffer.array();
     }
 
     /**

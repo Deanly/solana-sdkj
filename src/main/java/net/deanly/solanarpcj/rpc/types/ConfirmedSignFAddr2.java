@@ -1,7 +1,6 @@
 package net.deanly.solanarpcj.rpc.types;
 
 import com.squareup.moshi.Json;
-import net.deanly.solanarpcj.rpc.types.config.Commitment;
 
 public class ConfirmedSignFAddr2 {
 

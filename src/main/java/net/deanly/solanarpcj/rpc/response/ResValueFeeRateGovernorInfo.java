@@ -1,4 +1,4 @@
-package net.deanly.solanarpcj.rpc.types;
+package net.deanly.solanarpcj.rpc.response;
 
 import com.squareup.moshi.Json;
 import lombok.Getter;
@@ -6,8 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class FeeRateGovernorInfo extends RpcResultObject
-{
+public class ResValueFeeRateGovernorInfo {
     @Getter
     @ToString
     public static class FeeRateGovernor {
@@ -27,14 +26,7 @@ public class FeeRateGovernorInfo extends RpcResultObject
         private double targetSignaturesPerSlot;
     }
 
-    @Getter
-    @ToString
-    public static class Value {
+    @Json(name = "feeRateGovernor")
+    private FeeRateGovernor feeRateGovernor;
 
-        @Json(name = "feeRateGovernor")
-        private FeeRateGovernor feeRateGovernor;
-    }
-
-    @Json(name = "value")
-    private Value value;
 }

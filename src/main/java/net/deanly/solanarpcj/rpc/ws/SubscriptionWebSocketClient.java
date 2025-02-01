@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
-import net.deanly.solanarpcj.rpc.types.config.Commitment;
+import net.deanly.solanarpcj.rpc.types.Commitment;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -21,8 +21,8 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
 import net.deanly.solanarpcj.rpc.types.RpcNotificationResult;
-import net.deanly.solanarpcj.rpc.types.RpcRequest;
-import net.deanly.solanarpcj.rpc.types.RpcResponse;
+import net.deanly.solanarpcj.rpc.request.RpcRequest;
+import net.deanly.solanarpcj.rpc.response.RpcResponse;
 import net.deanly.solanarpcj.rpc.ws.listeners.NotificationEventListener;
 
 /**
@@ -423,10 +423,10 @@ public class SubscriptionWebSocketClient extends WebSocketClient {
     private void handleSubscriptionResponse(RpcResponse<Long> rpcResult) {
         String rpcResultId = rpcResult.getId();
         if (subscriptionIds.containsKey(rpcResultId)) {
-            subscriptionIds.put(rpcResultId, rpcResult.getResult());
+            subscriptionIds.put(rpcResultId, rpcResult.getValue());
             SubscriptionParams params = subscriptions.get(rpcResultId);
             if (params != null) {
-                subscriptionListeners.put(rpcResult.getResult(), params.listener);
+                subscriptionListeners.put(rpcResult.getValue(), params.listener);
                 subscriptions.remove(rpcResultId);
                 // Update the activeSubscriptions map with the new subscription ID
                 activeSubscriptions.put(String.valueOf(rpcResult.getResult()), params);

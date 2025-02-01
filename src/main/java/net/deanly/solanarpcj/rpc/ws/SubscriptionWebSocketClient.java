@@ -17,7 +17,6 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 
-import net.deanly.solanarpcj.transaction.TransactionSignature;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
@@ -162,7 +161,7 @@ public class SubscriptionWebSocketClient extends WebSocketClient {
      * @param signature The signature to subscribe to
      * @param listener The listener to handle notifications
      */
-    public void signatureSubscribe(TransactionSignature signature, NotificationEventListener listener) {
+    public void signatureSubscribe(String signature, NotificationEventListener listener) {
         List<Object> params = new ArrayList<>();
         params.add(signature);
 

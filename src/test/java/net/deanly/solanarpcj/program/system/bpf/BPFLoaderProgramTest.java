@@ -2,7 +2,6 @@ package net.deanly.solanarpcj.program.system.bpf;
 
 import net.deanly.solanarpcj.crypto.KeyPair;
 import net.deanly.solanarpcj.program.system.account.SystemProgram;
-import net.deanly.solanarpcj.transaction.TransactionSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
@@ -145,7 +144,7 @@ public class BPFLoaderProgramTest {
         String hash = client.getApi().getRecentBlockhash();
         transaction.setRecentBlockHash(hash);
 
-        TransactionSignature txId = client.getApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
+        String txId = client.getApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
         assertNotNull(txId);
         System.out.println("Transaction ID: " + txId);
     }

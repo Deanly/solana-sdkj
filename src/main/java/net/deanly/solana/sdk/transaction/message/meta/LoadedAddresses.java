@@ -1,0 +1,16 @@
+package net.deanly.solana.sdk.transaction.message.meta;
+
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import lombok.Value;
+import net.deanly.solana.sdk.crypto.PublicKey;
+
+import java.util.List;
+
+@Value
+@RequiredArgsConstructor
+@ToString
+public class LoadedAddresses {
+    List<PublicKey> writable;
+    List<PublicKey> readonly;
+}

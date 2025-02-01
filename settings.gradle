@@ -1,4 +1,4 @@
-rootProject.name = 'solanarpcj'
+rootProject.name = 'solana-sdkj'
 
 include(":struct-layout")
 project(":struct-layout").projectDir = file("../struct-layout")

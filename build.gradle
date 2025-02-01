@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'          // Maven 배포 플러그인
 }
 
-group = 'net.deanly.solanarpcj'
+group = 'net.deanly'
 version = '0.0.1'
 description = 'Solana RPC Methods for java'
 

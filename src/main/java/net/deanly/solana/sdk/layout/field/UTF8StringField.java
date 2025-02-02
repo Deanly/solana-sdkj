@@ -68,4 +68,9 @@ public class UTF8StringField extends FieldBase<String> implements DynamicSpanFie
         // 모든 남은 데이터 길이를 반환 (offset 이후부터 끝까지)
         return data.length - offset;
     }
+
+    @Override
+    public int getNoDataSpan() {
+        return 0;
+    }
 }

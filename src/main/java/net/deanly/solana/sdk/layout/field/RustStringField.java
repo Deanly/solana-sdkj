@@ -58,4 +58,9 @@ public class RustStringField extends FieldBase<String> implements DynamicSpanFie
                 ((data[offset + 2] & 0xFF) << 16) | ((data[offset + 3] & 0xFF) << 24));
         return 4 + length; // 길이 필드(4 bytes) + 문자열 데이터 길이
     }
+
+    @Override
+    public int getNoDataSpan() {
+        return 4;
+    }
 }

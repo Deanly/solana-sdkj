@@ -38,6 +38,11 @@ public class SVLBlobField extends FieldBase<byte[]> implements DynamicSpanField 
         return lengthPrefixSpan + blobLength;
     }
 
+    @Override
+    public int getNoDataSpan() {
+        return encodeLength(0).length;
+    }
+
     public void setSpan(int span) {
         // Since span is dynamic and calculated, there's no distinct field to set.
         // This method can be left empty unless specific behavior needs to be applied.

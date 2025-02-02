@@ -74,6 +74,11 @@ public class ShortVecField extends FieldBase<Integer> implements DynamicSpanFiel
     }
 
     @Override
+    public int getNoDataSpan() {
+        return encodeLength(0).length;
+    }
+
+    @Override
     public int getSpan() {
         return this.dynamicSpan;
     }

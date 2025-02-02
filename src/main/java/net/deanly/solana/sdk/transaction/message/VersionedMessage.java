@@ -2,10 +2,14 @@ package net.deanly.solana.sdk.transaction.message;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
+import net.deanly.structlayout.annotation.StructTypeSelector;
+import net.deanly.structlayout.codec.helpers.ByteArrayHelper;
+import net.deanly.structlayout.dispatcher.StructTypeDispatcher;
 
 import java.nio.ByteBuffer;
 import java.util.List;
 
+@StructTypeSelector(dispatcher = VersionedMessage.Dispatcher.class)
 public interface VersionedMessage {
     Version getVersion();
     byte[] serialize();
@@ -29,5 +33,27 @@ public interface VersionedMessage {
      */
     static VersionedMessage deserialize(ByteBuffer buffer) {
         return deserialize(buffer.array());
+    }
+
+    class Dispatcher implements StructTypeDispatcher {
+        @Override
+        public Class<?> dispatch(byte[] data, int startOffset) {
+            Version version = Version.detectVersion(new byte[]{data[startOffset]});
+
+            if (version == null) {
+                throw new IllegalArgumentException("Message data is corrupted");
+            }
+
+            return switch (version) {
+                case LEGACY -> Message.class;
+                case V0 -> MessageV0.class;
+            };
+
+        }
+
+        @Override
+        public int getNoDataSpan() {
+            return 0;
+        }
     }
 }

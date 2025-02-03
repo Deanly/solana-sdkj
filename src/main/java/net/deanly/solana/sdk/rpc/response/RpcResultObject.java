@@ -3,23 +3,22 @@ package net.deanly.solana.sdk.rpc.response;
 import com.squareup.moshi.Json;
 import lombok.*;
 
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
 @ToString
-@Builder(builderClassName = "Builder")
 public class RpcResultObject<T> {
-
     @Getter
     @ToString
     public static class Context {
         @Json(name = "slot")
         private long slot;
+
+        @Json(name = "apiVersion")
+        private String apiVersion;
     }
 
     @Json(name = "context")
-    protected Context context;
+    private Context context;
 
     @Json(name = "value")
-    T value;
+    private T value;
 }

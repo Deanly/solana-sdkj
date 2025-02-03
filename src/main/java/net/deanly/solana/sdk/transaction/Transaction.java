@@ -99,7 +99,7 @@ public class Transaction {
      * @param recentBlockhash The recent blockhash to set
      * @throws NullPointerException if the recentBlockhash is null
      */
-    public void setRecentBlockHash(String recentBlockhash) {
+    public void setRecentBlockhash(String recentBlockhash) {
         this.recentBlockhash = Objects.requireNonNull(recentBlockhash, "Recent blockhash cannot be null");
     }
 

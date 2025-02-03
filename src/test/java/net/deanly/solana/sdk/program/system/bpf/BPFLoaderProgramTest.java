@@ -9,9 +9,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
-import net.deanly.solana.sdk.rpc.Cluster;
-import net.deanly.solana.sdk.rpc.RpcClient;
-import net.deanly.solana.sdk.rpc.RpcException;
+import net.deanly.solana.sdk.rpc.client.Cluster;
+import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 
 import java.util.List;
 
@@ -142,7 +142,7 @@ public class BPFLoaderProgramTest {
         );
 
         String hash = client.getApi().getRecentBlockhash();
-        transaction.setRecentBlockHash(hash);
+        transaction.setRecentBlockhash(hash);
 
         String txId = client.getApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
         assertNotNull(txId);

@@ -1,0 +1,167 @@
+package net.deanly.solana.sdk.rpc.client;
+
+import lombok.Getter;
+import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
+import net.deanly.solana.sdk.rpc.client.http.impl.MoshiHttpMethodApiImpl;
+import net.deanly.solana.sdk.rpc.client.legacy.http.RpcApi;
+import net.deanly.solana.sdk.rpc.client.legacy.http.RpcApiImpl;
+import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
+import net.deanly.solana.sdk.rpc.client.websocket.impl.MoshiWebsocketMethodApiImpl;
+import okhttp3.MediaType;
+
+/**
+ * RpcClient is responsible for making RPC calls to a Solana cluster.
+ */
+public class RpcClient {
+    @Getter
+    private final ClientConfig config;
+    private final HttpMethodApi httpMethodApi;
+    private final WebsocketMethodApi websocketMethodApi;
+
+    @Deprecated
+    private final RpcApiImpl rpcApi;
+
+
+    public RpcClient(ClientConfig config) {
+        this.config = config;
+        this.httpMethodApi = new MoshiHttpMethodApiImpl(config);
+        this.websocketMethodApi = new MoshiWebsocketMethodApiImpl(config);
+
+        this.rpcApi = new RpcApiImpl(config.getEndpoint());
+    }
+
+    public RpcClient(Cluster cluster) {
+        this(ClientConfig.builder()
+                .endpoint(cluster.getEndpoint())
+                .build());
+    }
+
+    /**
+     * Constructs an RpcClient with a specified endpoint.
+     *
+     * @param endpoint the RPC endpoint
+     */
+    public RpcClient(String endpoint) {
+        this(ClientConfig.builder()
+                .endpoint(endpoint)
+                .build());
+    }
+
+    /**
+     * Constructs an RpcClient with a specified endpoint and user agent.
+     *
+     * @param endpoint  the RPC endpoint
+     * @param userAgent the user agent to set in the request header
+     */
+    public RpcClient(String endpoint, String userAgent) {
+        this(ClientConfig.builder()
+                .endpoint(endpoint)
+                .userAgent(userAgent)
+                .build());
+    }
+
+    /**
+     * Constructs an RpcClient with a specified endpoint and timeout.
+     *
+     * @param endpoint the RPC endpoint
+     * @param timeout  the read timeout in seconds
+     */
+    public RpcClient(String endpoint, int timeout) {
+        this(ClientConfig.builder()
+                .endpoint(endpoint)
+                .readTimeoutMs(timeout * 1000)
+                .build());
+    }
+
+    /**
+     * Constructs an RpcClient with specified timeouts for read, connect, and write.
+     *
+     * @param endpoint        the RPC endpoint
+     * @param readTimeoutMs   the read timeout in milliseconds
+     * @param connectTimeoutMs the connect timeout in milliseconds
+     * @param writeTimeoutMs  the write timeout in milliseconds
+     */
+    public RpcClient(String endpoint, int readTimeoutMs, int connectTimeoutMs, int writeTimeoutMs) {
+        this(ClientConfig.builder()
+                .endpoint(endpoint)
+                .readTimeoutMs(readTimeoutMs)
+                .connectTimeoutMs(connectTimeoutMs)
+                .writeTimeoutMs(writeTimeoutMs)
+                .build());
+    }
+
+    /**
+     * Constructs an RpcClient with a specified endpoint and SOCKS proxy.
+     *
+     * @param endpoint the RPC endpoint
+     * @param proxyHost the SOCKS proxy host
+     * @param proxyPort the SOCKS proxy port
+     */
+    public RpcClient(String endpoint, String proxyHost, int proxyPort) {
+        this(ClientConfig.builder()
+                .endpoint(endpoint)
+                .proxyHost(proxyHost)
+                .proxyPort(proxyPort)
+                .build());
+    }
+
+    @Getter
+    @lombok.Builder(builderClassName = "Builder")
+    public static class ClientConfig {
+        @lombok.Builder.Default
+        private MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
+
+        @lombok.Builder.Default
+        private Integer readTimeoutMs = 20_000;
+
+        private String endpoint;
+
+        private Integer connectTimeoutMs;
+
+        private Integer writeTimeoutMs;
+
+        private String proxyHost;
+
+        private Integer proxyPort;
+
+        private String userAgent;
+    }
+
+    /**
+     * Returns the RpcApi instance associated with this client.
+     *
+     * @return the RpcApi instance
+     */
+    @Deprecated
+    public RpcApi getApi() {
+        return this.rpcApi;
+    }
+
+    /**
+     * Returns the HttpMethodApi instance associated with this client.
+     *
+     * @return the HttpMethodApi instance
+     */
+    public HttpMethodApi getHttpApi() {
+        return this.httpMethodApi;
+    }
+
+    /**
+     * Returns the WebsocketMethodApi instance associated with this client.
+     *
+     * @return the WebsocketMethodApi instance
+     */
+    public WebsocketMethodApi getWsApi() {
+        return this.websocketMethodApi;
+    }
+
+    /**
+     * Returns the current RPC endpoint.
+     *
+     * @return the RPC endpoint
+     */
+    public String getEndpoint() {
+        return this.config.getEndpoint();
+    }
+
+}

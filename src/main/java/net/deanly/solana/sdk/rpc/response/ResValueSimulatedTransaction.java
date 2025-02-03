@@ -22,9 +22,6 @@ public class ResValueSimulatedTransaction {
     @Json(name = "accounts")
     private List<ResValueAccountInfo> accounts;
 
-    @Json(name = "logs")
-    private List<String> logMessages;
-
     @Json(name = "unitsConsumed")
     private Long unitsConsumed;
 

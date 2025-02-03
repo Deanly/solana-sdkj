@@ -7,6 +7,7 @@ import lombok.*;
 
 @Getter
 @ToString
+@lombok.Builder(builderClassName = "Builder")
 public class ResValueAccountInfo {
 
     @Json(name = "data")
@@ -23,5 +24,8 @@ public class ResValueAccountInfo {
 
     @Json(name = "rentEpoch")
     private Long rentEpoch;
+
+    @Json(name = "space")
+    private Long space;
 
 }

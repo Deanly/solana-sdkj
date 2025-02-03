@@ -30,7 +30,7 @@ public class TransactionTest {
 
         Transaction transaction = new Transaction();
         transaction.addInstruction(SystemProgram.transfer(fromPublicKey, toPublickKey, lamports));
-        transaction.setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn");
+        transaction.setRecentBlockhash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn");
         transaction.sign(signer);
         byte[] serializedTransaction = transaction.serialize();
 

@@ -55,7 +55,7 @@ public class TransactionBuilder {
      */
     public TransactionBuilder setRecentBlockHash(String recentBlockHash) {
         Objects.requireNonNull(recentBlockHash, "Recent block hash cannot be null");
-        transaction.setRecentBlockHash(recentBlockHash);
+        transaction.setRecentBlockhash(recentBlockHash);
         return this;
     }
 

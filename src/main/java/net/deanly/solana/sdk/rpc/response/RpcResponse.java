@@ -2,10 +2,14 @@ package net.deanly.solana.sdk.rpc.response;
 
 import com.squareup.moshi.Json;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
+@NoArgsConstructor
+@lombok.AllArgsConstructor
+@lombok.Builder(builderClassName = "Builder")
 public class RpcResponse<T> {
 
     @Getter
@@ -16,24 +20,21 @@ public class RpcResponse<T> {
 
         @Json(name = "message")
         private String message;
+
+        @Json(name = "data")
+        private String data; // json string
     }
 
     @Json(name = "jsonrpc")
     private String jsonrpc;
 
     @Json(name = "result")
-    private RpcResultObject<T> result;
+    private T result;
 
     @Json(name = "error")
     private Error error;
 
     @Json(name = "id")
-    private String id;
+    private Long id;
 
-    public T getValue() {
-        if (result != null) {
-            return result.getValue();
-        }
-        return null;
-    }
 }

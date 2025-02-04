@@ -1,11 +1,10 @@
 package net.deanly.solana.sdk.rpc.client.http;
 
+import com.google.common.primitives.UnsignedLong;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
-import net.deanly.solana.sdk.rpc.request.config.ProgramAccountConfig;
-import net.deanly.solana.sdk.rpc.request.config.RpcSendTransactionConfig;
-import net.deanly.solana.sdk.rpc.request.config.SimulateTransactionConfig;
+import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.rpc.types.*;
 import net.deanly.solana.sdk.transaction.Transaction;
@@ -17,16 +16,16 @@ import java.util.Map;
 public interface HttpMethodApi {
 
     // https://solana.com/ko/docs/rpc/http/getaccountinfo
-    ResValueAccountInfo getAccountInfo(PublicKey account, Map<String, Object> additionalParams) throws RpcException;
+    ResValueAccountInfo getAccountInfo(PublicKey account, AccountInfoConfig configuration) throws RpcException;
 
     // https://solana.com/ko/docs/rpc/http/getbalance
-    long getBalance(PublicKey account, Commitment commitment) throws RpcException;
+    UnsignedLong getBalance(PublicKey account, BaseConfig configuration) throws RpcException;
 
     // https://solana.com/ko/docs/rpc/http/getblock
-    ResValueBlock getBlock(int slot, Map<String, Object> optionalParams) throws RpcException;
+    ResValueBlock getBlock(int slot, BlockConfig configuration) throws RpcException;
 
     // https://solana.com/ko/docs/rpc/http/getblockcommitment
-    BlockCommitment getBlockCommitment(long block) throws RpcException;
+    ResValueBlockCommitment getBlockCommitment(long block) throws RpcException;
 
     // https://solana.com/ko/docs/rpc/http/getblockheight
     long getBlockHeight(Commitment commitment) throws RpcException;
@@ -62,7 +61,8 @@ public interface HttpMethodApi {
     String getGenesisHash() throws RpcException;
 
     // https://solana.com/ko/docs/rpc/http/gethealth
-    boolean getHealth() throws RpcException;
+    void getHealth() throws RpcException;
+    boolean getHealthCheck();
 
     // https://solana.com/ko/docs/rpc/http/gethighestsnapshotslot
     SnapshotSlot getHighestSnapshotSlot() throws RpcException;

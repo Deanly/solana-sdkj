@@ -1,24 +1,36 @@
 package net.deanly.solana.sdk.rpc.types;
 
+import com.squareup.moshi.Json;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 public enum Encoding {
-    base64("base64"),
-    base58("base58");
+    @Json(name = "base64")
+    BASE64,
 
-    private final String value;
+    @Json(name = "base58")
+    BASE58,
 
-    Encoding(String enc) {
-        this.value = enc;
-    }
+    @Json(name = "base64+zstd")
+    BASE64_ZSTD,
 
-    public String getEncoding() {
-        return value;
-    }
+    @Json(name = "jsonParsed")
+    JSON_PARSED;
 
-    @Override
-    public String toString() {
-        return value;
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    /// Data slicing is only available for base58, base64, or base64+zstd encodings.
+    public static class DataSlice {
+        /// number of bytes to return
+        @Json(name = "length")
+        private Integer length;
+
+        /// byte offset from which to start reading
+        @Json(name = "offset")
+        private Integer offset;
     }
 }

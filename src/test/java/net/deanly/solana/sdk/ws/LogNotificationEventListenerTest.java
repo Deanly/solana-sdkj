@@ -5,7 +5,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
-import net.deanly.solana.sdk.rpc.client.legacy.ws.listeners.LogNotificationEventListener;
+import net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners.LogNotificationEventListener;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -3,8 +3,8 @@ package net.deanly.solana.sdk.rpc.client;
 import lombok.Getter;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
 import net.deanly.solana.sdk.rpc.client.http.impl.MoshiHttpMethodApiImpl;
-import net.deanly.solana.sdk.rpc.client.legacy.http.RpcApi;
-import net.deanly.solana.sdk.rpc.client.legacy.http.RpcApiImpl;
+import net.deanly.solana.sdk.rpc.client.http.LegacyRpcApi;
+import net.deanly.solana.sdk.rpc.client.http.impl.LegacyRpcApiImpl;
 import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.client.websocket.impl.MoshiWebsocketMethodApiImpl;
 import okhttp3.MediaType;
@@ -19,7 +19,7 @@ public class RpcClient {
     private final WebsocketMethodApi websocketMethodApi;
 
     @Deprecated
-    private final RpcApiImpl rpcApi;
+    private final LegacyRpcApiImpl rpcApi;
 
 
     public RpcClient(ClientConfig config) {
@@ -27,7 +27,8 @@ public class RpcClient {
         this.httpMethodApi = new MoshiHttpMethodApiImpl(config);
         this.websocketMethodApi = new MoshiWebsocketMethodApiImpl(config);
 
-        this.rpcApi = new RpcApiImpl(config.getEndpoint());
+        this.rpcApi = new LegacyRpcApiImpl();
+        this.rpcApi.setClient((MoshiHttpMethodApiImpl) this.httpMethodApi);
     }
 
     public RpcClient(Cluster cluster) {
@@ -133,7 +134,7 @@ public class RpcClient {
      * @return the RpcApi instance
      */
     @Deprecated
-    public RpcApi getApi() {
+    public LegacyRpcApi getApi() {
         return this.rpcApi;
     }
 

@@ -1,13 +1,11 @@
-package net.deanly.solana.sdk.rpc.client.legacy.http;
+package net.deanly.solana.sdk.rpc.client.http.impl;
 
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Types;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
-import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
-import net.deanly.solana.sdk.rpc.request.RpcRequest;
+import net.deanly.solana.sdk.rpc.client.http.LegacyRpcApi;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.rpc.types.*;
@@ -15,105 +13,31 @@ import net.deanly.solana.sdk.rpc.request.SimulateTransactionParams;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.rpc.types.TokenResultObjects.TokenAccount;
 import net.deanly.solana.sdk.rpc.types.TokenResultObjects.TokenAmountInfo;
-import okhttp3.*;
 
-import javax.net.ssl.SSLHandshakeException;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Deprecated
-public class RpcApiImpl implements HttpMethodApi, RpcApi {
-    private final Client client;
+public class LegacyRpcApiImpl implements LegacyRpcApi {
+    private MoshiHttpMethodApiImpl client;
 
-    public RpcApiImpl(String endpoint) {
-        this.client = new Client(endpoint);
+    public LegacyRpcApiImpl() {
+    }
+
+    public void setClient(MoshiHttpMethodApiImpl client) {
+        this.client = client;
     }
 
     public ResValueLatestBlockhash getLatestBlockhash() throws RpcException {
         return getLatestBlockhash(null);
     }
 
-    private static class Client {
-        private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-        private final String endpoint;
-        private OkHttpClient httpClient = new OkHttpClient.Builder().readTimeout(20, TimeUnit.SECONDS).build();
-        private final Moshi moshi = new Moshi.Builder().build();
-
-        JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
-        private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
-
-        public Client(String endpoint) {
-            this.endpoint = endpoint;
-        }
-
-        /**
-         * Calls the specified RPC method with the given parameters.
-         *
-         * @param method the RPC method to call
-         * @param params the parameters for the RPC method
-         * @param responseType  the type of the expected result
-         * @return the result of the RPC call
-         * @throws RpcException if an error occurs during the RPC call
-         */
-        @SuppressWarnings("unchecked")
-        public <T> T call(String method, List<Object> params, Type responseType) throws RpcException {
-            RpcRequest rpcRequest = new RpcRequest(method, params);
-
-            JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
-
-            Request request = new Request.Builder().url(endpoint)
-                    .post(RequestBody.create(rpcRequestJsonAdapter.toJson(rpcRequest), JSON))
-                    .build();
-
-            try {
-                Response response = httpClient.newCall(request).execute();
-                final String result = Objects.requireNonNull(response.body()).string();
-                RpcResponse<T> rpcResponse = resultAdapter.fromJson(result);
-
-                if (rpcResponse == null) {
-                    throw new RpcException("Failed to parse RpcResponse: Response is null");
-                }
-
-                if (rpcResponse.getError() != null) {
-                    RpcResponse.Error error = rpcResponse.getError();
-                    throw new RpcException(
-                            "RPC Error: " + error.getMessage(),
-                            (int) error.getCode() // Convert long to Integer for RpcException
-                    );
-                }
-
-                if (rpcResponse.getResult() instanceof RpcResultObject<?>) {
-                    return ((RpcResultObject<T>) rpcResponse.getResult()).getValue();
-                } else {
-                    return (T) rpcResponse.getResult();
-                }
-
-            } catch (SSLHandshakeException e) {
-                this.httpClient = new OkHttpClient.Builder().build();
-                throw new RpcException("SSL Handshake failed: " + e.getMessage());
-            } catch (IOException e) {
-                throw new RpcException("IO error during RPC call: " + e.getMessage());
-            }
-        }
-
-
-        @SuppressWarnings("unchecked")
-        private <T> JsonAdapter<RpcResponse<T>> getCachedAdapter(Type responseType) {
-            return (JsonAdapter<RpcResponse<T>>) adapterCache.computeIfAbsent(
-                    responseType, type -> moshi.adapter(Types.newParameterizedType(RpcResponse.class, type))
-            );
-        }
-    }
-
     public ResValueLatestBlockhash getLatestBlockhash(Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         Type responseType = Types.newParameterizedType(RpcResultObject.class, ResValueLatestBlockhash.class);
@@ -130,7 +54,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return ((ResValueRecentBlockhash) client.call("getRecentBlockhash", params, ResValueRecentBlockhash.class)).getBlockhash();
@@ -226,7 +150,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         params.add(account.toString());
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getBalance", params, Long.class);
@@ -299,13 +223,13 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         filters.add(new Filter(memcmp));
 
-        ProgramAccountConfig programAccountConfig = new ProgramAccountConfig(Encoding.base64);
+        ProgramAccountConfig programAccountConfig = new ProgramAccountConfig(Encoding.BASE64);
         programAccountConfig.setFilters(filters);
         return getProgramAccounts(account, programAccountConfig);
     }
 
     public List<ResValueProgram> getProgramAccounts(PublicKey account) throws RpcException {
-        return getProgramAccounts(account, new ProgramAccountConfig(Encoding.base64));
+        return getProgramAccounts(account, new ProgramAccountConfig(Encoding.BASE64));
     }
 
     @Deprecated  // DO NOT USE THIS
@@ -328,9 +252,9 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         }
 
         accountInfoBuilder.executable((boolean) account.get("executable"));
-        accountInfoBuilder.lamports((long) account.get("lamports"));
+        accountInfoBuilder.lamports((UnsignedLong) account.get("lamports"));
         accountInfoBuilder.owner((String) account.get("owner"));
-        accountInfoBuilder.rentEpoch((long) account.get("rentEpoch"));
+        accountInfoBuilder.rentEpoch((UnsignedLong) account.get("rentEpoch"));
 
         return programBuilder
                 .account(accountInfoBuilder.build())
@@ -373,7 +297,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         filters.add(new DataSize(dataSize));
 
         ProgramAccountConfig programAccountConfig = new ProgramAccountConfig(filters);
-        programAccountConfig.setEncoding(Encoding.base64);
+        programAccountConfig.setEncoding(Encoding.BASE64);
         params.add(programAccountConfig);
 
         List<AbstractMap> rawResult = client.call("getProgramAccounts", params, List.class);
@@ -398,7 +322,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         });
 
         ProgramAccountConfig programAccountConfig = new ProgramAccountConfig(filters);
-        programAccountConfig.setEncoding(Encoding.base64);
+        programAccountConfig.setEncoding(Encoding.BASE64);
         params.add(programAccountConfig);
 
         List<AbstractMap> rawResult = client.call("getProgramAccounts", params, List.class);
@@ -424,7 +348,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         if (additionalParams.containsKey("commitment")) {
             Commitment commitment = (Commitment) additionalParams.get("commitment");
-            parameterMap.put("commitment", commitment.getValue());
+            parameterMap.put("commitment", commitment);
         }
         if (additionalParams.containsKey("dataSlice")) {
             parameterMap.put("dataSlice", additionalParams.get("dataSlice"));
@@ -449,7 +373,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         params.add(dataLength);
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getMinimumBalanceForRentExemption", params, Long.class);
@@ -477,7 +401,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
         return client.call("getBlockHeight", params, Long.class);
     }
@@ -493,7 +417,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         Map<String, Object> parameterMap = new HashMap<>();
         if (optionalParams.containsKey("commitment")) {
             Commitment commitment = (Commitment) optionalParams.get("commitment");
-            parameterMap.put("commitment", commitment.getValue());
+            parameterMap.put("commitment", commitment);
         }
         params.add(parameterMap);
 
@@ -518,18 +442,18 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(address.toString());
         params.add(lamports);
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("requestAirdrop", params, String.class);
     }
 
-    public BlockCommitment getBlockCommitment(long block) throws RpcException {
+    public ResValueBlockCommitment getBlockCommitment(long block) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         params.add(block);
 
-        return client.call("getBlockCommitment", params, BlockCommitment.class);
+        return client.call("getBlockCommitment", params, ResValueBlockCommitment.class);
     }
 
     /**
@@ -557,7 +481,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         Map<String, Object> configMap = new HashMap<>();
         if (commitment != null) {
-            configMap.put("commitment", commitment.getValue());
+            configMap.put("commitment", commitment);
         }
         params.add(configMap);
 
@@ -626,7 +550,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         if (commitment != null) {
             Map<String, Object> configMap = new HashMap<>();
-            configMap.put("commitment", commitment.getValue());
+            configMap.put("commitment", commitment);
             params.add(configMap);
         }
 
@@ -641,7 +565,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getTransactionCount", params, Long.class);
@@ -708,7 +632,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             BlockConfig blockConfig = new BlockConfig();
             if (optionalParams.containsKey("commitment")) {
                 Commitment commitment = (Commitment) optionalParams.get("commitment");
-                blockConfig.setCommitment(commitment.getValue());
+                blockConfig.setCommitment(commitment);
             }
 
             if (optionalParams.containsKey("maxSupportedTransactionVersion")) {
@@ -744,7 +668,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getEpochInfo", params, EpochInfo.class);
@@ -792,7 +716,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getInflationGovernor", params, InflationGovernor.class);
@@ -813,7 +737,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             rpcEpochConfig.setEpoch(epoch);
         }
         if (commitment != null) {
-            rpcEpochConfig.setCommitment(commitment.getValue());
+            rpcEpochConfig.setCommitment(commitment.name().toLowerCase());
         }
         params.add(rpcEpochConfig);
 
@@ -837,7 +761,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getSlot", params, Long.class);
@@ -851,7 +775,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return new PublicKey((String) client.call("getSlotLeader", params, String.class));
@@ -905,7 +829,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         return client.call("getSupply", params, ResValueSupply.class);
@@ -947,7 +871,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(tokenAccount.toString());
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         Map<String, Object> rawResult = client.call("getTokenAccountBalance", params, Map.class);
@@ -964,7 +888,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(tokenMint.toString());
 
         if (null != commitment) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         Map<String, Object> rawResult =  client.call("getTokenSupply", params, Map.class);
@@ -981,7 +905,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(tokenMint.toString());
 
         if (null != commitment) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         Map<String, Object> rawResult = client.call("getTokenLargestAccounts", params, Map.class);
@@ -1025,7 +949,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             parameterMap.put("encoding", optionalParams.getOrDefault("encoding", "jsonParsed"));
             if (optionalParams.containsKey("commitment")) {
                 Commitment commitment = (Commitment) optionalParams.get("commitment");
-                parameterMap.put("commitment", commitment.getValue());
+                parameterMap.put("commitment", commitment);
             }
             if (optionalParams.containsKey("dataSlice")) {
                 parameterMap.put("dataSlice", optionalParams.get("dataSlice"));
@@ -1051,7 +975,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             voteAccountConfig.setVotePubkey(votePubkey.toBase58());
         }
         if (commitment != null) {
-            voteAccountConfig.setCommitment(commitment.getValue());
+            voteAccountConfig.setCommitment(commitment.name().toLowerCase());
         }
         params.add(voteAccountConfig);
 
@@ -1073,7 +997,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             rpcEpochConfig.setEpoch(epoch);
         }
         if (null != commitment) {
-            rpcEpochConfig.setCommitment(commitment.getValue());
+            rpcEpochConfig.setCommitment(commitment.name().toLowerCase());
         }
         params.add(rpcEpochConfig);
 
@@ -1117,7 +1041,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
     }
 
     // Throws an exception if not healthy
-    public boolean getHealth() throws RpcException {
+    public boolean getHealth2() throws RpcException {
         List<Object> params = new ArrayList<>();
         String result = client.call("getHealth", params, String.class);
         return result.equals("ok");
@@ -1135,7 +1059,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             largestAccountConfig.setFilter(filter);
         }
         if (null != commitment) {
-            largestAccountConfig.setCommitment(commitment.getValue());
+            largestAccountConfig.setCommitment(commitment.name().toLowerCase());
         }
         params.add(largestAccountConfig);
 
@@ -1165,7 +1089,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
             leaderScheduleConfig.setIdentity(identity);
         }
         if (null != commitment) {
-            leaderScheduleConfig.setCommitment(commitment.getValue());
+            leaderScheduleConfig.setCommitment(commitment.name().toLowerCase());
         }
         params.add(leaderScheduleConfig);
 
@@ -1193,7 +1117,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
 
         if (additionalParams.containsKey("commitment")) {
             Commitment commitment = (Commitment) additionalParams.get("commitment");
-            parameterMap.put("commitment", commitment.getValue());
+            parameterMap.put("commitment", commitment);
         }
         if (additionalParams.containsKey("dataSlice")) {
             parameterMap.put("dataSlice", additionalParams.get("dataSlice"));
@@ -1271,7 +1195,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(endSlot);
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         List<Double> result = client.call("getBlocks", params, List.class);
@@ -1305,7 +1229,7 @@ public class RpcApiImpl implements HttpMethodApi, RpcApi {
         params.add(limit);
 
         if (commitment != null) {
-            params.add(Map.of("commitment", commitment.getValue()));
+            params.add(Map.of("commitment", commitment));
         }
 
         List<Double> result = client.call("getBlocksWithLimit", params, List.class);

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.Map;
+
 @Getter
 @ToString
 @NoArgsConstructor
@@ -22,7 +24,7 @@ public class RpcResponse<T> {
         private String message;
 
         @Json(name = "data")
-        private String data; // json string
+        private Map<String, Object> data;
     }
 
     @Json(name = "jsonrpc")

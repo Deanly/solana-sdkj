@@ -1,33 +1,48 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
+import net.deanly.solana.sdk.rpc.types.InnerInstruction;
+import net.deanly.solana.sdk.rpc.types.TokenBalance;
+import net.deanly.solana.sdk.rpc.types.TransactionError;
 
 import java.util.List;
 
 @Getter
 @ToString
 public class ResValueBlock {
-
-    @Json(name = "blockTime")
-    private int blockTime;
-
-    @Json(name = "blockHeight")
-    private int blockHeight;
-
+    /// this block, as base-58 encoded string
     @Json(name = "blockhash")
     private String blockhash;
 
-    @Json(name = "parentSlot")
-    private int parentSlot;
-
+    /// the blockhash of this block's parent, as base-58 encoded string; if the parent block is not available due to ledger cleanup, this field will return "11111111111111111111111111111111"
     @Json(name = "previousBlockhash")
     private String previousBlockhash;
 
+    /// the slot index of this block's parent
+    @Json(name = "parentSlot")
+    private UnsignedLong parentSlot;
+
+    /// present if "full" transaction details are requested; an array of JSON objects containing:
     @Json(name = "transactions")
     private List<ResValueConfirmedTransaction> transactions;
 
+    /// present if "signatures" are requested for transaction details; an array of signatures strings, corresponding to the transaction order in the block
+    @Json(name = "signatures")
+    private List<String> signatures;
+
+    /// block-level rewards, present if rewards are requested; an array of JSON objects containing:
     @Json(name = "rewards")
     private List<ResValueReward> rewards;
+
+    /// estimated production time, as Unix timestamp (seconds since the Unix epoch). null if not available
+    @Json(name = "blockTime")
+    private Long blockTime;
+
+    /// the number of blocks beneath this block
+    @Json(name = "blockHeight")
+    private UnsignedLong blockHeight;
 }

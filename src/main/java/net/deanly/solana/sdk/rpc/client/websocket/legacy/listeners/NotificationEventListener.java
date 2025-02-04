@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.ws.listeners;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners;
 
 @Deprecated
 public interface NotificationEventListener {

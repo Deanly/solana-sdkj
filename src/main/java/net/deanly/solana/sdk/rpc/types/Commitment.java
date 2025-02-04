@@ -1,28 +1,32 @@
 package net.deanly.solana.sdk.rpc.types;
 
+import com.squareup.moshi.Json;
+
 public enum Commitment {
+    @Json(name = "finalized")
+    FINALIZED,
 
-    FINALIZED("finalized"),
-    CONFIRMED("confirmed"),
-    PROCESSED("processed"),
-    SINGLE_GOSSIP("singleGossip"),
-    SINGLE("single"),
-    ROOT("root"),
-    RECENT("recent"),
-    MAX("max");
+    @Json(name = "confirmed")
+    CONFIRMED,
 
-    private final String value;
+    @Json(name = "processed")
+    PROCESSED,
 
-    Commitment(final String value) {
-        this.value = value;
-    }
+    @Json(name = "singleGossip")
+    SINGLE_GOSSIP,
 
-    public String getValue() {
-        return value;
-    }
+    @Json(name = "maxGossip")
+    MAX_GOSSIP,
 
-    @Override
-    public String toString() {
-        return value;
-    }
+    @Json(name = "single")
+    SINGLE,
+
+    @Json(name = "root")
+    ROOT,
+
+    @Json(name = "recent")
+    RECENT,
+
+    @Json(name = "max")
+    MAX;
 }

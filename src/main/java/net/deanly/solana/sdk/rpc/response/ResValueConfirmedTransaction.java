@@ -2,132 +2,124 @@ package net.deanly.solana.sdk.rpc.response;
 
 import java.util.List;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
-import net.deanly.solana.sdk.rpc.types.TokenResultObjects;
+import net.deanly.solana.sdk.rpc.types.*;
+
 
 @Getter
 @ToString
 public class ResValueConfirmedTransaction {
+    /// the slot this transaction was processed in
+    @Json(name = "slot")
+    private UnsignedLong slot;
 
-    @Getter
-    @ToString
-    public static class Header {
+    /// Transaction object, either in JSON format or encoded binary data, depending on encoding parameter
+    @Json(name = "transaction")
+    private ResValueTransaction transaction;
 
-        @Json(name = "numReadonlySignedAccounts")
-        private long numReadonlySignedAccounts;
+    /// estimated production time, as Unix timestamp (seconds since the Unix epoch) of when the transaction was processed. null if not available
+    @Json(name = "blockTime")
+    private Long blockTime;
 
-        @Json(name = "numReadonlyUnsignedAccounts")
-        private long numReadonlyUnsignedAccounts;
+    /// transaction status metadata object
+    @Json(name = "meta")
+    private Meta meta;
 
-        @Json(name = "numRequiredSignatures")
-        private long numRequiredSignatures;
-    }
+    /// Transaction version. Undefined if maxSupportedTransactionVersion is not set in request params.
+    @Json(name = "version")
+    private String version;
 
-    @Getter
-    @ToString
-    public static class Instruction {
-
-        @Json(name = "accounts")
-        private List<Long> accounts;
-
-        @Json(name = "data")
-        private String data;
-
-        @Json(name = "programIdIndex")
-        private long programIdIndex;
-    }
-
-    @Getter
-    @ToString
-    public static class Message {
-
-        @Json(name = "accountKeys")
-        private List<String> accountKeys;
-
-        @Json(name = "header")
-        private Header header;
-
-        @Json(name = "instructions")
-        private List<Instruction> instructions;
-
-        @Json(name = "recentBlockhash")
-        private String recentBlockhash;
-    }
-
-    @Getter
-    @ToString
-    public static class Status {
-
-        @Json(name = "Ok")
-        private Object ok;
-    }
-
-    @Getter
-    @ToString
-    public static class TokenBalance {
-
-        @Json(name = "accountIndex")
-        private Double accountIndex;
-
-        @Json(name = "mint")
-        private String mint;
-
-        @Json(name = "uiTokenAmount")
-        private TokenResultObjects.TokenAmountInfo uiTokenAmount;
-    }
 
     @Getter
     @ToString
     public static class Meta {
-
+        /// Error if transaction failed, null if transaction succeeded.
         @Json(name = "err")
-        private Object err;
+        private TransactionError err;
 
+        /// fee this transaction was charged, as u64 integer
         @Json(name = "fee")
-        private long fee;
+        private UnsignedLong fee;
 
+        /// array of u64 account balances from before the transaction was processed
+        @Json(name = "preBalances")
+        private List<UnsignedLong> preBalances;
+
+        /// array of u64 account balances after the transaction was processed
+        @Json(name = "postBalances")
+        private List<UnsignedLong> postBalances;
+
+        /// List of inner instructions or null if inner instruction recording was not enabled during this transaction
         @Json(name = "innerInstructions")
-        private List<Object> innerInstructions;
+        private List<InnerInstruction> innerInstructions;
 
+        /// List of token balances from before the transaction was processed or omitted if token balance recording was not yet enabled during this transaction
         @Json(name = "preTokenBalances")
         private List<TokenBalance> preTokenBalances;
 
         @Json(name = "postTokenBalances")
         private List<TokenBalance> postTokenBalances;
 
-        @Json(name = "postBalances")
-        private List<Long> postBalances;
+        /// array of string log messages or null if log message recording was not enabled during this transaction
+        @Json(name = "logMessage")
+        private List<String> logMessage;
 
-        @Json(name = "preBalances")
-        private List<Long> preBalances;
+//        /// DEPRECATED: status: <object> - Transaction status
+//        @Json(name = "status")
+//        private Status status;
 
-        @Json(name = "status")
-        private Status status;
+        /// transaction-level rewards, populated if rewards are requested; an array of JSON objects containing:
+        @Json(name = "rewards")
+        private List<ResValueReward> rewards;
+
+        /// Transaction addresses loaded from address lookup tables. Undefined if maxSupportedTransactionVersion is not set in request params, or if jsonParsed encoding is set in request params.
+        @Json(name = "loadedAddresses")
+        private LoadedAddresses loadedAddresses;
+
+        /// the most-recent return data generated by an instruction in the transaction, with the following fields:
+        @Json(name = "returnData")
+        private ReturnData returnData;
+
+        /// number of compute units consumed by the transaction
+        @Json(name = "computeUnitsConsumed")
+        private UnsignedLong computeUnitsConsumed;
     }
 
     @Getter
     @ToString
-    public static class Transaction {
+    public static class Status {
+        @Json(name = "Ok")
+        private String ok;
 
-        @Json(name = "message")
-        private Message message;
-
-        @Json(name = "signatures")
-        private List<String> signatures;
-
-        @Json(name = "blockTime")
-        private String blocktime;
-
+        @Json(name = "Err")
+        private TransactionError err;
     }
 
-    @Json(name = "meta")
-    private Meta meta;
+    @Getter
+    @ToString
+    public static class LoadedAddresses {
+        /// Ordered list of base-58 encoded addresses for writable loaded accounts
+        @Json(name = "writable")
+        private List<String> writable;
 
-    @Json(name = "slot")
-    private long slot;
+        /// Ordered list of base-58 encoded addresses for readonly loaded accounts
+        @Json(name = "readonly")
+        private List<String> readonly;
+    }
 
-    @Json(name = "transaction")
-    private Transaction transaction;
+    @Getter
+    @ToString
+    public static class ReturnData {
+        /// the program that generated the return data, as base-58 encoded Pubkey
+        @Json(name = "programId")
+        private String programId;
+
+        /// the return data itself, as base-64 encoded binary data
+        @Json(name = "data")
+        private List<String> data;
+    }
+
 }

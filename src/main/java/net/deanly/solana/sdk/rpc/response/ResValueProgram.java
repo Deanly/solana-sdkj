@@ -1,11 +1,9 @@
-package net.deanly.solana.sdk.rpc.types;
+package net.deanly.solana.sdk.rpc.response;
 
 import com.squareup.moshi.Json;
 
 import lombok.Getter;
 import lombok.ToString;
-
-import net.deanly.solana.sdk.rpc.response.ResValueAccountInfo;
 
 @Getter
 @ToString

@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.ws.listeners;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners;
 
 import java.util.Map;
 import java.util.HashMap;

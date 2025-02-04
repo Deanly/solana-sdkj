@@ -13,7 +13,7 @@ public class RpcSendTransactionConfig {
 
     @lombok.Builder.Default
     @Json(name = "encoding")
-    private Encoding encoding = Encoding.base64;
+    private Encoding encoding = Encoding.BASE64;
 
     @lombok.Builder.Default
     @Json(name ="skipPreflight")

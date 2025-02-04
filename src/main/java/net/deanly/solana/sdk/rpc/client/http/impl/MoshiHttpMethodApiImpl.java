@@ -1,15 +1,20 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.adapter.MoshiUnsignedLongJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
-import net.deanly.solana.sdk.rpc.client.legacy.http.RpcApiImpl;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
-import net.deanly.solana.sdk.rpc.response.RpcResponse;
-import net.deanly.solana.sdk.rpc.response.RpcResultObject;
+import net.deanly.solana.sdk.rpc.request.config.AccountInfoConfig;
+import net.deanly.solana.sdk.rpc.request.config.BaseConfig;
+import net.deanly.solana.sdk.rpc.request.config.BlockConfig;
+import net.deanly.solana.sdk.rpc.response.*;
+import net.deanly.solana.sdk.rpc.types.Commitment;
 import okhttp3.*;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -23,16 +28,18 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class MoshiHttpMethodApiImpl extends RpcApiImpl implements HttpMethodApi {
+public class MoshiHttpMethodApiImpl extends LegacyRpcApiImpl implements HttpMethodApi {
     private final RpcClient.ClientConfig config;
     private OkHttpClient httpClient;
-    private final Moshi moshi = new Moshi.Builder().build();
+    private final Moshi moshi = new Moshi.Builder()
+            .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
+            .build();
 
     JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
     private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
 
     public MoshiHttpMethodApiImpl(RpcClient.ClientConfig config) {
-        super(config.getEndpoint());
+        super.setClient(this);
         this.config = config;
         this.httpClient = this.createHttpClient();
     }
@@ -64,18 +71,18 @@ public class MoshiHttpMethodApiImpl extends RpcApiImpl implements HttpMethodApi 
         return builder.build();
     }
 
-
     /**
-     * Calls the specified RPC method with the given parameters.
+     * Makes a JSON-RPC call using the specified method, parameters, and response types.
      *
-     * @param method the RPC method to call
-     * @param params the parameters for the RPC method
-     * @param responseType  the type of the expected result
-     * @return the result of the RPC call
-     * @throws RpcException if an error occurs during the RPC call
+     * @param method          The name of the JSON-RPC method to execute.
+     * @param params          A list of objects representing the parameters for the method call.
+     * @param responseType    The expected type of the response result.
+     * @param errorDataType   The type of the error data to parse if an error occurs.
+     * @return The result of the JSON-RPC call, parsed into the specified response type.
+     * @throws RpcException   If an error occurs during the RPC call or when parsing the response.
      */
     @SuppressWarnings("unchecked")
-    public <T> T call(String method, List<Object> params, Type responseType) throws RpcException {
+    public <T> T call(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException {
         RpcRequest rpcRequest = new RpcRequest(method, params);
 
         JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
@@ -95,12 +102,29 @@ public class MoshiHttpMethodApiImpl extends RpcApiImpl implements HttpMethodApi 
 
             if (rpcResponse.getError() != null) {
                 RpcResponse.Error error = rpcResponse.getError();
-                throw new RpcException(
-                        "RPC Error: " + error.getMessage(),
-                        (int) error.getCode() // Convert long to Integer for RpcException
-                );
-            }
 
+                Map<String, Object> errorData = null;
+                if (error.getData() != null) {
+                    try {
+                        if (errorDataType != null) {
+                            JsonAdapter<Map<String, Object>> mapAdapter = getCachedAdapter(errorDataType);
+                            errorData = mapAdapter.fromJsonValue(error.getData());
+                        } else {
+                            Type mapType = Types.newParameterizedType(Map.class, String.class, Object.class);
+                            JsonAdapter<Map<String, Object>> mapAdapter = getCachedAdapter(mapType);
+                            errorData = mapAdapter.fromJsonValue(error.getData());
+                        }
+                    } catch (Exception e) {
+                        throw new RpcException(
+                                "Failed to parse error data: " + e.getMessage(),
+                                (int) error.getCode(),
+                                null
+                        );
+                    }
+                }
+
+                throw new RpcException(error.getMessage(), (int) error.getCode(), errorData);
+            }
 
             if (rpcResponse.getResult() instanceof RpcResultObject<?>) {
                 return ((RpcResultObject<T>) rpcResponse.getResult()).getValue();
@@ -115,12 +139,79 @@ public class MoshiHttpMethodApiImpl extends RpcApiImpl implements HttpMethodApi 
         }
     }
 
+    @Deprecated
+    public <T> T call(String method, List<Object> params, Type responseType) throws RpcException {
+        return this.call(method, params, responseType, null);
+    }
+
     @SuppressWarnings("unchecked")
-    private <T> JsonAdapter<RpcResponse<T>> getCachedAdapter(Type responseType) {
-        return (JsonAdapter<RpcResponse<T>>) adapterCache.computeIfAbsent(
-                responseType, type -> moshi.adapter(Types.newParameterizedType(RpcResponse.class, type))
-        );
+    private <T> JsonAdapter<T> getCachedAdapter(Type responseType) {
+        return (JsonAdapter<T>) adapterCache.computeIfAbsent(responseType, moshi::adapter);
     }
 
 
+    /*
+     * Solana RPC HTTP Methods
+     */
+
+    @Override
+    public ResValueAccountInfo getAccountInfo(PublicKey account, AccountInfoConfig configuration) throws RpcException {
+        if (configuration == null) {
+            throw new IllegalArgumentException("configuration must not be null");
+        }
+        List<Object> params = List.of(
+                account.toString(),
+                configuration
+        );
+        Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueAccountInfo.class);
+        return this.call("getAccountInfo", params, type, null);
+    }
+
+    @Override
+    public UnsignedLong getBalance(PublicKey account, BaseConfig configuration) throws RpcException {
+        if (configuration == null) {
+            throw new IllegalArgumentException("configuration must not be null");
+        }
+        List<Object> params = List.of(
+                account.toString(),
+                configuration
+        );
+        Type type = Types.newParameterizedType(RpcResponseV2.class, UnsignedLong.class);
+        return this.call("getBalance", params, type, null);
+    }
+
+    @Override
+    public ResValueBlock getBlock(int slot, BlockConfig configuration) throws RpcException {
+        if (configuration == null) {
+            throw new IllegalArgumentException("configuration must not be null");
+        }
+        if (configuration.getCommitment().equals(Commitment.PROCESSED)) {
+            throw new IllegalArgumentException("PROCESSED commitment is not supported for getBalance");
+        }
+        List<Object> params = List.of(
+                slot,
+                configuration
+        );
+        Type type = Types.newParameterizedType(RpcResponse.class, ResValueBlock.class);
+        return this.call("getBlock", params, type, null);
+    }
+
+
+    @Override
+    public void getHealth() throws RpcException {
+        Type resType = Types.newParameterizedType(RpcResponse.class, String.class);
+        Type errType = Types.newParameterizedType(Map.class, String.class, Integer.class);
+        this.call("getHealth", List.of(), resType, errType).equals("ok");
+    }
+
+    @Override
+    public boolean getHealthCheck() {
+        Type resType = Types.newParameterizedType(RpcResponse.class, String.class);
+        Type errType = Types.newParameterizedType(Map.class, String.class, Integer.class);
+        try {
+            return this.call("getHealth", List.of(), resType, errType).equals("ok");
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

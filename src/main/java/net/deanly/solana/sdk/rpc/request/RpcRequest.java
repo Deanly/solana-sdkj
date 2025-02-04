@@ -21,7 +21,7 @@ public class RpcRequest {
     private List<Object> params;
 
     @Json(name = "id")
-    private final Long id = Math.abs(UUID.randomUUID().getMostSignificantBits());
+    private final Long id;
 
     public RpcRequest(String method) {
         this(method, null);
@@ -30,5 +30,12 @@ public class RpcRequest {
     public RpcRequest(String method, List<Object> params) {
         this.method = method;
         this.params = params;
+        this.id = Math.abs(UUID.randomUUID().getLeastSignificantBits());
+    }
+
+    public RpcRequest(String method, List<Object> params, Long id) {
+        this.method = method;
+        this.params = params;
+        this.id = id;
     }
 }

@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.ws;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy;
 
 @Deprecated
 public class SignatureNotification {

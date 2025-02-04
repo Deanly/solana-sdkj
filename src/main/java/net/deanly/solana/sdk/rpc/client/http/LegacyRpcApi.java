@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.http;
+package net.deanly.solana.sdk.rpc.client.http;
 
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.KeyPair;
@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Deprecated
-public interface RpcApi {
+public interface LegacyRpcApi {
 
     ResValueLatestBlockhash getLatestBlockhash() throws RpcException;
 
@@ -93,7 +93,7 @@ public interface RpcApi {
 
     String requestAirdrop(PublicKey address, long lamports, Commitment commitment) throws RpcException;
 
-    BlockCommitment getBlockCommitment(long block) throws RpcException;
+    ResValueBlockCommitment getBlockCommitment(long block) throws RpcException;
 
     Long getFeeForMessage(String message) throws RpcException;
 
@@ -195,7 +195,7 @@ public interface RpcApi {
     List<PerformanceSample> getRecentPerformanceSamples() throws RpcException;
     List<PerformanceSample> getRecentPerformanceSamples(int limit) throws RpcException;
 
-    boolean getHealth() throws RpcException;
+    boolean getHealth2() throws RpcException;
 
     List<LargeAccount> getLargestAccounts() throws RpcException;
     List<LargeAccount> getLargestAccounts(String filter, Commitment commitment) throws RpcException;

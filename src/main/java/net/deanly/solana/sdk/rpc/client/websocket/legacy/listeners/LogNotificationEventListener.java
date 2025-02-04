@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.ws.listeners;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;

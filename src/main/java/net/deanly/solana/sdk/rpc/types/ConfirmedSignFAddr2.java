@@ -14,10 +14,10 @@ public class ConfirmedSignFAddr2 {
     private String until;
 
     @Json(name = "commitment")
-    private String commitment;
+    private Commitment commitment;
 
     public ConfirmedSignFAddr2(int limit, Commitment commitment) {
         this.limit = limit;
-        this.commitment = commitment.getValue();
+        this.commitment = commitment;
     }
 }

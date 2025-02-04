@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client.legacy.ws;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,7 +25,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import net.deanly.solana.sdk.rpc.types.RpcNotificationResult;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.response.RpcResponse;
-import net.deanly.solana.sdk.rpc.client.legacy.ws.listeners.NotificationEventListener;
+import net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners.NotificationEventListener;
 
 /**
  * SubscriptionWebSocketClient is a WebSocket client for managing subscriptions to various Solana events.
@@ -143,7 +143,7 @@ public class SubscriptionWebSocketClient extends WebSocketClient {
     public void accountSubscribe(String key, NotificationEventListener listener, Commitment commitment, String encoding) {
         List<Object> params = new ArrayList<>();
         params.add(key);
-        params.add(Map.of("encoding", encoding, "commitment", commitment.getValue()));
+        params.add(Map.of("encoding", encoding, "commitment", commitment));
 
         RpcRequest rpcRequest = new RpcRequest("accountSubscribe", params);
         addSubscription(rpcRequest, listener);
@@ -206,7 +206,7 @@ public class SubscriptionWebSocketClient extends WebSocketClient {
      */
     public void blockSubscribe(NotificationEventListener listener, Commitment commitment, String encoding) {
         List<Object> params = new ArrayList<>();
-        params.add(Map.of("encoding", encoding, "commitment", commitment.getValue()));
+        params.add(Map.of("encoding", encoding, "commitment", commitment));
 
         RpcRequest rpcRequest = new RpcRequest("blockSubscribe", params);
         addSubscription(rpcRequest, listener);
@@ -240,7 +240,7 @@ public class SubscriptionWebSocketClient extends WebSocketClient {
     public void programSubscribe(String programId, NotificationEventListener listener, Commitment commitment, String encoding) {
         List<Object> params = new ArrayList<>();
         params.add(programId);
-        params.add(Map.of("encoding", encoding, "commitment", commitment.getValue()));
+        params.add(Map.of("encoding", encoding, "commitment", commitment));
 
         RpcRequest rpcRequest = new RpcRequest("programSubscribe", params);
         addSubscription(rpcRequest, listener);

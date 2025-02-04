@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.deanly.solana.sdk.rpc.client.legacy.ws.SubscriptionWebSocketClient;
-import net.deanly.solana.sdk.rpc.client.legacy.ws.listeners.NotificationEventListener;
+import net.deanly.solana.sdk.rpc.client.websocket.legacy.SubscriptionWebSocketClient;
+import net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners.NotificationEventListener;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CompletableFuture;

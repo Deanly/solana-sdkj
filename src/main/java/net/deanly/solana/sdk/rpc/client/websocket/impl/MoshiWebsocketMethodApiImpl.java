@@ -13,7 +13,7 @@ import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.ResValueProgram;
+import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 import okhttp3.*;
 import com.google.common.cache.Cache;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -293,7 +292,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     ) {
         List<Object> params = List.of(
                 accountKey,
-                Map.of("commitment", commitment.getValue(), "encoding", encoding)
+                Map.of("commitment", commitment, "encoding", encoding)
         );
         Type type = Types.newParameterizedType(
                 RpcNotificationV2.class,
@@ -310,7 +309,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     @Override
     public RpcResponse<Long> blockSubscribe(Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueBlock>> listener) {
         List<Object> params = List.of(
-                Map.of("commitment", commitment.getValue(), "encoding", encoding)
+                Map.of("commitment", commitment, "encoding", encoding)
         );
         Type type = Types.newParameterizedType(
                 RpcNotificationV2.class,
@@ -328,7 +327,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     public RpcResponse<Long> logsSubscribe(List<String> mention, Commitment commitment, NotificationListener<RpcNotificationV2<ResValueLog>> listener) {
         List<Object> params = List.of(
                 mention,
-                Map.of("commitment", commitment.getValue())
+                Map.of("commitment", commitment)
         );
         Type type = Types.newParameterizedType(
                 RpcNotificationV2.class,
@@ -346,7 +345,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     public RpcResponse<Long> programSubscribe(String programId, Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueProgram>> listener) {
         List<Object> params = List.of(
                 programId,
-                Map.of("commitment", commitment.getValue(), "encoding", encoding)
+                Map.of("commitment", commitment, "encoding", encoding)
         );
         Type type = Types.newParameterizedType(
                 RpcNotificationV2.class,

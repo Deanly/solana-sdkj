@@ -1,11 +1,9 @@
 package net.deanly.solana.sdk.rpc.response;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
+import net.deanly.solana.sdk.rpc.types.EncodedData;
 
 @Getter
 @ToString
@@ -24,7 +22,7 @@ public class ResValueAccountInfo {
 
     /// data associated with the account, either as encoded binary data or JSON format
     @Json(name = "data")
-    private List<String> data;
+    private EncodedData data;
 
     /// boolean indicating if the account contains a program (and is strictly read-only)
     @Json(name = "executable")

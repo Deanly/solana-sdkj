@@ -1,24 +1,32 @@
 package net.deanly.solana.sdk.rpc.types;
 
 import com.squareup.moshi.Json;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@RequiredArgsConstructor
 public enum Encoding {
     @Json(name = "base64")
-    BASE64,
+    BASE64("base64"),
 
     @Json(name = "base58")
-    BASE58,
+    BASE58("base58"),
 
     @Json(name = "base64+zstd")
-    BASE64_ZSTD,
+    BASE64_ZSTD("base64+zstd"),
 
     @Json(name = "jsonParsed")
-    JSON_PARSED;
+    JSON_PARSED("jsonParsed"),
+
+    @Json(name = "json")
+    JSON("json");
+
+    private final String value;
+
+    @Override
+    public String toString() {
+        return value;
+    }
 
     @Data
     @AllArgsConstructor

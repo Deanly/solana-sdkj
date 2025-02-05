@@ -8,6 +8,7 @@ import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.LegacyRpcApi;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
+import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
 import net.deanly.solana.sdk.rpc.types.*;
 import net.deanly.solana.sdk.rpc.request.SimulateTransactionParams;
 import net.deanly.solana.sdk.transaction.Transaction;
@@ -246,9 +247,9 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         Object rawData = account.get("data");
         if (rawData instanceof List) {
             List<String> dataList = ((List<String>) rawData);
-            accountInfoBuilder.data(dataList);
+            accountInfoBuilder.data(new EncodedData(dataList.get(0), Encoding.valueOf(dataList.get(1))));
         } else if (rawData instanceof String) {
-            accountInfoBuilder.data(List.of((String) rawData));
+            accountInfoBuilder.data(new EncodedData((String) rawData, null));
         }
 
         accountInfoBuilder.executable((boolean) account.get("executable"));
@@ -428,8 +429,8 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         return client.call("minimumLedgerSlot", new ArrayList<>(), Long.class);
     }
 
-    public SolanaVersion getVersion() throws RpcException {
-        return client.call("getVersion", new ArrayList<>(), SolanaVersion.class);
+    public ResValueVersion getVersion() throws RpcException {
+        return client.call("getVersion", new ArrayList<>(), ResValueVersion.class);
     }
 
     public String requestAirdrop(PublicKey address, long lamports) throws RpcException {
@@ -588,16 +589,16 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
     }
 
 
-    public List<ResResultClusterNode> getClusterNodes() throws RpcException {
+    public List<ResValueClusterNode> getClusterNodes() throws RpcException {
         List<Object> params = new ArrayList<>();
 
         // TODO - fix uncasted type stuff
         List<AbstractMap> rawResult = client.call("getClusterNodes", params, List.class);
 
-        List<ResResultClusterNode> result = new ArrayList<>();
-        for (AbstractMap item : rawResult) {
-            result.add(new ResResultClusterNode(item));
-        }
+        List<ResValueClusterNode> result = new ArrayList<>();
+//        for (AbstractMap item : rawResult) {
+//            result.add(new ResResultClusterNode(item));
+//        }
 
         return result;
     }
@@ -650,9 +651,9 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
      *
      * @throws RpcException
      */
-    public SnapshotSlot getHighestSnapshotSlot() throws RpcException {
+    public ResValueSnapshotSlot getHighestSnapshotSlot() throws RpcException {
         List<Object> params = new ArrayList<>();
-        return client.call("getHighestSnapshotSlot", params, SnapshotSlot.class);
+        return client.call("getHighestSnapshotSlot", params, ResValueSnapshotSlot.class);
     }
 
     /**
@@ -660,24 +661,24 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
      * @return
      * @throws RpcException
      */
-    public EpochInfo getEpochInfo() throws RpcException {
+    public ResValueEpochInfo getEpochInfo() throws RpcException {
         return getEpochInfo(null);
     }
 
-    public EpochInfo getEpochInfo(Commitment commitment) throws RpcException {
+    public ResValueEpochInfo getEpochInfo(Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
             params.add(Map.of("commitment", commitment));
         }
 
-        return client.call("getEpochInfo", params, EpochInfo.class);
+        return client.call("getEpochInfo", params, ResValueEpochInfo.class);
     }
 
-    public EpochSchedule getEpochSchedule() throws RpcException {
+    public ResValueEpochSchedule getEpochSchedule() throws RpcException {
         List<Object> params = new ArrayList<>();
 
-        return client.call("getEpochSchedule", params, EpochSchedule.class);
+        return client.call("getEpochSchedule", params, ResValueEpochSchedule.class);
     }
 
     public PublicKey getTokenAccountsByOwner(PublicKey owner, PublicKey tokenMint) throws RpcException {
@@ -704,29 +705,29 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         return tokenAccountKey;
     }
 
-    public InflationRate getInflationRate() throws RpcException {
-        return client.call("getInflationRate", new ArrayList<>(), InflationRate.class);
+    public ResValueInflationRate getInflationRate() throws RpcException {
+        return client.call("getInflationRate", new ArrayList<>(), ResValueInflationRate.class);
     }
 
-    public InflationGovernor getInflationGovernor() throws RpcException {
+    public ResValueInflationGovernor getInflationGovernor() throws RpcException {
         return getInflationGovernor(null);
     }
 
-    public InflationGovernor getInflationGovernor(Commitment commitment) throws RpcException {
+    public ResValueInflationGovernor getInflationGovernor(Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         if (commitment != null) {
             params.add(Map.of("commitment", commitment));
         }
 
-        return client.call("getInflationGovernor", params, InflationGovernor.class);
+        return client.call("getInflationGovernor", params, ResValueInflationGovernor.class);
     }
 
-    public List<InflationReward> getInflationReward(List<PublicKey> addresses) throws RpcException {
+    public List<ResValueInflationReward> getInflationReward(List<PublicKey> addresses) throws RpcException {
         return getInflationReward(addresses, null, null);
     }
 
-    public List<InflationReward> getInflationReward(List<PublicKey> addresses, Long epoch, Commitment commitment)
+    public List<ResValueInflationReward> getInflationReward(List<PublicKey> addresses, Long epoch, Commitment commitment)
             throws RpcException {
         List<Object> params = new ArrayList<>();
 
@@ -743,12 +744,12 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
 
         List<AbstractMap> rawResult = client.call("getInflationReward", params, List.class);
 
-        List<InflationReward> result = new ArrayList<>();
-        for (AbstractMap item : rawResult) {
-            if (item != null) {
-                result.add(new InflationReward(item));
-            }
-        }
+        List<ResValueInflationReward> result = new ArrayList<>();
+//        for (AbstractMap item : rawResult) {
+//            if (item != null) {
+//                result.add(new ResValueInflationReward(item));
+//            }
+//        }
 
         return result;
     }
@@ -963,11 +964,11 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         return client.call(method, params, responseType);
     }
 
-    public VoteAccounts getVoteAccounts() throws RpcException {
+    public ResValueVoteAccounts getVoteAccounts() throws RpcException {
         return getVoteAccounts(null, null);
     }
 
-    public VoteAccounts getVoteAccounts(PublicKey votePubkey, Commitment commitment) throws RpcException {
+    public ResValueVoteAccounts getVoteAccounts(PublicKey votePubkey, Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         VoteAccountConfig voteAccountConfig = new VoteAccountConfig();
@@ -979,7 +980,7 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         }
         params.add(voteAccountConfig);
 
-        return client.call("getVoteAccounts", params, VoteAccounts.class);
+        return client.call("getVoteAccounts", params, ResValueVoteAccounts.class);
     }
 
     @Deprecated
@@ -1013,29 +1014,29 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         return client.call("getSignatureStatuses", params, ResValueSignatureStatuses.class);
     }
 
-    public List<PerformanceSample> getRecentPerformanceSamples() throws RpcException {
+    public List<ResValuePerformanceSample> getRecentPerformanceSamples() throws RpcException {
         List<Object> params = new ArrayList<>();
 
         List<AbstractMap> rawResult = client.call("getRecentPerformanceSamples", params, List.class);
 
-        List<PerformanceSample> result = new ArrayList<>();
-        for (AbstractMap item : rawResult) {
-            result.add(new PerformanceSample(item));
-        }
+        List<ResValuePerformanceSample> result = new ArrayList<>();
+//        for (AbstractMap item : rawResult) {
+//            result.add(new ResValuePerformanceSample(item));
+//        }
 
         return result;
     }
 
-    public List<PerformanceSample> getRecentPerformanceSamples(int limit) throws RpcException {
+    public List<ResValuePerformanceSample> getRecentPerformanceSamples(int limit) throws RpcException {
         List<Object> params = new ArrayList<>();
         params.add(limit);
 
         List<AbstractMap> rawResult = client.call("getRecentPerformanceSamples", params, List.class);
 
-        List<PerformanceSample> result = new ArrayList<>();
-        for (AbstractMap item : rawResult) {
-            result.add(new PerformanceSample(item));
-        }
+        List<ResValuePerformanceSample> result = new ArrayList<>();
+//        for (AbstractMap item : rawResult) {
+//            result.add(new ResValuePerformanceSample(item));
+//        }
 
         return result;
     }
@@ -1047,11 +1048,11 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         return result.equals("ok");
     }
 
-    public List<LargeAccount> getLargestAccounts() throws RpcException {
+    public List<ResValueLargestAccount> getLargestAccounts() throws RpcException {
         return getLargestAccounts(null, null);
     }
 
-    public List<LargeAccount> getLargestAccounts(String filter, Commitment commitment) throws RpcException {
+    public List<ResValueLargestAccount> getLargestAccounts(String filter, Commitment commitment) throws RpcException {
         List<Object> params = new ArrayList<>();
 
         LargestAccountConfig largestAccountConfig = new LargestAccountConfig();
@@ -1065,10 +1066,10 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
 
         Map<String, Object> rawResult = client.call("getLargestAccounts", params, Map.class);
 
-        List<LargeAccount> result = new ArrayList<>();
-        for (AbstractMap item : (List<AbstractMap>) rawResult.get("value")) {
-            result.add(new LargeAccount(item));
-        }
+        List<ResValueLargestAccount> result = new ArrayList<>();
+//        for (AbstractMap item : (List<AbstractMap>) rawResult.get("value")) {
+//            result.add(new ResValueLargestAccount(item));
+//        }
 
         return result;
     }
@@ -1089,7 +1090,7 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
             leaderScheduleConfig.setIdentity(identity);
         }
         if (null != commitment) {
-            leaderScheduleConfig.setCommitment(commitment.name().toLowerCase());
+            leaderScheduleConfig.setCommitment(commitment);
         }
         params.add(leaderScheduleConfig);
 

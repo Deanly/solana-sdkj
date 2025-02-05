@@ -1,8 +1,11 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
+import net.deanly.solana.sdk.rpc.types.EncodedData;
 import net.deanly.solana.sdk.rpc.types.InnerInstruction;
+import net.deanly.solana.sdk.rpc.types.TransactionError;
 
 import java.util.List;
 
@@ -14,7 +17,7 @@ import java.util.List;
 public class ResValueSimulatedTransaction {
 
     @Json(name = "err")
-    private Object err;
+    private TransactionError err;
 
     @Json(name = "logs")
     private List<String> logs;
@@ -23,7 +26,7 @@ public class ResValueSimulatedTransaction {
     private List<ResValueAccountInfo> accounts;
 
     @Json(name = "unitsConsumed")
-    private Long unitsConsumed;
+    private UnsignedLong unitsConsumed;
 
     @Json(name = "returnData")
     private ReturnData returnData;
@@ -39,7 +42,7 @@ public class ResValueSimulatedTransaction {
         private String programId;
 
         @Json(name = "data")
-        private List<String> data;
+        private EncodedData data;
 
     }
 }

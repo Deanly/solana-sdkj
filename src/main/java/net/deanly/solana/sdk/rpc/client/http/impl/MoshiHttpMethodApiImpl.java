@@ -4,17 +4,19 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
+import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.adapter.MoshiDataJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.adapter.MoshiUnsignedLongJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
-import net.deanly.solana.sdk.rpc.request.config.AccountInfoConfig;
-import net.deanly.solana.sdk.rpc.request.config.BaseConfig;
-import net.deanly.solana.sdk.rpc.request.config.BlockConfig;
+import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
+import net.deanly.solana.sdk.rpc.types.*;
+import net.deanly.solana.sdk.transaction.Transaction;
 import okhttp3.*;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -22,24 +24,22 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
-public class MoshiHttpMethodApiImpl extends LegacyRpcApiImpl implements HttpMethodApi {
+public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private final RpcClient.ClientConfig config;
     private OkHttpClient httpClient;
     private final Moshi moshi = new Moshi.Builder()
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
+            .add(EncodedData.class, new MoshiDataJsonAdapter())
             .build();
 
     JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
     private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
 
     public MoshiHttpMethodApiImpl(RpcClient.ClientConfig config) {
-        super.setClient(this);
         this.config = config;
         this.httpClient = this.createHttpClient();
     }
@@ -149,6 +149,15 @@ public class MoshiHttpMethodApiImpl extends LegacyRpcApiImpl implements HttpMeth
         return (JsonAdapter<T>) adapterCache.computeIfAbsent(responseType, moshi::adapter);
     }
 
+    private List<Object> getParams(Object... params) {
+        List<Object> result = new ArrayList<>(params.length);
+        for (Object param : params) {
+            if (param != null) {
+                result.add(param);
+            }
+        }
+        return result;
+    }
 
     /*
      * Solana RPC HTTP Methods
@@ -156,44 +165,101 @@ public class MoshiHttpMethodApiImpl extends LegacyRpcApiImpl implements HttpMeth
 
     @Override
     public ResValueAccountInfo getAccountInfo(PublicKey account, AccountInfoConfig configuration) throws RpcException {
-        if (configuration == null) {
-            throw new IllegalArgumentException("configuration must not be null");
+        if (account == null) {
+            throw new IllegalArgumentException("account must not be null");
         }
-        List<Object> params = List.of(
-                account.toString(),
-                configuration
-        );
         Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueAccountInfo.class);
-        return this.call("getAccountInfo", params, type, null);
+        return this.call("getAccountInfo", this.getParams(account.toString(), configuration), type, null);
     }
 
     @Override
-    public UnsignedLong getBalance(PublicKey account, BaseConfig configuration) throws RpcException {
-        if (configuration == null) {
-            throw new IllegalArgumentException("configuration must not be null");
+    public UnsignedLong getBalance(PublicKey account, BalanceConfig configuration) throws RpcException {
+        if (account == null) {
+            throw new IllegalArgumentException("account must not be null");
         }
-        List<Object> params = List.of(
-                account.toString(),
-                configuration
-        );
         Type type = Types.newParameterizedType(RpcResponseV2.class, UnsignedLong.class);
-        return this.call("getBalance", params, type, null);
+        return this.call("getBalance", this.getParams(account.toString(), configuration), type, null);
     }
 
+    private static final EnumSet<Encoding> SUPPORTED_ENCODINGS_BLOCK = EnumSet.of(
+            Encoding.BASE64,
+            Encoding.JSON,
+            Encoding.BASE58,
+            Encoding.JSON_PARSED
+    );
     @Override
-    public ResValueBlock getBlock(int slot, BlockConfig configuration) throws RpcException {
-        if (configuration == null) {
-            throw new IllegalArgumentException("configuration must not be null");
+    public ResValueBlock getBlock(UnsignedLong slot, BlockConfig configuration) throws RpcException {
+        if (slot == null) {
+            throw new IllegalArgumentException("slot must not be null");
         }
-        if (configuration.getCommitment().equals(Commitment.PROCESSED)) {
+        if (configuration.getEncoding() != null && !SUPPORTED_ENCODINGS_BLOCK.contains(configuration.getEncoding())) {
+            throw new IllegalArgumentException("Unsupported encoding: " + configuration.getEncoding());
+        }
+        if (Commitment.PROCESSED.equals(configuration.getCommitment())) {
             throw new IllegalArgumentException("PROCESSED commitment is not supported for getBalance");
         }
-        List<Object> params = List.of(
-                slot,
-                configuration
-        );
         Type type = Types.newParameterizedType(RpcResponse.class, ResValueBlock.class);
-        return this.call("getBlock", params, type, null);
+        return this.call("getBlock", this.getParams(slot, configuration), type, null);
+    }
+
+    @Override
+    public ResValueBlockCommitment getBlockCommitment(UnsignedLong block) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public UnsignedLong getBlockHeight(BlockHeightConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueBlockProduction getBlockProduction(BlockProductionConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public List<UnsignedLong> getBlocks(UnsignedLong startSlot, UnsignedLong endSlot, BlocksConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<UnsignedLong> getBlocksWithLimit(UnsignedLong startSlot, UnsignedLong limit, BlocksWithLimitConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public Long getBlockTime(UnsignedLong slot) throws RpcException {
+        return 0L;
+    }
+
+    @Override
+    public List<ResValueClusterNode> getClusterNodes() throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public ResValueEpochInfo getEpochInfo(EpochInfoConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueEpochSchedule getEpochSchedule() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public Long getFeeForMessage(String message, FeeForMessageConfig configuration) throws RpcException {
+        return 0L;
+    }
+
+    @Override
+    public UnsignedLong getFirstAvailableBlock() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public String getGenesisHash() throws RpcException {
+        return "";
     }
 
 
@@ -214,4 +280,185 @@ public class MoshiHttpMethodApiImpl extends LegacyRpcApiImpl implements HttpMeth
             return false;
         }
     }
+
+    @Override
+    public ResValueSnapshotSlot getHighestSnapshotSlot() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public String getIdentity() throws RpcException {
+        return "";
+    }
+
+    @Override
+    public ResValueInflationGovernor getInflationGovernor(InflationGovernorConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueInflationRate getInflationRate() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public List<ResValueInflationReward> getInflationReward(List<PublicKey> addresses, InflationRewardConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueLargestAccount> getLargestAccounts(LargestAccountsConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public ResValueLatestBlockhash getLatestBlockhash(LatestBlockhashConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public Map<String, List<Integer>> getLeaderSchedule(Long epoch, LeaderScheduleConfig configuration) throws RpcException {
+        return Map.of();
+    }
+
+    @Override
+    public UnsignedLong getMaxRetransmitSlot() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public UnsignedLong getMaxShredInsertSlot() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public UnsignedLong getMinimumBalanceForRentExemption(long dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public List<ResValueAccountInfo> getMultipleAccounts(List<PublicKey> accounts, MultipleAccountsConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueProgramAccount> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValuePerformanceSample> getRecentPerformanceSamples(Integer limit) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValuePrioritizationFee> getRecentPrioritizationFees(List<PublicKey> accounts) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueTransactionSignature> getSignaturesForAddress(PublicKey account, SignaturesForAddressConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueSignatureStatus> getSignatureStatuses(List<String> signatures, SignatureStatusesConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public UnsignedLong getSlot(SlotConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public String getSlotLeader(SlotLeaderConfig configuration) throws RpcException {
+        return "";
+    }
+
+    @Override
+    public List<String> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public UnsignedLong getStakeMinimumDelegation(StakeMinimumDelegationConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueSupply getSupply(SupplyConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueTokenAccountBalance getTokenAccountBalance(PublicKey account, TokenAccountBalanceConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public List<ResValueTokenAccount> getTokenAccountsByDelegate(PublicKey delegate, TokenAccountsByDelegateFilter filter, TokenAccountsByDelegateConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueTokenAccount> getTokenAccountsByOwner(PublicKey owner, TokenAccountsByOwnerFilter filter, TokenAccountsByOwnerConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public List<ResValueTokenLargestAccounts> getTokenLargestAccounts(PublicKey mint, TokenLargestAccountsConfig configuration) throws RpcException {
+        return List.of();
+    }
+
+    @Override
+    public ResValueTokenSupply getTokenSupply(PublicKey mint, TokenSupplyConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueConfirmedTransaction getTransaction(String signature, TransactionConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public UnsignedLong getTransactionCount(TransactionCountConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueVersion getVersion() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public ResValueVoteAccounts getVoteAccounts(VoteAccountsConfig configuration) throws RpcException {
+        return null;
+    }
+
+    @Override
+    public boolean isBlockhashValid(String blockhash, BlockhashValidConfig configuration) throws RpcException {
+        return false;
+    }
+
+    @Override
+    public UnsignedLong minimumLedgerSlot() throws RpcException {
+        return null;
+    }
+
+    @Override
+    public String requestAirdrop(PublicKey pubkey, long lamports, RequestAirdropConfig configuration) throws RpcException {
+        return "";
+    }
+
+    @Override
+    public String sendTransaction(String transaction, SendTransactionConfig configuration) throws RpcException {
+        return "";
+    }
+
+    @Override
+    public ResValueSimulatedTransaction simulateTransaction(String transaction, SimulateTransactionConfig configuration) throws RpcException {
+        return null;
+    }
+
 }

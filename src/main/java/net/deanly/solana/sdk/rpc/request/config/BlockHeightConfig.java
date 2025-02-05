@@ -1,25 +1,19 @@
 package net.deanly.solana.sdk.rpc.request.config;
 
 import com.squareup.moshi.Json;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.Encoding;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Getter @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @lombok.Builder
-public class AccountInfoConfig {
+public class BlockHeightConfig {
     @Json(name = "commitment")
     private Commitment commitment;
-
-    @Json(name = "encoding")
-    private Encoding encoding;
-
-    @Json(name = "dataSlice")
-    private Encoding.DataSlice dataSlice;
-
     @Json(name = "minContextSlot")
     private Long minContextSlot;
 }

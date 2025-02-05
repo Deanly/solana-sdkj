@@ -3,22 +3,14 @@ package net.deanly.solana.sdk.rpc.request.config;
 import com.squareup.moshi.Json;
 import lombok.*;
 import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.Encoding;
 
-@Getter
-@Setter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @lombok.Builder
-public class AccountInfoConfig {
+public class BalanceConfig {
     @Json(name = "commitment")
     private Commitment commitment;
-
-    @Json(name = "encoding")
-    private Encoding encoding;
-
-    @Json(name = "dataSlice")
-    private Encoding.DataSlice dataSlice;
 
     @Json(name = "minContextSlot")
     private Long minContextSlot;

@@ -9,11 +9,11 @@ import net.deanly.solana.sdk.rpc.types.Commitment;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LeaderScheduleConfig {
+public class SlotLeaderConfig {
 
     @Json(name = "commitment")
     private Commitment commitment; // Optional: Specifies the commitment level.
 
-    @Json(name = "identity")
-    private String identity; // Optional: Only return results for this validator identity (base-58 encoded).
+    @Json(name = "minContextSlot")
+    private Long minContextSlot; // Optional: The minimum slot that the request can be evaluated at.
 }

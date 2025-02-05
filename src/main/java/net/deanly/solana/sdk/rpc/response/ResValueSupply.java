@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.rpc.response;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
-
+import com.google.common.primitives.UnsignedLong;
 import java.util.List;
 
 @Getter
@@ -11,14 +11,14 @@ import java.util.List;
 public class ResValueSupply {
 
     @Json(name = "total")
-    private long total;
+    private UnsignedLong total; // Total supply in lamports.
 
     @Json(name = "circulating")
-    private long circulating;
+    private UnsignedLong circulating; // Circulating supply in lamports.
 
     @Json(name = "nonCirculating")
-    private long nonCirculating;
+    private UnsignedLong nonCirculating; // Non-circulating supply in lamports.
 
     @Json(name = "nonCirculatingAccounts")
-    private List<String> nonCirculatingAccounts;
+    private List<String> nonCirculatingAccounts; // List of non-circulating account addresses as base-58 encoded strings.
 }

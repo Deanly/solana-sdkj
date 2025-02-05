@@ -2,45 +2,50 @@ package net.deanly.solana.sdk.rpc.request.config;
 
 import lombok.*;
 import com.squareup.moshi.Json;
+import net.deanly.solana.sdk.rpc.types.Commitment;
 import net.deanly.solana.sdk.rpc.types.Encoding;
+
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(builderClassName = "Builder")
+@lombok.Builder
 public class SimulateTransactionConfig {
 
-    @lombok.Builder.Default
     @Json(name = "commitment")
-    private String commitment = "finalized";
+    private Commitment commitment;
 
-    @lombok.Builder.Default
     @Json(name = "sigVerify")
-    private Boolean sigVerify = false;
+    private Boolean sigVerify;
 
-    @lombok.Builder.Default
     @Json(name = "replaceRecentBlockhash")
-    private Boolean replaceRecentBlockhash = false;
+    private Boolean replaceRecentBlockhash;
 
-    @lombok.Builder.Default
     @Json(name = "minContextSlot")
-    private Long minContextSlot = null;
+    private Long minContextSlot;
 
-    @lombok.Builder.Default
     @Json(name = "encoding")
-    private Encoding encoding = Encoding.BASE64;
+    private Encoding encoding;
 
-    @lombok.Builder.Default
     @Json(name = "innerInstructions")
-    private Boolean innerInstructions = false;
+    private Boolean innerInstructions;
 
-    @lombok.Builder.Default
     @Json(name = "accounts")
-    private AccountConfig accounts = null;
+    private Accounts accounts;
 
-    public SimulateTransactionConfig(Encoding encoding) {
-        this.encoding = encoding;
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @lombok.Builder
+    public static class Accounts {
+
+        @Json(name = "encoding")
+        private Encoding encoding; // Optional: Encoding for returned account data.
+
+        @Json(name = "addresses")
+        private List<String> addresses; // An array of accounts to return, as base-58 encoded strings.
     }
-
 }

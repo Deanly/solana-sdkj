@@ -27,59 +27,6 @@ public class ResValueTransaction {
     @Json(name = "signatures")
     private List<String> signatures;
 
-    @Getter
-    @ToString
-    public static class Header {
-        /// The total number of signatures required to make the transaction valid.
-        /// The signatures must match the first `numRequiredSignatures` of `message.accountKeys`.
-        @Json(name = "numReadonlySignedAccounts")
-        private Integer numReadonlySignedAccounts;
-
-        /// The last `numReadonlySignedAccounts` of the signed keys are read-only accounts.
-        /// Programs may process multiple transactions that load read-only accounts within
-        /// a single PoH entry, but are not permitted to credit or debit lamports or modify
-        /// account data. Transactions targeting the same read-write account are evaluated sequentially.
-        @Json(name = "numReadonlyUnsignedAccounts")
-        private Integer numReadonlyUnsignedAccounts;
-
-        /// The last numReadonlyUnsignedAccounts of the unsigned keys are read-only accounts.
-        @Json(name = "numRequiredSignatures")
-        private Integer numRequiredSignatures;
-    }
-
-    @Getter
-    @ToString
-    public static class Instruction {
-        /// Index into the message.accountKeys array indicating the program account that executes
-        /// this instruction.
-        @Json(name = "programIdIndex")
-        private Integer programIdIndex;
-
-        /// List of ordered indices into the message.accountKeys array indicating which accounts
-        /// to pass to the program.
-        @Json(name = "accounts")
-        private List<Integer> accounts;
-
-        /// The program input data encoded in a base-58 string.
-        @Json(name = "data")
-        private String data;
-    }
-
-    @Getter
-    @ToString
-    public static class AddressTableLookup {
-        /// base-58 encoded public key for an address lookup table account.
-        @Json(name = "accountKey")
-        private String accountKey;
-
-        /// List of indices used to load addresses of writable accounts from a lookup table.
-        @Json(name = "writableIndexes")
-        private List<Integer> writableIndexes;
-
-        /// List of indices used to load addresses of readonly accounts from a lookup table.
-        @Json(name = "readonlyIndexes")
-        private List<Integer> readonlyIndexes;
-    }
 
     @Getter
     @ToString
@@ -103,6 +50,59 @@ public class ResValueTransaction {
         /// atomic transaction if all succeed.
         @Json(name = "instructions")
         private List<Instruction> instructions;
+
+        @Getter
+        @ToString
+        public static class Header {
+            /// The total number of signatures required to make the transaction valid.
+            /// The signatures must match the first `numRequiredSignatures` of `message.accountKeys`.
+            @Json(name = "numReadonlySignedAccounts")
+            private Integer numReadonlySignedAccounts;
+
+            /// The last `numReadonlySignedAccounts` of the signed keys are read-only accounts.
+            /// Programs may process multiple transactions that load read-only accounts within
+            /// a single PoH entry, but are not permitted to credit or debit lamports or modify
+            /// account data. Transactions targeting the same read-write account are evaluated sequentially.
+            @Json(name = "numReadonlyUnsignedAccounts")
+            private Integer numReadonlyUnsignedAccounts;
+
+            /// The last numReadonlyUnsignedAccounts of the unsigned keys are read-only accounts.
+            @Json(name = "numRequiredSignatures")
+            private Integer numRequiredSignatures;
+        }
+
+        @Getter
+        @ToString
+        public static class Instruction {
+            /// Index into the message.accountKeys array indicating the program account that executes
+            /// this instruction.
+            @Json(name = "programIdIndex")
+            private Integer programIdIndex;
+
+            /// List of ordered indices into the message.accountKeys array indicating which accounts
+            /// to pass to the program.
+            @Json(name = "accounts")
+            private List<Integer> accounts;
+
+            /// The program input data encoded in a base-58 string.
+            @Json(name = "data")
+            private String data;
+        }
     }
 
+    @Getter
+    @ToString
+    public static class AddressTableLookup {
+        /// base-58 encoded public key for an address lookup table account.
+        @Json(name = "accountKey")
+        private String accountKey;
+
+        /// List of indices used to load addresses of writable accounts from a lookup table.
+        @Json(name = "writableIndexes")
+        private List<Integer> writableIndexes;
+
+        /// List of indices used to load addresses of readonly accounts from a lookup table.
+        @Json(name = "readonlyIndexes")
+        private List<Integer> readonlyIndexes;
+    }
 }

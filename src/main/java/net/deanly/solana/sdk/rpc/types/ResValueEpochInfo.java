@@ -6,8 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class EpochInfo {
-
+public class ResValueEpochInfo {
     @Json(name = "absoluteSlot")
     private long absoluteSlot;
 

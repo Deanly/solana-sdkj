@@ -6,7 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.FilterAccountType;
 
 @Getter
 @Setter
@@ -19,5 +20,5 @@ public class LargestAccountsConfig {
     private Commitment commitment; // Optional: Specifies the commitment level.
 
     @Json(name = "filter")
-    private String filter; // Optional: Filter results by account type. Valid values are "circulating" and "nonCirculating".
+    private FilterAccountType filter; // Optional: Filter results by account type. Valid values are "circulating" and "nonCirculating".
 }

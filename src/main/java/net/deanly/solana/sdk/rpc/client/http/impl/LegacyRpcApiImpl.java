@@ -8,12 +8,11 @@ import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.LegacyRpcApi;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
-import net.deanly.solana.sdk.rpc.types.*;
+import net.deanly.solana.sdk.types.*;
 import net.deanly.solana.sdk.rpc.request.SimulateTransactionParams;
 import net.deanly.solana.sdk.transaction.Transaction;
-import net.deanly.solana.sdk.rpc.types.TokenResultObjects.TokenAccount;
-import net.deanly.solana.sdk.rpc.types.TokenResultObjects.TokenAmountInfo;
+import net.deanly.solana.sdk.types.TokenResultObjects.TokenAccount;
+import net.deanly.solana.sdk.types.TokenResultObjects.TokenAmountInfo;
 
 import java.lang.reflect.Type;
 import java.util.*;
@@ -88,9 +87,9 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
                                                 RpcSendTransactionConfig rpcSendTransactionConfig)
             throws RpcException {
         if (recentBlockHash == null) {
-            recentBlockHash = getLatestBlockhash().getBlockhash();
+            recentBlockHash = getLatestBlockhash().getBlockhash().getValue();
         }
-        transaction.setRecentBlockhash(recentBlockHash);
+        transaction.setRecentBlockhash(Blockhash.of(recentBlockHash));
 
         if (!transaction.isSigned()) {
             transaction.sign(signers);
@@ -247,14 +246,14 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         Object rawData = account.get("data");
         if (rawData instanceof List) {
             List<String> dataList = ((List<String>) rawData);
-            accountInfoBuilder.data(new EncodedData(dataList.get(0), Encoding.valueOf(dataList.get(1))));
+            accountInfoBuilder.data(new EncodedData(Encoding.valueOf(dataList.get(1)), dataList.get(0)));
         } else if (rawData instanceof String) {
-            accountInfoBuilder.data(new EncodedData((String) rawData, null));
+            accountInfoBuilder.data(new EncodedData(null, (String) rawData));
         }
 
         accountInfoBuilder.executable((boolean) account.get("executable"));
         accountInfoBuilder.lamports((UnsignedLong) account.get("lamports"));
-        accountInfoBuilder.owner((String) account.get("owner"));
+        accountInfoBuilder.owner(new PublicKey((String) account.get("owner")));
         accountInfoBuilder.rentEpoch((UnsignedLong) account.get("rentEpoch"));
 
         return programBuilder
@@ -1087,7 +1086,7 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
 
         LeaderScheduleConfig leaderScheduleConfig = new LeaderScheduleConfig();
         if (null != identity) {
-            leaderScheduleConfig.setIdentity(identity);
+            leaderScheduleConfig.setIdentity(PublicKey.valueOf(identity));
         }
         if (null != commitment) {
             leaderScheduleConfig.setCommitment(commitment);

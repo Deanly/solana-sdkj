@@ -8,8 +8,7 @@ import net.deanly.solana.sdk.rpc.request.config.ProgramAccountConfig;
 import net.deanly.solana.sdk.rpc.request.config.RpcSendTransactionConfig;
 import net.deanly.solana.sdk.rpc.request.config.SimulateTransactionConfig;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
-import net.deanly.solana.sdk.rpc.types.*;
+import net.deanly.solana.sdk.types.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 
 import java.util.List;

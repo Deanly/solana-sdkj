@@ -5,7 +5,8 @@ import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.crypto.Ed25519Signer;
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.types.codec.Base58;
 import net.deanly.solana.sdk.layout.field.Base58Bytes64Field;
 import net.deanly.solana.sdk.layout.field.ShortVecField;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
@@ -38,7 +39,7 @@ public class Transaction {
 
     private final List<TransactionInstruction> instructions;
     private final List<AddressLookupTableAccount> addressTableLookups;
-    private String recentBlockhash;
+    private Blockhash recentBlockhash;
     private PublicKey feePayer;
 
     /**
@@ -99,7 +100,7 @@ public class Transaction {
      * @param recentBlockhash The recent blockhash to set
      * @throws NullPointerException if the recentBlockhash is null
      */
-    public void setRecentBlockhash(String recentBlockhash) {
+    public void setRecentBlockhash(Blockhash recentBlockhash) {
         this.recentBlockhash = Objects.requireNonNull(recentBlockhash, "Recent blockhash cannot be null");
     }
 
@@ -179,7 +180,7 @@ public class Transaction {
      * @param recentBlockhash The recent blockhash for the transaction.
      * @param instructions   The list of transaction instructions.
      */
-    public void compile(PublicKey feePayer, String recentBlockhash, List<TransactionInstruction> instructions) {
+    public void compile(PublicKey feePayer, Blockhash recentBlockhash, List<TransactionInstruction> instructions) {
         compile(feePayer, recentBlockhash, instructions, addressTableLookups);
     }
 
@@ -195,7 +196,7 @@ public class Transaction {
      * @param instructions   The list of transaction instructions.
      * @param addressTableLookups The list of address lookup table accounts to use for the transaction.
      */
-    public void compile(PublicKey feePayer, String recentBlockhash, List<TransactionInstruction> instructions, List<AddressLookupTableAccount> addressTableLookups) {
+    public void compile(PublicKey feePayer, Blockhash recentBlockhash, List<TransactionInstruction> instructions, List<AddressLookupTableAccount> addressTableLookups) {
         if (!addressTableLookups.isEmpty()) {
             message = MessageV0.compile(feePayer, instructions, recentBlockhash, addressTableLookups);
         } else {

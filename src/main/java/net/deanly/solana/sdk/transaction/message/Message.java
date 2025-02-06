@@ -5,6 +5,7 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.layout.field.Base58Bytes32Field;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructObjectField;
@@ -39,10 +40,10 @@ public class Message extends Struct implements VersionedMessage {
     @StructSequenceObjectField(order = 4, lengthType = ShortVecField.class)
     protected List<MessageCompiledInstruction> instructions;
 
-    public Message(MessageHeader messageHeader, List<PublicKey> staticAccountKeys, String recentBlockhash, List<MessageCompiledInstruction> instructions) {
+    public Message(MessageHeader messageHeader, List<PublicKey> staticAccountKeys, Blockhash recentBlockhash, List<MessageCompiledInstruction> instructions) {
         this.header = messageHeader;
         this.staticAccountKeys = staticAccountKeys;
-        this.recentBlockhash = recentBlockhash;
+        this.recentBlockhash = recentBlockhash.getValue();
         this.instructions = instructions;
     }
 
@@ -63,7 +64,7 @@ public class Message extends Struct implements VersionedMessage {
     /**
      * Compile the message using the payer key, instructions, and recent blockhash.
      */
-    public static Message compile(PublicKey payerKey, List<TransactionInstruction> instructions, String recentBlockhash) {
+    public static Message compile(PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
         return MessageCompiler.compileLegacy(payerKey, instructions, recentBlockhash);
     }
 

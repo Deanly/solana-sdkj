@@ -2,8 +2,9 @@ package net.deanly.solana.sdk.rpc.request.config;
 
 import lombok.*;
 import com.squareup.moshi.Json;
-import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.Encoding;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.Encoding;
 
 import java.util.List;
 
@@ -46,6 +47,6 @@ public class SimulateTransactionConfig {
         private Encoding encoding; // Optional: Encoding for returned account data.
 
         @Json(name = "addresses")
-        private List<String> addresses; // An array of accounts to return, as base-58 encoded strings.
+        private List<PublicKey> addresses; // An array of accounts to return, as base-58 encoded strings.
     }
 }

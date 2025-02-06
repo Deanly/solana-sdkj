@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.transaction;
 
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
+import net.deanly.solana.sdk.types.Blockhash;
 
 import java.util.List;
 import java.util.Objects;
@@ -53,7 +54,7 @@ public class TransactionBuilder {
      * @return this builder for method chaining
      * @throws NullPointerException if recentBlockHash is null
      */
-    public TransactionBuilder setRecentBlockHash(String recentBlockHash) {
+    public TransactionBuilder setRecentBlockHash(Blockhash recentBlockHash) {
         Objects.requireNonNull(recentBlockHash, "Recent block hash cannot be null");
         transaction.setRecentBlockhash(recentBlockHash);
         return this;

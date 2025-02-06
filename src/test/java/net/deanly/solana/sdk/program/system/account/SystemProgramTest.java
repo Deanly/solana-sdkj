@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 
 public class SystemProgramTest {
 

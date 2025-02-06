@@ -5,8 +5,9 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
-import net.deanly.solana.sdk.rpc.types.*;
+import net.deanly.solana.sdk.transaction.Transaction;
+import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.types.Signature;
 
 import java.util.List;
 import java.util.Map;
@@ -205,7 +206,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getidentity">getIdentity RPC Method</a>
      */
-    String getIdentity() throws RpcException;
+    PublicKey getIdentity() throws RpcException;
 
     /**
      * Returns the current inflation governor parameters.
@@ -267,7 +268,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getleaderschedule">getLeaderSchedule RPC Method</a>
      */
-    Map<String, List<Integer>> getLeaderSchedule(Long epoch, LeaderScheduleConfig configuration) throws RpcException;
+    Map<String, List<Integer>> getLeaderSchedule(UnsignedLong epoch, LeaderScheduleConfig configuration) throws RpcException;
 
     /**
      * Returns the maximum slot seen from the retransmit stage.
@@ -296,7 +297,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getminimumbalanceforrentexemption">getMinimumBalanceForRentExemption RPC Method</a>
      */
-    UnsignedLong getMinimumBalanceForRentExemption(long dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException;
+    UnsignedLong getMinimumBalanceForRentExemption(Integer dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException;
 
     /**
      * Returns the account information for a list of Pubkeys.
@@ -365,7 +366,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsignaturestatuses">getSignatureStatuses RPC Method</a>
      */
-    List<ResValueSignatureStatus> getSignatureStatuses(List<String> signatures, SignatureStatusesConfig configuration) throws RpcException;
+    List<ResValueSignatureStatus> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException;
 
     /**
      * Returns the slot that has reached the given or default commitment level.
@@ -385,7 +386,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getslotleader">getSlotLeader RPC Method</a>
      */
-    String getSlotLeader(SlotLeaderConfig configuration) throws RpcException;
+    PublicKey getSlotLeader(SlotLeaderConfig configuration) throws RpcException;
 
     /**
      * Returns the slot leaders for a given slot range.
@@ -396,7 +397,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getslotleaders">getSlotLeaders RPC Method</a>
      */
-    List<String> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException;
+    List<PublicKey> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException;
 
     /**
      * Returns the stake minimum delegation, in lamports.
@@ -536,7 +537,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/isblockhashvalid">isBlockhashValid RPC Method</a>
      */
-    boolean isBlockhashValid(String blockhash, BlockhashValidConfig configuration) throws RpcException;
+    boolean isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException;
 
     /**
      * Returns the lowest slot that the node has information about in its ledger.
@@ -557,28 +558,28 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/requestairdrop">requestAirdrop RPC Method</a>
      */
-    String requestAirdrop(PublicKey pubkey, long lamports, RequestAirdropConfig configuration) throws RpcException;
+    Signature requestAirdrop(PublicKey pubkey, UnsignedLong lamports, RequestAirdropConfig configuration) throws RpcException;
 
     /**
      * Submits a signed transaction to the cluster for processing.
      *
-     * @param transaction   The fully-signed Transaction, as an encoded string.
+     * @param transaction   The fully-signed Transaction.
      * @param configuration Optional configuration parameters.
      * @return The first transaction signature embedded in the transaction, as a base-58 encoded string (transaction id).
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/sendtransaction">sendTransaction RPC Method</a>
      */
-    String sendTransaction(String transaction, SendTransactionConfig configuration) throws RpcException;
+    Signature sendTransaction(Transaction transaction, SendTransactionConfig configuration) throws RpcException;
 
     /**
      * Simulates sending a transaction.
      *
-     * @param transaction   The transaction to simulate, as an encoded string.
+     * @param transaction   The transaction to simulate.
      * @param configuration Optional configuration parameters.
      * @return A ResSimulateTransaction object containing the simulation result.
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/simulatetransaction">simulateTransaction RPC Method</a>
      */
-    ResValueSimulatedTransaction simulateTransaction(String transaction, SimulateTransactionConfig configuration) throws RpcException;
+    ResValueSimulatedTransaction simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException;
 
 }

@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.crypto;
 
+import net.deanly.solana.sdk.types.codec.Base58;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;

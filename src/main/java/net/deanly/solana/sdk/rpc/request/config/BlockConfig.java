@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.Encoding;
-import net.deanly.solana.sdk.rpc.types.TransactionDetails;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.Encoding;
+import net.deanly.solana.sdk.types.TransactionDetails;
 
 @Getter
 @Setter

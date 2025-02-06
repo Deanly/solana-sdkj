@@ -3,6 +3,10 @@ package net.deanly.solana.sdk.rpc.response;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.Signature;
 
 import java.util.List;
 
@@ -25,7 +29,7 @@ public class ResValueTransaction {
     /// `message.header.numRequiredSignatures` and not empty. The signature at index i corresponds to t
     /// he public key at index i in `message.accountKeys`. The first one is used as the transaction id.
     @Json(name = "signatures")
-    private List<String> signatures;
+    private List<Signature> signatures;
 
 
     @Getter
@@ -35,7 +39,7 @@ public class ResValueTransaction {
         /// and for signatures. The first `message.header.numRequiredSignatures` public keys must
         /// sign the transaction.
         @Json(name = "accountKeys")
-        private List<String> accountKeys;
+        private List<PublicKey> accountKeys;
 
         /// Details the account types and signatures required by the transaction.
         @Json(name = "header")
@@ -44,12 +48,12 @@ public class ResValueTransaction {
         /// A base-58 encoded hash of a recent block in the ledger used to prevent transaction
         /// duplication and to give transactions lifetimes.
         @Json(name = "recentBlockhash")
-        private String recentBlockhash;
+        private Blockhash recentBlockhash;
 
         /// List of program instructions that will be executed in sequence and committed in one
         /// atomic transaction if all succeed.
         @Json(name = "instructions")
-        private List<Instruction> instructions;
+        private List<ResValueInstruction> instructions;
 
         @Getter
         @ToString
@@ -70,24 +74,6 @@ public class ResValueTransaction {
             @Json(name = "numRequiredSignatures")
             private Integer numRequiredSignatures;
         }
-
-        @Getter
-        @ToString
-        public static class Instruction {
-            /// Index into the message.accountKeys array indicating the program account that executes
-            /// this instruction.
-            @Json(name = "programIdIndex")
-            private Integer programIdIndex;
-
-            /// List of ordered indices into the message.accountKeys array indicating which accounts
-            /// to pass to the program.
-            @Json(name = "accounts")
-            private List<Integer> accounts;
-
-            /// The program input data encoded in a base-58 string.
-            @Json(name = "data")
-            private String data;
-        }
     }
 
     @Getter
@@ -95,7 +81,7 @@ public class ResValueTransaction {
     public static class AddressTableLookup {
         /// base-58 encoded public key for an address lookup table account.
         @Json(name = "accountKey")
-        private String accountKey;
+        private PublicKey accountKey;
 
         /// List of indices used to load addresses of writable accounts from a lookup table.
         @Json(name = "writableIndexes")

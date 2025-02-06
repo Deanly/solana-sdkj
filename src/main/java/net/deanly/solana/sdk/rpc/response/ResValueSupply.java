@@ -4,6 +4,8 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.crypto.PublicKey;
+
 import java.util.List;
 
 @Getter
@@ -20,5 +22,5 @@ public class ResValueSupply {
     private UnsignedLong nonCirculating; // Non-circulating supply in lamports.
 
     @Json(name = "nonCirculatingAccounts")
-    private List<String> nonCirculatingAccounts; // List of non-circulating account addresses as base-58 encoded strings.
+    private List<PublicKey> nonCirculatingAccounts; // List of non-circulating account addresses as base-58 encoded strings.
 }

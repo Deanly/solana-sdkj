@@ -12,7 +12,7 @@ import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
 import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.types.Commitment;
 import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 import okhttp3.*;
 import com.google.common.cache.Cache;

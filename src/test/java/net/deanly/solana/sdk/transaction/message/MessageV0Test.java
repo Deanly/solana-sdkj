@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.transaction.message;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstructionImpl;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
@@ -45,7 +46,7 @@ class MessageV0Test {
         );
 
         // Compile to create MessageV0
-        MessageV0 originalMessage = MessageV0.compile(payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
+        MessageV0 originalMessage = MessageV0.compile(payerKey, instructions,  Blockhash.of(recentBlockhash), addressLookupTableAccounts);
 
         // Act
         byte[] serialized = originalMessage.serialize();
@@ -123,7 +124,7 @@ class MessageV0Test {
         String recentBlockhash = "ThirdPubkey33333333333333333333333333333333";
 
         // Act: Create a MessageV0 that will exceed the size limit when serialized
-        MessageV0 message = MessageV0.compile(payerKey, instructions, recentBlockhash, List.of(createMockAddressLookupTableAccount(new PublicKey("11111111111111111111111111111111"))));
+        MessageV0 message = MessageV0.compile(payerKey, instructions,  Blockhash.of(recentBlockhash), List.of(createMockAddressLookupTableAccount(new PublicKey("11111111111111111111111111111111"))));
 
         // Assert: Ensure exception is thrown during serialization
         IllegalStateException exception = assertThrows(IllegalStateException.class, message::serialize);
@@ -166,7 +167,7 @@ class MessageV0Test {
                 new PublicKey("SecondPubey22222222222222222222222222222222"),
                 new PublicKey("ThirdPubkey33333333333333333333333333333333")
         );
-        MessageV0 message = new MessageV0(header, staticKeys, "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn", List.of(), List.of());
+        MessageV0 message = new MessageV0(header, staticKeys,  Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"), List.of(), List.of());
 
         // Act & Assert
         assertTrue(message.isAccountSigner(0)); // First account is a signer
@@ -184,7 +185,7 @@ class MessageV0Test {
                 new PublicKey("ThirdPubkey33333333333333333333333333333333"), // Signed readonly
                 new PublicKey("FourthPubke44444444444444444444444444444444")  // Unsigned readonly
         );
-        MessageV0 message = new MessageV0(header, staticKeys, "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn", List.of(), List.of());
+        MessageV0 message = new MessageV0(header, staticKeys,  Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"), List.of(), List.of());
 
         // Act & Assert
         assertTrue(message.isAccountWritable(0)); // Writable signed
@@ -207,7 +208,7 @@ class MessageV0Test {
         MessageV0 message = new MessageV0(
                 new MessageHeader(0, 0, 0),
                 new ArrayList<>(),
-                "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn",
+                Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"),
                 new ArrayList<>(),
                 tableLookups
         );
@@ -235,7 +236,7 @@ class MessageV0Test {
         List<PublicKey> staticKeys = List.of(new PublicKey("11111111111111111111111111111111"));
         MessageHeader header = new MessageHeader(1, 0, 0);
 
-        MessageV0 message = new MessageV0(header, staticKeys, "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn", List.of(), tableLookups);
+        MessageV0 message = new MessageV0(header, staticKeys,  Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"), List.of(), tableLookups);
 
         // Act & Assert
         assertTrue(message.isAccountWritable(1)); // Check writable index from lookup keys
@@ -253,7 +254,7 @@ class MessageV0Test {
         );
 
         // Compile to create original message
-        MessageV0 originalMessage = MessageV0.compile(payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
+        MessageV0 originalMessage = MessageV0.compile(payerKey, instructions,  Blockhash.of(recentBlockhash), addressLookupTableAccounts);
 
         // Act
         byte[] serialized = originalMessage.serialize();

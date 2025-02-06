@@ -4,13 +4,14 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.crypto.PublicKey;
 
 @Getter
 @ToString
 public class ResValueTokenLargestAccounts {
 
     @Json(name = "address")
-    private String address; // The address of the token account.
+    private PublicKey address; // The address of the token account.
 
     @Json(name = "amount")
     private UnsignedLong amount; // The raw token account balance without decimals, as a string representation of u64.

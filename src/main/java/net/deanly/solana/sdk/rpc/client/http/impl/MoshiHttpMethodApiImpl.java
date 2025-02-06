@@ -4,19 +4,16 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
-import net.deanly.solana.sdk.rpc.client.adapter.MoshiDataJsonAdapter;
-import net.deanly.solana.sdk.rpc.client.adapter.MoshiUnsignedLongJsonAdapter;
+import net.deanly.solana.sdk.rpc.client.adapter.*;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.response.ResValueInflationRate;
-import net.deanly.solana.sdk.rpc.types.*;
 import net.deanly.solana.sdk.transaction.Transaction;
+import net.deanly.solana.sdk.types.*;
 import okhttp3.*;
 
 import javax.net.ssl.SSLHandshakeException;
@@ -33,7 +30,11 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private OkHttpClient httpClient;
     private final Moshi moshi = new Moshi.Builder()
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
-            .add(EncodedData.class, new MoshiDataJsonAdapter())
+            .add(EncodedData.class, new MoshiEncodedDataJsonAdapter())
+            .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
+            .add(Blockhash.class, new MoshiBlockhashJsonAdapter())
+            .add(Signature.class, new MoshiSignatureJsonAdapter())
+            .add(EpochCredits.class, new MoshiEpochCreditsJsonAdapter())
             .build();
 
     JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
@@ -169,7 +170,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
             throw new IllegalArgumentException("account must not be null");
         }
         Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueAccountInfo.class);
-        return this.call("getAccountInfo", this.getParams(account.toString(), configuration), type, null);
+        return this.call("getAccountInfo", this.getParams(account, configuration), type, null);
     }
 
     @Override
@@ -178,7 +179,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
             throw new IllegalArgumentException("account must not be null");
         }
         Type type = Types.newParameterizedType(RpcResponseV2.class, UnsignedLong.class);
-        return this.call("getBalance", this.getParams(account.toString(), configuration), type, null);
+        return this.call("getBalance", this.getParams(account, configuration), type, null);
     }
 
     private static final EnumSet<Encoding> SUPPORTED_ENCODINGS_BLOCK = EnumSet.of(
@@ -287,8 +288,8 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public String getIdentity() throws RpcException {
-        return "";
+    public PublicKey getIdentity() throws RpcException {
+        return null;
     }
 
     @Override
@@ -317,7 +318,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public Map<String, List<Integer>> getLeaderSchedule(Long epoch, LeaderScheduleConfig configuration) throws RpcException {
+    public Map<String, List<Integer>> getLeaderSchedule(UnsignedLong epoch, LeaderScheduleConfig configuration) throws RpcException {
         return Map.of();
     }
 
@@ -332,7 +333,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public UnsignedLong getMinimumBalanceForRentExemption(long dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException {
+    public UnsignedLong getMinimumBalanceForRentExemption(Integer dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException {
         return null;
     }
 
@@ -362,7 +363,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public List<ResValueSignatureStatus> getSignatureStatuses(List<String> signatures, SignatureStatusesConfig configuration) throws RpcException {
+    public List<ResValueSignatureStatus> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException {
         return List.of();
     }
 
@@ -372,12 +373,12 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public String getSlotLeader(SlotLeaderConfig configuration) throws RpcException {
-        return "";
+    public PublicKey getSlotLeader(SlotLeaderConfig configuration) throws RpcException {
+        return null;
     }
 
     @Override
-    public List<String> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException {
+    public List<PublicKey> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException {
         return List.of();
     }
 
@@ -437,7 +438,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public boolean isBlockhashValid(String blockhash, BlockhashValidConfig configuration) throws RpcException {
+    public boolean isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException {
         return false;
     }
 
@@ -447,17 +448,17 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public String requestAirdrop(PublicKey pubkey, long lamports, RequestAirdropConfig configuration) throws RpcException {
-        return "";
+    public Signature requestAirdrop(PublicKey pubkey, UnsignedLong lamports, RequestAirdropConfig configuration) throws RpcException {
+        return null;
     }
 
     @Override
-    public String sendTransaction(String transaction, SendTransactionConfig configuration) throws RpcException {
-        return "";
+    public Signature sendTransaction(Transaction transaction, SendTransactionConfig configuration) throws RpcException {
+        return null;
     }
 
     @Override
-    public ResValueSimulatedTransaction simulateTransaction(String transaction, SimulateTransactionConfig configuration) throws RpcException {
+    public ResValueSimulatedTransaction simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException {
         return null;
     }
 

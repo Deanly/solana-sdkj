@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.types.Commitment;
 
 @Getter
 @Setter

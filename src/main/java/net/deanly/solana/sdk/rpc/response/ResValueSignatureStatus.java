@@ -4,8 +4,8 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
-import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.TransactionError;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.TransactionError;
 
 @Getter
 @ToString

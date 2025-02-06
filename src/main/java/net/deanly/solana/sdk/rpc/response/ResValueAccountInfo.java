@@ -3,7 +3,8 @@ package net.deanly.solana.sdk.rpc.response;
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
-import net.deanly.solana.sdk.rpc.types.EncodedData;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.EncodedData;
 
 @Getter
 @ToString
@@ -18,7 +19,7 @@ public class ResValueAccountInfo {
 
     /// base-58 encoded Pubkey of the program this account has been assigned to
     @Json(name = "owner")
-    private String owner;
+    private PublicKey owner;
 
     /// data associated with the account, either as encoded binary data or JSON format
     @Json(name = "data")

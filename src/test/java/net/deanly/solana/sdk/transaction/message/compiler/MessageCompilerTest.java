@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstructionImpl;
 import net.deanly.solana.sdk.transaction.message.Message;
 import net.deanly.solana.sdk.transaction.message.MessageV0;
+import net.deanly.solana.sdk.types.Blockhash;
 import org.junit.jupiter.api.Test;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -34,7 +35,7 @@ class MessageCompilerTest {
         String recentBlockhash = "7dA2H9LGYhFNco7DAFS52trcmCQt6tLdqiy4ApXPtGBF";
 
         // Execute
-        Message legacyMessage = MessageCompiler.compileLegacy(payer, instructions, recentBlockhash);
+        Message legacyMessage = MessageCompiler.compileLegacy(payer, instructions,  Blockhash.of(recentBlockhash));
 
         // Assertions
         assertNotNull(legacyMessage);
@@ -77,7 +78,7 @@ class MessageCompilerTest {
         );
 
         // Compile versioned message
-        MessageV0 messageV0 = MessageCompiler.compileV0(payer, instructions, recentBlockhash, List.of(lookupTableAccount));
+        MessageV0 messageV0 = MessageCompiler.compileV0(payer, instructions,  Blockhash.of(recentBlockhash), List.of(lookupTableAccount));
 
         // Verify MessageV0 object structure
         assertNotNull(messageV0, "MessageV0 should not be null");
@@ -110,7 +111,7 @@ class MessageCompilerTest {
         String recentBlockhash = "7dA2H9LGYhFNco7DAFS52trcmCQt6tLdqiy4ApXPtGBF";
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            MessageCompiler.compileLegacy(payer, Collections.emptyList(), recentBlockhash);
+            MessageCompiler.compileLegacy(payer, Collections.emptyList(),  Blockhash.of(recentBlockhash));
         });
 
         assertEquals("Instructions cannot be empty", exception.getMessage());
@@ -132,7 +133,7 @@ class MessageCompilerTest {
         String recentBlockhash = "7dA2H9LGYhFNco7DAFS52trcmCQt6tLdqiy4ApXPtGBF";
 
         // Execute
-        MessageV0 messageV0 = MessageCompiler.compileV0(payer, instructions, recentBlockhash, null);
+        MessageV0 messageV0 = MessageCompiler.compileV0(payer, instructions,  Blockhash.of(recentBlockhash), null);
 
         // Assertions
         assertNotNull(messageV0);
@@ -177,7 +178,7 @@ class MessageCompilerTest {
 
         // Execute
         MessageV0 messageV0 = MessageCompiler.compileV0(
-                payer, instructions, recentBlockhash, List.of(lookupTableAccount)
+                payer, instructions,  Blockhash.of(recentBlockhash), List.of(lookupTableAccount)
         );
 
         // Assertions
@@ -229,7 +230,7 @@ class MessageCompilerTest {
 
         // Execute
         MessageV0 messageV0 = MessageCompiler.compileV0(
-                payer, instructions, recentBlockhash, List.of(lookupTableAccount)
+                payer, instructions,  Blockhash.of(recentBlockhash), List.of(lookupTableAccount)
         );
 
         // Verify MessageV0 object structure

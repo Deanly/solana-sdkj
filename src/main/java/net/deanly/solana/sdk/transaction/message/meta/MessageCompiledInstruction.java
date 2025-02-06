@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.type.basic.UInt8Field;
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 import net.deanly.solana.sdk.layout.field.SVLBlobField;
 import net.deanly.solana.sdk.layout.field.ShortVecField;
 import net.deanly.solana.sdk.transaction.codec.ShortvecEncoding;

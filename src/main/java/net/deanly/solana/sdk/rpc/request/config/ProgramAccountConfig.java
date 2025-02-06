@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.request.config;
 
-import net.deanly.solana.sdk.rpc.types.Encoding;
+import net.deanly.solana.sdk.types.Encoding;
 
 import java.util.List;
 

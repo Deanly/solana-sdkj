@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 
 import net.deanly.solana.sdk.rpc.response.RpcResultObject;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.types.Commitment;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -22,7 +22,7 @@ import com.squareup.moshi.Types;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
-import net.deanly.solana.sdk.rpc.types.RpcNotificationResult;
+import net.deanly.solana.sdk.types.RpcNotificationResult;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.response.RpcResponse;
 import net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners.NotificationEventListener;

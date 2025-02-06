@@ -4,15 +4,16 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import com.google.common.primitives.UnsignedLong;
-import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.TransactionError;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.Signature;
+import net.deanly.solana.sdk.types.TransactionError;
 
 @Getter
 @ToString
 public class ResValueTransactionSignature {
 
     @Json(name = "signature")
-    private String signature; // Transaction signature as a base-58 encoded string.
+    private Signature signature; // Transaction signature as a base-58 encoded string.
 
     @Json(name = "slot")
     private UnsignedLong slot; // The slot that contains the block with the transaction.

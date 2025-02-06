@@ -2,8 +2,8 @@ package net.deanly.solana.sdk.rpc.request.config;
 
 import com.squareup.moshi.Json;
 import lombok.*;
-import net.deanly.solana.sdk.rpc.types.Commitment;
-import net.deanly.solana.sdk.rpc.types.Encoding;
+import net.deanly.solana.sdk.types.Commitment;
+import net.deanly.solana.sdk.types.Encoding;
 
 @Getter
 @Setter

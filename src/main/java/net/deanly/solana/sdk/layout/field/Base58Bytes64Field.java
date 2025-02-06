@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.layout.field;
 
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 import net.deanly.structlayout.type.FieldBase;
 
 public class Base58Bytes64Field extends FieldBase<String> {

@@ -3,9 +3,9 @@ package net.deanly.solana.sdk.rpc.response;
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
-import net.deanly.solana.sdk.rpc.types.EncodedData;
-import net.deanly.solana.sdk.rpc.types.InnerInstruction;
-import net.deanly.solana.sdk.rpc.types.TransactionError;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.TransactionError;
 
 import java.util.List;
 
@@ -32,14 +32,14 @@ public class ResValueSimulatedTransaction {
     private ReturnData returnData;
 
     @Json(name = "innerInstructions")
-    private List<InnerInstruction> innerInstruction;
+    private List<ResValueInnerInstruction> innerInstruction;
 
     @Getter @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ReturnData {
         @Json(name = "programId")
-        private String programId;
+        private PublicKey programId;
 
         @Json(name = "data")
         private EncodedData data;

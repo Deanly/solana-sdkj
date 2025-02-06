@@ -1,8 +1,9 @@
 package net.deanly.solana.sdk.transaction.message;
 
 import net.deanly.solana.sdk.crypto.KeyPair;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +34,7 @@ public class MessageTest {
         Message message =  Message.compile(
                 signer.getPublicKey(),
                 List.of(SystemProgram.transfer(fromPublicKey, toPublickKey, lamports)),
-                "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"
+                Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
         );
 
         assertArrayEquals(new int[] { 1, 0, 1, 3, 6, 26, 217, 208, 83, 135, 21, 72, 83, 126, 222, 62, 38, 24, 73, 163,
@@ -84,7 +85,7 @@ public class MessageTest {
     public void compile_nullPayerKey_shouldThrowException() {
         Exception exception = assertThrows(
                 NullPointerException.class,
-                () -> Message.compile(null, List.of(), "RecentBlockhash")
+                () -> Message.compile(null, List.of(), Blockhash.of("RecentBlockhash"))
         );
 
         assertEquals("Payer key is required", exception.getMessage());
@@ -108,7 +109,7 @@ public class MessageTest {
 
         Exception exception = assertThrows(
                 IllegalArgumentException.class,
-                () -> Message.compile(payerKey, List.of(), "RecentBlockhash")
+                () -> Message.compile(payerKey, List.of(), Blockhash.of("RecentBlockhash"))
         );
 
         assertEquals("Instructions cannot be empty", exception.getMessage());
@@ -125,7 +126,7 @@ public class MessageTest {
         MessageCompiledInstruction instruction = new MessageCompiledInstruction(1, List.of(0), new byte[]{});
         List<MessageCompiledInstruction> instructions = List.of(instruction);
 
-        Message message = new Message(header, accountKeys, recentBlockhash, instructions);
+        Message message = new Message(header, accountKeys,  Blockhash.of(recentBlockhash), instructions);
 
         assertEquals(header, message.getHeader(), "Message header mismatch!");
         assertEquals(accountKeys, message.getStaticAccountKeys(), "Account keys mismatch!");
@@ -149,7 +150,7 @@ public class MessageTest {
                 new byte[] {0x01, 0x02, 0x03}
         );
         List<MessageCompiledInstruction> instructions = List.of(instruction);
-        Message originalMessage = new Message(header, accountKeys, recentBlockhash, instructions);
+        Message originalMessage = new Message(header, accountKeys,  Blockhash.of(recentBlockhash), instructions);
 
         StructLayout.debug(originalMessage);
 
@@ -189,7 +190,7 @@ public class MessageTest {
         String recentBlockhash = "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn";
         List<MessageCompiledInstruction> instructions = List.of();
 
-        Message message = new Message(header, accountKeys, recentBlockhash, instructions);
+        Message message = new Message(header, accountKeys,  Blockhash.of(recentBlockhash), instructions);
 
         assertTrue(message.isAccountSigner(0), "Account 0 should be a signer!");
         assertTrue(message.isAccountSigner(1), "Account 1 should be a signer!");
@@ -207,7 +208,7 @@ public class MessageTest {
         String recentBlockhash = "Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn";
         List<MessageCompiledInstruction> instructions = List.of();
 
-        Message message = new Message(header, accountKeys, recentBlockhash, instructions);
+        Message message = new Message(header, accountKeys,  Blockhash.of(recentBlockhash), instructions);
 
         assertTrue(message.isAccountWritable(0), "Account 0 should be writable!");
         assertTrue(message.isAccountWritable(1), "Account 1 should be writable!");

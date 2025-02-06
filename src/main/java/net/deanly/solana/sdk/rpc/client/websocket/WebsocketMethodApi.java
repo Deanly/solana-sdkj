@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.rpc.client.websocket;
 
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.types.Commitment;
+import net.deanly.solana.sdk.types.Commitment;
 import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 
 import java.util.List;

@@ -5,6 +5,7 @@ import net.deanly.solana.sdk.crypto.bip.HDKey;
 import net.deanly.solana.sdk.crypto.bip.HDKeyDerivation;
 import net.deanly.solana.sdk.crypto.bip.MnemonicGenerator;
 import net.deanly.solana.sdk.crypto.bip.SolanaKeyDerivation;
+import net.deanly.solana.sdk.types.codec.Base58;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 
 import java.security.SecureRandom;

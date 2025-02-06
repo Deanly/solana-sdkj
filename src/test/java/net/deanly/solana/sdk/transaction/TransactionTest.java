@@ -7,6 +7,7 @@ import net.deanly.solana.sdk.program.spl.memo.SplMemoProgram;
 import net.deanly.solana.sdk.program.spl.memo.instruction.SplMemoInstructionWrite;
 import net.deanly.solana.sdk.program.system.account.SystemProgram;
 
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Base64;
 import java.util.List;
 
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 
 @Slf4j
 public class TransactionTest {
@@ -30,7 +31,7 @@ public class TransactionTest {
 
         Transaction transaction = new Transaction();
         transaction.addInstruction(SystemProgram.transfer(fromPublicKey, toPublickKey, lamports));
-        transaction.setRecentBlockhash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn");
+        transaction.setRecentBlockhash((Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")));
         transaction.sign(signer);
         byte[] serializedTransaction = transaction.serialize();
 
@@ -51,7 +52,7 @@ public class TransactionTest {
         instruction.setProgramId(SplMemoProgram.PROGRAM_ID_OLD);
         final Transaction transaction = new TransactionBuilder()
                 .addInstruction(instruction)
-                .setRecentBlockHash("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn")
+                .setRecentBlockHash(Blockhash.of("Eit7RCyhUixAe2hGBS8oqnw59QK3kgMMjfLME5bm9wRn"))
                 .setSigners(List.of(signer))
                 .build();
 

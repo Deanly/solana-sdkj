@@ -4,6 +4,7 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +24,7 @@ class VersionedMessageTest {
         String recentBlockhash = "7dA2H9LGYhFNco7DAFS52trcmCQt6tLdqiy4ApXPtGBF";
         List<MessageCompiledInstruction> instructions = List.of();
 
-        Message originalMessage = new Message(header, staticAccountKeys, recentBlockhash, instructions);
+        Message originalMessage = new Message(header, staticAccountKeys,  Blockhash.of(recentBlockhash), instructions);
 
         // Serialize the message
         byte[] serializedMessage = originalMessage.serialize();
@@ -56,7 +57,7 @@ class VersionedMessageTest {
 
         List<MessageAddressTableLookup> addressTableLookups = List.of(addressTableLookup);
 
-        MessageV0 originalMessageV0 = new MessageV0(header, staticAccountKeys, recentBlockhash, instructions, addressTableLookups);
+        MessageV0 originalMessageV0 = new MessageV0(header, staticAccountKeys,  Blockhash.of(recentBlockhash), instructions, addressTableLookups);
 
         // Serialize the message
         byte[] serializedMessageV0 = originalMessageV0.serialize();
@@ -111,7 +112,7 @@ class VersionedMessageTest {
 
         List<MessageAddressTableLookup> addressTableLookups = List.of(addressTableLookup);
 
-        MessageV0 originalMessageV0 = new MessageV0(header, staticAccountKeys, recentBlockhash, instructions, addressTableLookups);
+        MessageV0 originalMessageV0 = new MessageV0(header, staticAccountKeys,  Blockhash.of(recentBlockhash), instructions, addressTableLookups);
 
         // Serialize the original message
         byte[] serializedMessage = originalMessageV0.serialize();

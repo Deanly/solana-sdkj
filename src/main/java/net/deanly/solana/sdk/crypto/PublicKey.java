@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.crypto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.deanly.solana.sdk.program.pda.ProgramDerivedAddress;
+import net.deanly.solana.sdk.types.codec.Base58;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 
 import java.io.ByteArrayOutputStream;

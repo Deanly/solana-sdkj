@@ -6,7 +6,10 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
-import net.deanly.solana.sdk.rpc.types.*;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.TokenBalance;
+import net.deanly.solana.sdk.types.TransactionError;
 
 
 @Getter
@@ -54,7 +57,7 @@ public class ResValueConfirmedTransaction {
 
         /// List of inner instructions or null if inner instruction recording was not enabled during this transaction
         @Json(name = "innerInstructions")
-        private List<InnerInstruction> innerInstructions;
+        private List<ResValueInnerInstruction> innerInstructions;
 
         /// List of token balances from before the transaction was processed or omitted if token balance recording was not yet enabled during this transaction
         @Json(name = "preTokenBalances")
@@ -103,11 +106,11 @@ public class ResValueConfirmedTransaction {
     public static class LoadedAddresses {
         /// Ordered list of base-58 encoded addresses for writable loaded accounts
         @Json(name = "writable")
-        private List<String> writable;
+        private List<PublicKey> writable;
 
         /// Ordered list of base-58 encoded addresses for readonly loaded accounts
         @Json(name = "readonly")
-        private List<String> readonly;
+        private List<PublicKey> readonly;
     }
 
     @Getter
@@ -115,11 +118,11 @@ public class ResValueConfirmedTransaction {
     public static class ReturnData {
         /// the program that generated the return data, as base-58 encoded Pubkey
         @Json(name = "programId")
-        private String programId;
+        private PublicKey programId;
 
         /// the return data itself, as base-64 encoded binary data
         @Json(name = "data")
-        private List<String> data;
+        private EncodedData data;
     }
 
 }

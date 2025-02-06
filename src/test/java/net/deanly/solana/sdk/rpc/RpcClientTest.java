@@ -1,13 +1,6 @@
 package net.deanly.solana.sdk.rpc;
 
-import net.deanly.solana.sdk.rpc.client.RpcClient;
 import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-
-import net.deanly.solana.sdk.rpc.types.WeightedEndpoint;
-
-import java.util.Arrays;
 
 @Disabled
 public class RpcClientTest {

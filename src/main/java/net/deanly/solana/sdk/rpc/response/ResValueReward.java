@@ -3,9 +3,8 @@ package net.deanly.solana.sdk.rpc.response;
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
-import net.deanly.solana.sdk.rpc.types.RewardType;
-
-import java.math.BigInteger;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.RewardType;
 
 @Getter
 @AllArgsConstructor
@@ -14,7 +13,7 @@ import java.math.BigInteger;
 public class ResValueReward {
     /// The public key, as base-58 encoded string, of the account that received the reward
     @Json(name = "pubkey")
-    private String pubkey;
+    private PublicKey pubkey;
 
     /// number of reward lamports credited or debited by the account, as a i64
     @Json(name = "lamports")

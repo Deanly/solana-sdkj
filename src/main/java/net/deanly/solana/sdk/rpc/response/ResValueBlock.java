@@ -3,11 +3,8 @@ package net.deanly.solana.sdk.rpc.response;
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
-import net.deanly.solana.sdk.rpc.types.InnerInstruction;
-import net.deanly.solana.sdk.rpc.types.TokenBalance;
-import net.deanly.solana.sdk.rpc.types.TransactionError;
+import net.deanly.solana.sdk.types.Signature;
 
 import java.util.List;
 
@@ -32,7 +29,7 @@ public class ResValueBlock {
 
     /// present if "signatures" are requested for transaction details; an array of signatures strings, corresponding to the transaction order in the block
     @Json(name = "signatures")
-    private List<String> signatures;
+    private List<Signature> signatures;
 
     /// block-level rewards, present if rewards are requested; an array of JSON objects containing:
     @Json(name = "rewards")

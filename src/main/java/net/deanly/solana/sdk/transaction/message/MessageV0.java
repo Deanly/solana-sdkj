@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceObjectField;
@@ -39,7 +40,7 @@ public class MessageV0 extends Message implements VersionedMessage {
     private List<MessageAddressTableLookup> addressTableLookups;
 
 
-    public MessageV0(MessageHeader header, List<PublicKey> staticAccountKeys, String recentBlockhash,
+    public MessageV0(MessageHeader header, List<PublicKey> staticAccountKeys, Blockhash recentBlockhash,
                      List<MessageCompiledInstruction> compiledInstructions, List<MessageAddressTableLookup> addressTableLookups) {
         super(header, staticAccountKeys, recentBlockhash, compiledInstructions);
         this.addressTableLookups = addressTableLookups;
@@ -51,7 +52,7 @@ public class MessageV0 extends Message implements VersionedMessage {
     }
 
     public static MessageV0 compile(PublicKey payerKey, List<TransactionInstruction> instructions,
-                                    String recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
+                                    Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
         return MessageCompiler.compileV0(payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
     }
 

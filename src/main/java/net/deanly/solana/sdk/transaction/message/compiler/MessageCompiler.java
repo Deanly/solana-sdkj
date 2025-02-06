@@ -9,6 +9,7 @@ import net.deanly.solana.sdk.transaction.message.meta.LoadedAddresses;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
+import net.deanly.solana.sdk.types.Blockhash;
 
 import java.util.*;
 
@@ -17,7 +18,7 @@ public class MessageCompiler {
     /**
      * Compile the message using the payer key, instructions, and recent blockhash.
      */
-    public static Message compileLegacy(PublicKey payerKey, List<TransactionInstruction> instructions, String recentBlockhash) {
+    public static Message compileLegacy(PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
         Objects.requireNonNull(payerKey, "Payer key is required");
         Objects.requireNonNull(recentBlockhash, "Recent blockhash is required");
         if (instructions.isEmpty()) {
@@ -52,7 +53,7 @@ public class MessageCompiler {
     }
 
     public static MessageV0 compileV0(PublicKey payerKey, List<TransactionInstruction> instructions,
-                                      String recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
+                                      Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
         Objects.requireNonNull(payerKey, "Payer key is required");
         Objects.requireNonNull(recentBlockhash, "Recent blockhash is required");
         if (instructions == null || instructions.isEmpty()) {

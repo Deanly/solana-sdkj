@@ -8,14 +8,13 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.AccountInfoConfig;
-import net.deanly.solana.sdk.rpc.request.config.BalanceConfig;
 import net.deanly.solana.sdk.rpc.request.config.BlockConfig;
 import net.deanly.solana.sdk.rpc.response.ResValueAccountInfo;
 import net.deanly.solana.sdk.rpc.response.ResValueBlock;
 import net.deanly.solana.sdk.rpc.response.ResValueConfirmedTransaction;
-import net.deanly.solana.sdk.rpc.types.Encoding;
+import net.deanly.solana.sdk.types.Encoding;
 import net.deanly.solana.sdk.rpc.response.ResValueBlockCommitment;
-import net.deanly.solana.sdk.rpc.types.TransactionDetails;
+import net.deanly.solana.sdk.types.TransactionDetails;
 import okhttp3.*;
 import okio.Buffer;
 import org.junit.jupiter.api.BeforeEach;
@@ -253,7 +252,7 @@ class MoshiHttpMethodApiTest {
         // 응답 데이터 검증
         assertNotNull(result);
         assertEquals(UnsignedLong.valueOf(88849814690250L), result.getLamports());
-        assertEquals("11111111111111111111111111111111", result.getOwner());
+        assertEquals(new PublicKey("11111111111111111111111111111111"), result.getOwner());
         assertFalse(result.getExecutable());
         assertEquals(UnsignedLong.valueOf("18446744073709551615"), result.getRentEpoch());
         assertEquals(UnsignedLong.valueOf(0L), result.getSpace());

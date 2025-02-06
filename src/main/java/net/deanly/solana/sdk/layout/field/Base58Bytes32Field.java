@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.layout.field;
 
 import net.deanly.structlayout.type.FieldBase;
-import net.deanly.solana.sdk.crypto.Base58;
+import net.deanly.solana.sdk.types.codec.Base58;
 
 public class Base58Bytes32Field extends FieldBase<String> {
 

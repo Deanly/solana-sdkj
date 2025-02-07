@@ -1,7 +1,9 @@
 package net.deanly.solana.sdk.types;
 
+import lombok.EqualsAndHashCode;
 import net.deanly.solana.sdk.types.codec.Base58;
 
+@EqualsAndHashCode
 public class Signature {
     private final String signature;
 

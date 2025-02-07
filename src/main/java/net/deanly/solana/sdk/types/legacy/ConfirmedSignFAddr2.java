@@ -1,6 +1,7 @@
-package net.deanly.solana.sdk.types;
+package net.deanly.solana.sdk.types.legacy;
 
 import com.squareup.moshi.Json;
+import net.deanly.solana.sdk.types.Commitment;
 
 public class ConfirmedSignFAddr2 {
 

@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.types;
+package net.deanly.solana.sdk.types.legacy;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

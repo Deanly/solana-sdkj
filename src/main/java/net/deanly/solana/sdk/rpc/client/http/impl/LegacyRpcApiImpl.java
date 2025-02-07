@@ -11,8 +11,9 @@ import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import net.deanly.solana.sdk.rpc.request.SimulateTransactionParams;
 import net.deanly.solana.sdk.transaction.Transaction;
-import net.deanly.solana.sdk.types.TokenResultObjects.TokenAccount;
-import net.deanly.solana.sdk.types.TokenResultObjects.TokenAmountInfo;
+import net.deanly.solana.sdk.types.legacy.TokenResultObjects.TokenAccount;
+import net.deanly.solana.sdk.types.legacy.TokenResultObjects.TokenAmountInfo;
+import net.deanly.solana.sdk.types.legacy.*;
 
 import java.lang.reflect.Type;
 import java.util.*;

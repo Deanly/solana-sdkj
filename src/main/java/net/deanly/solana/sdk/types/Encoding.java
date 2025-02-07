@@ -29,6 +29,7 @@ public enum Encoding {
     }
 
     public static Encoding fromString(String encoding) {
+        encoding = encoding.toLowerCase();
         for (Encoding e : Encoding.values()) {
             if (e.value.equals(encoding)) {
                 return e;

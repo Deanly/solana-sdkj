@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.types;
+package net.deanly.solana.sdk.types.legacy;
 
 import com.squareup.moshi.Json;
 import lombok.AllArgsConstructor;

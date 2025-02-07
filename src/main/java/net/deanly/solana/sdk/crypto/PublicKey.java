@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.crypto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.deanly.solana.sdk.program.pda.ProgramDerivedAddress;
@@ -16,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @NoArgsConstructor
-public class PublicKey {
+public class PublicKey implements Comparable<PublicKey> {
     public static final int PUBLIC_KEY_LENGTH = 32;
     public static final PublicKey DEFAULT = new PublicKey("11111111111111111111111111111111"); // None
 
@@ -102,6 +103,17 @@ public class PublicKey {
     @Override
     public int hashCode() {
         return Arrays.hashCode(rawPublicKey);
+    }
+
+    @Override
+    public int compareTo(PublicKey other) {
+        for (int i = 0; i < this.rawPublicKey.length; i++) {
+            int diff = Byte.toUnsignedInt(this.rawPublicKey[i]) - Byte.toUnsignedInt(other.rawPublicKey[i]);
+            if (diff != 0) {
+                return diff;
+            }
+        }
+        return 0;
     }
 
     @Override

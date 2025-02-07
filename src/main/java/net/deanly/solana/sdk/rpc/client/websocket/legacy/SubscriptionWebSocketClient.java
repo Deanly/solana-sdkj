@@ -22,7 +22,7 @@ import com.squareup.moshi.Types;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ServerHandshake;
-import net.deanly.solana.sdk.types.RpcNotificationResult;
+import net.deanly.solana.sdk.types.legacy.RpcNotificationResult;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.response.RpcResponse;
 import net.deanly.solana.sdk.rpc.client.websocket.legacy.listeners.NotificationEventListener;

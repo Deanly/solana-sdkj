@@ -37,7 +37,10 @@ public class MoshiEncodedDataJsonAdapter extends JsonAdapter<EncodedData> {
             String encodingStr = jsonReader.nextString();
             jsonReader.endArray();
 
-            Encoding encoding = Optional.ofNullable(Encoding.fromString(encodingStr)).orElse(detectEncoding(value));
+            Encoding encoding = Encoding.fromString(encodingStr);
+            if (encoding == null) {
+                encoding = detectEncoding(value);
+            }
             return new EncodedData(encoding, value);
         }
 

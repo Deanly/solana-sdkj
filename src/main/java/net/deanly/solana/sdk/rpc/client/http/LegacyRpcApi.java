@@ -10,6 +10,7 @@ import net.deanly.solana.sdk.rpc.request.config.SimulateTransactionConfig;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import net.deanly.solana.sdk.transaction.Transaction;
+import net.deanly.solana.sdk.types.legacy.*;
 
 import java.util.List;
 import java.util.Map;

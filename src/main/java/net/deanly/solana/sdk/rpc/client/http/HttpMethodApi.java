@@ -7,6 +7,7 @@ import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.types.GenesisHash;
 import net.deanly.solana.sdk.types.Signature;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getaccountinfo">getAccountInfo RPC Method</a>
      */
-    ResValueAccountInfo getAccountInfo(PublicKey pubkey, AccountInfoConfig configuration) throws RpcException;
+    RpcResultObject<ResValueAccountInfo> getAccountInfo(PublicKey pubkey, AccountInfoConfig configuration) throws RpcException;
 
     /**
      * Returns the balance of the account of provided Pubkey.
@@ -35,7 +36,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getbalance">getBalance RPC Method</a>
      */
-    UnsignedLong getBalance(PublicKey pubkey, BalanceConfig configuration) throws RpcException;
+    RpcResultObject<UnsignedLong> getBalance(PublicKey pubkey, BalanceConfig configuration) throws RpcException;
 
     /**
      * Returns identity and transaction information about a confirmed block in the ledger.
@@ -77,7 +78,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getblockproduction">getBlockProduction RPC Method</a>
      */
-    ResValueBlockProduction getBlockProduction(BlockProductionConfig configuration) throws RpcException;
+    RpcResultObject<ResValueBlockProduction> getBlockProduction(BlockProductionConfig configuration) throws RpcException;
 
     /**
      * Returns a list of confirmed blocks between two slots.
@@ -150,7 +151,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getfeeformessage">getFeeForMessage RPC Method</a>
      */
-    Long getFeeForMessage(String message, FeeForMessageConfig configuration) throws RpcException;
+    RpcResultObject<UnsignedLong> getFeeForMessage(String message, FeeForMessageConfig configuration) throws RpcException;
 
     /**
      * Returns the slot of the lowest confirmed block that has not been purged from the ledger.
@@ -168,7 +169,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getgenesishash">getGenesisHash RPC Method</a>
      */
-    String getGenesisHash() throws RpcException;
+    GenesisHash getGenesisHash() throws RpcException;
 
     /**
      * Retrieves the current health status of the system or application.
@@ -206,7 +207,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getidentity">getIdentity RPC Method</a>
      */
-    PublicKey getIdentity() throws RpcException;
+    ResValueIdentity getIdentity() throws RpcException;
 
     /**
      * Returns the current inflation governor parameters.
@@ -246,7 +247,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getlargestaccounts">getLargestAccounts RPC Method</a>
      */
-    List<ResValueLargestAccount> getLargestAccounts(LargestAccountsConfig configuration) throws RpcException;
+    RpcResultObject<List<ResValueLargestAccount>> getLargestAccounts(LargestAccountsConfig configuration) throws RpcException;
 
     /**
      * Returns the latest blockhash.
@@ -256,7 +257,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getlatestblockhash">getLatestBlockhash RPC Method</a>
      */
-    ResValueLatestBlockhash getLatestBlockhash(LatestBlockhashConfig configuration) throws RpcException;
+    RpcResultObject<ResValueLatestBlockhash> getLatestBlockhash(LatestBlockhashConfig configuration) throws RpcException;
 
     /**
      * Returns the leader schedule for an epoch.
@@ -268,7 +269,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getleaderschedule">getLeaderSchedule RPC Method</a>
      */
-    Map<String, List<Integer>> getLeaderSchedule(UnsignedLong epoch, LeaderScheduleConfig configuration) throws RpcException;
+    Map<PublicKey, List<Integer>> getLeaderSchedule(UnsignedLong epoch, LeaderScheduleConfig configuration) throws RpcException;
 
     /**
      * Returns the maximum slot seen from the retransmit stage.
@@ -308,7 +309,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getmultipleaccounts">getMultipleAccounts RPC Method</a>
      */
-    List<ResValueAccountInfo> getMultipleAccounts(List<PublicKey> accounts, MultipleAccountsConfig configuration) throws RpcException;
+    RpcResultObject<List<ResValueAccountInfo>> getMultipleAccounts(List<PublicKey> accounts, MultipleAccountsConfig configuration) throws RpcException;
 
     /**
      * Returns all accounts owned by the provided program Pubkey.
@@ -366,7 +367,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsignaturestatuses">getSignatureStatuses RPC Method</a>
      */
-    List<ResValueSignatureStatus> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException;
+    RpcResultObject<List<ResValueSignatureStatus>> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException;
 
     /**
      * Returns the slot that has reached the given or default commitment level.
@@ -407,7 +408,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getstakeminimumdelegation">getStakeMinimumDelegation RPC Method</a>
      */
-    UnsignedLong getStakeMinimumDelegation(StakeMinimumDelegationConfig configuration) throws RpcException;
+    RpcResultObject<UnsignedLong> getStakeMinimumDelegation(StakeMinimumDelegationConfig configuration) throws RpcException;
 
     /**
      * Returns information about the current supply.
@@ -417,7 +418,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsupply">getSupply RPC Method</a>
      */
-    ResValueSupply getSupply(SupplyConfig configuration) throws RpcException;
+    RpcResultObject<ResValueSupply> getSupply(SupplyConfig configuration) throws RpcException;
 
     /**
      * Returns the token balance of an SPL Token account.
@@ -428,7 +429,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokenaccountbalance">getTokenAccountBalance RPC Method</a>
      */
-    ResValueTokenAccountBalance getTokenAccountBalance(PublicKey account, TokenAccountBalanceConfig configuration) throws RpcException;
+    RpcResultObject<ResValueTokenAccountBalance> getTokenAccountBalance(PublicKey account, TokenAccountBalanceConfig configuration) throws RpcException;
 
     /**
      * Returns all SPL Token accounts by approved Delegate.
@@ -440,7 +441,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokenaccountsbydelegate">getTokenAccountsByDelegate RPC Method</a>
      */
-    List<ResValueTokenAccount> getTokenAccountsByDelegate(
+    RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByDelegate(
             PublicKey delegate,
             TokenAccountsByDelegateFilter filter,
             TokenAccountsByDelegateConfig configuration
@@ -456,7 +457,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokenaccountsbyowner">getTokenAccountsByOwner RPC Method</a>
      */
-    List<ResValueTokenAccount> getTokenAccountsByOwner(
+    RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByOwner(
             PublicKey owner,
             TokenAccountsByOwnerFilter filter,
             TokenAccountsByOwnerConfig configuration
@@ -471,7 +472,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/gettokenlargestaccounts">getTokenLargestAccounts RPC Method</a>
      */
-    List<ResValueTokenLargestAccounts> getTokenLargestAccounts(
+    RpcResultObject<List<ResValueTokenLargestAccounts>> getTokenLargestAccounts(
             PublicKey mint,
             TokenLargestAccountsConfig configuration
     ) throws RpcException;
@@ -485,7 +486,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokensupply">getTokenSupply RPC Method</a>
      */
-    ResValueTokenSupply getTokenSupply(PublicKey mint, TokenSupplyConfig configuration) throws RpcException;
+    RpcResultObject<ResValueTokenSupply> getTokenSupply(PublicKey mint, TokenSupplyConfig configuration) throws RpcException;
 
     /**
      * Returns transaction details for a confirmed transaction.
@@ -537,7 +538,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/isblockhashvalid">isBlockhashValid RPC Method</a>
      */
-    boolean isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException;
+    RpcResultObject<Boolean> isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException;
 
     /**
      * Returns the lowest slot that the node has information about in its ledger.
@@ -580,6 +581,6 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/simulatetransaction">simulateTransaction RPC Method</a>
      */
-    ResValueSimulatedTransaction simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException;
+    RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException;
 
 }

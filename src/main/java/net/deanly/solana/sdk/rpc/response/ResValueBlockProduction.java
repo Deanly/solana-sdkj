@@ -1,8 +1,11 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.types.ValidatorIdentityInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -11,25 +14,19 @@ import java.util.Map;
 @ToString
 public class ResValueBlockProduction {
 
-    @Getter
-    @ToString
-    public static class BlockProductionRange {
-        @Json(name = "firstSlot")
-        private double firstSlot;
-
-        @Json(name = "lastSlot")
-        private double lastSlot;
-
-    }
-
     @Json(name = "byIdentity")
-    private Map<String, List<Double>> byIdentity;
-
-    public Map<String, List<Double>> getByIdentity() {
-        return byIdentity;
-    }
+    private Map<PublicKey, ValidatorIdentityInfo> byIdentity;
 
     @Json(name = "range")
-    private BlockProductionRange blockProductionRange;
+    private Range range;
 
+    @Getter
+    @ToString
+    public static class Range {
+        @Json(name = "firstSlot")
+        private UnsignedLong firstSlot;
+
+        @Json(name = "lastSlot")
+        private UnsignedLong lastSlot;
+    }
 }

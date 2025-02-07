@@ -2,25 +2,26 @@ package net.deanly.solana.sdk.types;
 
 import lombok.EqualsAndHashCode;
 import net.deanly.solana.sdk.types.codec.Base58;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
 @EqualsAndHashCode
-public class Blockhash implements Comparable<Blockhash> {
-    private final String blockhash;
+public class GenesisHash implements Comparable<GenesisHash> {
+    private final String genesisHash;
 
-    public Blockhash(String blockhash) {
+    public GenesisHash(String genesisHash) {
         if (isTestModeEnabled()) {
-            blockhash = applyTestModeTransformation(blockhash);
+            genesisHash = applyTestModeTransformation(genesisHash);
         }
-        if (!isValidBase58(blockhash)) {
-            throw new IllegalArgumentException("Invalid Blockhash format");
+        if (!isValidBase58(genesisHash)) {
+            throw new IllegalArgumentException("Invalid GenesisHash format");
         }
-        this.blockhash = blockhash;
+        this.genesisHash = genesisHash;
     }
 
-    public static Blockhash of(String blockhash) {
-        return new Blockhash(blockhash);
+    public static GenesisHash of(String genesisHash) {
+        return new GenesisHash(genesisHash);
     }
 
     private boolean isValidBase58(String input) {
@@ -31,16 +32,16 @@ public class Blockhash implements Comparable<Blockhash> {
     }
 
     public String getValue() {
-        return blockhash;
-    }
-
-    public byte[] toByteArray() {
-        return Base58.decode(blockhash);
+        return genesisHash;
     }
 
     @Override
     public String toString() {
-        return blockhash;
+        return genesisHash;
+    }
+
+    public byte[] toByteArray() {
+        return Base58.decode(genesisHash);
     }
 
     private String applyTestModeTransformation(String pubkey) {
@@ -70,9 +71,8 @@ public class Blockhash implements Comparable<Blockhash> {
         return isTestMode;
     }
 
-
     @Override
-    public int compareTo(Blockhash other) {
-        return this.blockhash.compareTo(other.blockhash);
+    public int compareTo(@NotNull GenesisHash o) {
+        return this.genesisHash.compareTo(o.genesisHash);
     }
 }

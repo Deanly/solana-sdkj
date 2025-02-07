@@ -22,5 +22,8 @@ public class ResValueEpochInfo {
 
     @Json(name = "slotsInEpoch")
     private UnsignedLong slotsInEpoch;
+
+    @Json(name = "transactionCount")
+    private UnsignedLong transactionCount;
 }
     

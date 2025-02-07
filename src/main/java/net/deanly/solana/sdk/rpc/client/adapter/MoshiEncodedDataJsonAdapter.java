@@ -1,17 +1,16 @@
 package net.deanly.solana.sdk.rpc.client.adapter;
 
 import com.squareup.moshi.*;
-import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.StateData;
 import net.deanly.solana.sdk.types.Encoding;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
-public class MoshiEncodedDataJsonAdapter extends JsonAdapter<EncodedData> {
+public class MoshiEncodedDataJsonAdapter extends JsonAdapter<StateData> {
 
     private static final Pattern BASE58_PATTERN = Pattern.compile("^[1-9A-HJ-NP-Za-km-z]+$");
     private static final Pattern BASE64_PATTERN = Pattern.compile("^[A-Za-z0-9+/=]+$");
@@ -21,13 +20,13 @@ public class MoshiEncodedDataJsonAdapter extends JsonAdapter<EncodedData> {
 
     @Nullable
     @Override
-    public EncodedData fromJson(JsonReader jsonReader) throws IOException {
+    public StateData fromJson(JsonReader jsonReader) throws IOException {
         JsonReader.Token token = jsonReader.peek();
 
         // JSON 객체 처리 (jsonParsed)
         if (token == JsonReader.Token.BEGIN_OBJECT) {
             Map<String, Object> jsonObject = mapJsonAdapter.fromJson(jsonReader);
-            return new EncodedData(jsonObject);
+            return new StateData(jsonObject);
         }
 
         // JSON 배열 처리 (base58, base64, json, base64+zstd)
@@ -41,21 +40,21 @@ public class MoshiEncodedDataJsonAdapter extends JsonAdapter<EncodedData> {
             if (encoding == null) {
                 encoding = detectEncoding(value);
             }
-            return new EncodedData(encoding, value);
+            return new StateData(encoding, value);
         }
 
         // 단일 문자열 처리 ({"data": "some-value"})
         if (token == JsonReader.Token.STRING) {
             String value = jsonReader.nextString();
             Encoding encoding = detectEncoding(value);
-            return new EncodedData(encoding, value, true);
+            return new StateData(encoding, value, true);
         }
 
         throw new IOException("Unexpected JSON format for EncodedData");
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable EncodedData data) throws IOException {
+    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable StateData data) throws IOException {
         if (data == null) {
             jsonWriter.nullValue();
             return;

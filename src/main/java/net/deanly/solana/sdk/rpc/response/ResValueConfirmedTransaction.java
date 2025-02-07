@@ -7,7 +7,7 @@ import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.StateData;
 import net.deanly.solana.sdk.types.TokenBalance;
 import net.deanly.solana.sdk.types.TransactionError;
 
@@ -122,7 +122,7 @@ public class ResValueConfirmedTransaction {
 
         /// the return data itself, as base-64 encoded binary data
         @Json(name = "data")
-        private EncodedData data;
+        private StateData data;
     }
 
 }

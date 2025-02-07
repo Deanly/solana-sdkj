@@ -247,9 +247,9 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         Object rawData = account.get("data");
         if (rawData instanceof List) {
             List<String> dataList = ((List<String>) rawData);
-            accountInfoBuilder.data(new EncodedData(Encoding.valueOf(dataList.get(1)), dataList.get(0)));
+            accountInfoBuilder.data(new StateData(Encoding.valueOf(dataList.get(1)), dataList.get(0)));
         } else if (rawData instanceof String) {
-            accountInfoBuilder.data(new EncodedData(null, (String) rawData));
+            accountInfoBuilder.data(new StateData(null, (String) rawData));
         }
 
         accountInfoBuilder.executable((boolean) account.get("executable"));

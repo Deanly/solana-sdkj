@@ -1,11 +1,9 @@
 package net.deanly.solana.sdk.rpc.response;
 
-import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.types.EncodedData;
 
 @Getter
 @ToString

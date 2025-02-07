@@ -4,7 +4,7 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.StateData;
 
 @Getter
 @ToString
@@ -23,7 +23,7 @@ public class ResValueAccountInfo {
 
     /// data associated with the account, either as encoded binary data or JSON format
     @Json(name = "data")
-    private EncodedData data;
+    private StateData data;
 
     /// boolean indicating if the account contains a program (and is strictly read-only)
     @Json(name = "executable")

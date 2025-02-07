@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.types.Blockhash;
-import net.deanly.solana.sdk.types.EncodedData;
 import net.deanly.solana.sdk.types.Signature;
 
 import java.util.List;

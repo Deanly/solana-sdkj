@@ -4,7 +4,7 @@ import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.StateData;
 import net.deanly.solana.sdk.types.TransactionError;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class ResValueSimulatedTransaction {
         private PublicKey programId;
 
         @Json(name = "data")
-        private EncodedData data;
+        private StateData data;
 
     }
 }

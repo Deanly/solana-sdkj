@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.deanly.solana.sdk.types.EncodedData;
+import net.deanly.solana.sdk.types.StateData;
 
 import java.util.List;
 
@@ -25,5 +25,5 @@ public class ResValueInstruction {
 
     /// The program input data encoded in a base-58 string.
     @Json(name = "data")
-    private EncodedData data;
+    private StateData data;
 }

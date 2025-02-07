@@ -32,7 +32,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
-            .add(EncodedData.class, new MoshiEncodedDataJsonAdapter())
+            .add(StateData.class, new MoshiEncodedDataJsonAdapter())
             .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
             .add(Blockhash.class, new MoshiBlockhashJsonAdapter())
             .add(GenesisHash.class, new MoshiGenesisHashJsonAdapter())
@@ -391,67 +391,87 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
 
     @Override
     public List<ResValuePerformanceSample> getRecentPerformanceSamples(Integer limit) throws RpcException {
-        return List.of();
+        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValuePerformanceSample.class));
+        return this.call("getRecentPerformanceSamples", this.getParams(limit), type, null);
     }
 
     @Override
     public List<ResValuePrioritizationFee> getRecentPrioritizationFees(List<PublicKey> accounts) throws RpcException {
-        return List.of();
+        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValuePrioritizationFee.class));
+        return this.call("getRecentPrioritizationFees", this.getParams(accounts), type, null);
     }
 
     @Override
     public List<ResValueTransactionSignature> getSignaturesForAddress(PublicKey account, SignaturesForAddressConfig configuration) throws RpcException {
-        return List.of();
+        Objects.requireNonNull(account, "account must not be null");
+        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValueTransactionSignature.class));
+        return this.call("getSignaturesForAddress", this.getParams(account, configuration), type, null);
     }
 
     @Override
     public RpcResultObject<List<ResValueSignatureStatus>> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(signatures, "signatures must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, Types.newParameterizedType(List.class, ResValueSignatureStatus.class));
+        return this.call("getSignatureStatuses", this.getParams(signatures, configuration), type, null);
     }
 
     @Override
     public UnsignedLong getSlot(SlotConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, UnsignedLong.class);
+        return this.call("getSlot", this.getParams(configuration), type, null);
     }
 
     @Override
     public PublicKey getSlotLeader(SlotLeaderConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, PublicKey.class);
+        return this.call("getSlotLeader", this.getParams(configuration), type, null);
     }
 
     @Override
     public List<PublicKey> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException {
-        return List.of();
+        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, PublicKey.class));
+        return this.call("getSlotLeaders", this.getParams(startSlot, limit), type, null);
     }
 
     @Override
     public RpcResultObject<UnsignedLong> getStakeMinimumDelegation(StakeMinimumDelegationConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponseV2.class, UnsignedLong.class);
+        return this.call("getStakeMinimumDelegation", this.getParams(configuration), type, null);
     }
 
     @Override
     public RpcResultObject<ResValueSupply> getSupply(SupplyConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueSupply.class);
+        return this.call("getSupply", this.getParams(configuration), type, null);
     }
 
     @Override
     public RpcResultObject<ResValueTokenAccountBalance> getTokenAccountBalance(PublicKey account, TokenAccountBalanceConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(account, "account must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueTokenAccountBalance.class);
+        return this.call("getTokenAccountBalance", this.getParams(account, configuration), type, null);
     }
 
     @Override
     public RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByDelegate(PublicKey delegate, TokenAccountsByDelegateFilter filter, TokenAccountsByDelegateConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(delegate, "delegate must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, Types.newParameterizedType(List.class, ResValueTokenAccount.class));
+        return this.call("getTokenAccountsByDelegate", this.getParams(delegate, filter, configuration), type, null);
     }
 
     @Override
     public RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByOwner(PublicKey owner, TokenAccountsByOwnerFilter filter, TokenAccountsByOwnerConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(owner, "owner must not be null");
+        Objects.requireNonNull(filter, "filter must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, Types.newParameterizedType(List.class, ResValueTokenAccount.class));
+        return this.call("getTokenAccountsByOwner", this.getParams(owner, filter, configuration), type, null);
     }
 
     @Override
     public RpcResultObject<List<ResValueTokenLargestAccounts>> getTokenLargestAccounts(PublicKey mint, TokenLargestAccountsConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(mint, "mint must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, Types.newParameterizedType(List.class, ResValueTokenLargestAccounts.class));
+        return this.call("getTokenLargestAccounts", this.getParams(mint, configuration), type, null);
     }
 
     @Override

@@ -1,6 +1,5 @@
-package net.deanly.solana.sdk.ws;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy;
 
-import net.deanly.solana.sdk.rpc.client.websocket.legacy.SubscriptionWebSocketClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;

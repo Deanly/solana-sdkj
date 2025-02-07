@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.ws;
+package net.deanly.solana.sdk.rpc.client.websocket.legacy;
 
 import org.junit.jupiter.api.Disabled;
 import org.mockito.Mock;

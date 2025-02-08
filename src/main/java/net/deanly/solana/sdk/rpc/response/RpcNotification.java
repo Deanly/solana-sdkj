@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.rpc.response;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solana.sdk.types.SubscriptionId;
 
 @Getter
 @ToString
@@ -23,7 +24,7 @@ public class RpcNotification<T> {
         private T result;
 
         @Json(name = "subscription")
-        private Long subscription;
+        private SubscriptionId subscription;
     }
 
 }

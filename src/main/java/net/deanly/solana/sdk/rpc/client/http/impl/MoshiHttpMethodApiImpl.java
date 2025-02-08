@@ -42,7 +42,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
             .add(ValidatorIdentityInfo.class, new MoshiValidatorIdentityInfoJsonAdapter())
             .build();
 
-    JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
+    private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
     private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
 
     public MoshiHttpMethodApiImpl(RpcClient.ClientConfig config) {

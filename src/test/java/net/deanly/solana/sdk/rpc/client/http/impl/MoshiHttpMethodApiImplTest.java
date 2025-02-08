@@ -440,17 +440,7 @@ class MoshiHttpMethodApiImplTest {
     """;
 
         // JSON 검증
-        Moshi moshi = new Moshi.Builder().build();
-        Type mapType = Types.newParameterizedType(Map.class, String.class, Object.class);
-        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(mapType);
-
-        Map<String, Object> actualRequestMap = adapter.fromJson(actualRequestJson);
-        Map<String, Object> expectedRequestMap = adapter.fromJson(expectedRequestJson);
-
-        // ID는 제외하고 비교
-        actualRequestMap.remove("id");
-        expectedRequestMap.remove("id");
-//        assertEquals(expectedRequestMap, actualRequestMap);
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
 
         // 8. 응답 데이터 검증
         assertNotNull(result);

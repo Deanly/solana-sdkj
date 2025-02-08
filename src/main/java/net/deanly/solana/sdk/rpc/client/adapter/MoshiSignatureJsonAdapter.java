@@ -18,9 +18,9 @@ public class MoshiSignatureJsonAdapter extends JsonAdapter<Signature> {
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable Signature blockhash) throws IOException {
-        if (blockhash != null) {
-            jsonWriter.value(blockhash.toString());
+    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable Signature signature) throws IOException {
+        if (signature != null) {
+            jsonWriter.value(signature.toString());
         } else {
             jsonWriter.nullValue();
         }

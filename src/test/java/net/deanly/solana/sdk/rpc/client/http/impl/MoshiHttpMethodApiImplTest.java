@@ -10,9 +10,12 @@ import net.deanly.solana.sdk.rpc.client.adapter.MoshiNumberJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
+import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.*;
+import net.deanly.solana.sdk.types.codec.Base58;
 import okhttp3.*;
 import okio.Buffer;
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -3396,5 +3399,742 @@ class MoshiHttpMethodApiImplTest {
         assertEquals(2, account2.getDecimals());
         assertEquals(2.29, account2.getUiAmount(), 0.01);
         assertEquals("2.29", account2.getUiAmountString());
+    }
+
+    @Test
+    void testGetTokenSupply() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "context": {
+                    "slot": 1114
+                  },
+                  "value": {
+                    "amount": "100000",
+                    "decimals": 2,
+                    "uiAmount": 1000,
+                    "uiAmountString": "1000"
+                  }
+                },
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        PublicKey mintAddress = PublicKey.valueOf("3wyAj7Rt1TWVPZVteFJPLa26JmLvdb1CAKEFZm3NY75E");
+        RpcResultObject<ResValueTokenSupply> response = clientApi.getTokenSupply(mintAddress, null);
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getTokenSupply",
+      "params": [
+        "3wyAj7Rt1TWVPZVteFJPLa26JmLvdb1CAKEFZm3NY75E"
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+        assertNotNull(response.getContext());
+        assertEquals(1114, response.getContext().getSlot());
+
+        ResValueTokenSupply value = response.getValue();
+        assertNotNull(value);
+        assertEquals(UnsignedLong.valueOf(100000), value.getAmount());
+        assertEquals(2, value.getDecimals());
+        assertEquals(1000.0, value.getUiAmount(), 0.01);
+        assertEquals("1000", value.getUiAmountString());
+    }
+
+    @Test
+    void testGetTransaction() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "meta": {
+                    "err": null,
+                    "fee": 5000,
+                    "innerInstructions": [],
+                    "postBalances": [499998932500, 26858640, 1, 1, 1],
+                    "postTokenBalances": [],
+                    "preBalances": [499998937500, 26858640, 1, 1, 1],
+                    "preTokenBalances": [],
+                    "rewards": [],
+                    "status": {
+                      "Ok": null
+                    }
+                  },
+                  "slot": 430,
+                  "transaction": {
+                    "message": {
+                      "accountKeys": [
+                        "3UVYmECPPMZSCqWKfENfuoTv51fTDTWicX9xmBD2euKe",
+                        "AjozzgE83A3x1sHNUR64hfH7zaEBWeMaFuAN9kQgujrc",
+                        "SysvarS1otHashes111111111111111111111111111",
+                        "SysvarC1ock11111111111111111111111111111111",
+                        "Vote111111111111111111111111111111111111111"
+                      ],
+                      "header": {
+                        "numReadonlySignedAccounts": 0,
+                        "numReadonlyUnsignedAccounts": 3,
+                        "numRequiredSignatures": 1
+                      },
+                      "instructions": [
+                        {
+                          "accounts": [1, 2, 3, 0],
+                          "data": "37u9WtQpcm6ULa3WRQHmj49EPs4if7o9f1jSRVZpm2dvihR9C8jY4NqEwXUbLwx15HBSNcP1",
+                          "programIdIndex": 4
+                        }
+                      ],
+                      "recentBlockhash": "mfcyqEXB3DnHXki6KjjmZck6YjmZLvpAByy2fj4nh6B"
+                    },
+                    "signatures": [
+                      "2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv"
+                    ]
+                  }
+                },
+                "blockTime": null,
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        Signature transactionSignature = Signature.of("2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv");
+        String encoding = "json";
+        ResValueConfirmedTransaction response = clientApi.getTransaction(transactionSignature, TransactionConfig.builder().encoding(Encoding.JSON).build());
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getTransaction",
+      "params": [
+        "2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv",
+        { "encoding": "json" }
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+
+        // Meta 검증
+        ResValueConfirmedTransaction.Meta meta = response.getMeta();
+        assertNotNull(meta);
+        assertNull(meta.getErr());
+        assertEquals(UnsignedLong.valueOf(5000), meta.getFee());
+        assertEquals(List.of(UnsignedLong.valueOf(499998932500L), UnsignedLong.valueOf(26858640L), UnsignedLong.valueOf(1L), UnsignedLong.valueOf(1L), UnsignedLong.valueOf(1L)), meta.getPostBalances());
+        assertEquals(List.of(UnsignedLong.valueOf(499998937500L), UnsignedLong.valueOf(26858640), UnsignedLong.valueOf(1L), UnsignedLong.valueOf(1L), UnsignedLong.valueOf(1L)), meta.getPreBalances());
+
+        // Transaction 검증
+        ResValueTransaction transaction = response.getTransaction();
+        assertNotNull(transaction);
+
+        ResValueTransaction.Message message = transaction.getMessage();
+        assertEquals(Blockhash.of("mfcyqEXB3DnHXki6KjjmZck6YjmZLvpAByy2fj4nh6B"), message.getRecentBlockhash());
+        assertEquals(5, message.getAccountKeys().size());
+        assertEquals(PublicKey.valueOf("Vote111111111111111111111111111111111111111"), message.getAccountKeys().get(4));
+
+        // Instructions 검증
+        ResValueInstruction instruction = message.getInstructions().get(0);
+        assertNotNull(instruction);
+        assertEquals(List.of(1, 2, 3, 0), instruction.getAccounts());
+        assertEquals("37u9WtQpcm6ULa3WRQHmj49EPs4if7o9f1jSRVZpm2dvihR9C8jY4NqEwXUbLwx15HBSNcP1", instruction.getData().getValue());
+        assertEquals(Encoding.BASE58, instruction.getData().getEncoding());
+        assertEquals(4, instruction.getProgramIdIndex());
+    }
+
+    @Test
+    void testGetTransactionCount() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": 268,
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        UnsignedLong transactionCount = clientApi.getTransactionCount(null);
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getTransactionCount"
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertEquals(UnsignedLong.valueOf(268), transactionCount);
+    }
+
+    @Test
+    void testGetVersion() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "feature-set": 2891131721,
+                  "solana-core": "1.16.7"
+                },
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        ResValueVersion response = clientApi.getVersion();
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getVersion"
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+        assertEquals("1.16.7", response.getSolanaCore());
+        assertEquals(2891131721L, response.getFeatureSet());
+    }
+
+    @Test
+    void testGetVoteAccounts() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "current": [
+                    {
+                      "commission": 0,
+                      "epochVoteAccount": true,
+                      "epochCredits": [
+                        [1, 64, 0],
+                        [2, 192, 64]
+                      ],
+                      "nodePubkey": "B97CCUW3AEZFGy6uUg6zUdnNYvnVq5VG8PUtb2HayTDD",
+                      "lastVote": 147,
+                      "activatedStake": 42,
+                      "votePubkey": "3ZT31jkAGhUaw8jsy4bTknwBMP8i4Eueh52By4zXcsVw"
+                    }
+                  ],
+                  "delinquent": []
+                },
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        PublicKey votePubkey = PublicKey.valueOf("3ZT31jkAGhUaw8jsy4bTknwBMP8i4Eueh52By4zXcsVw");
+        ResValueVoteAccounts response = clientApi.getVoteAccounts(VoteAccountsConfig.builder().votePubkey(votePubkey).build());
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getVoteAccounts",
+      "params": [
+        {
+          "votePubkey": "3ZT31jkAGhUaw8jsy4bTknwBMP8i4Eueh52By4zXcsVw"
+        }
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+
+        // Current vote accounts validation
+        List<ResValueVoteAccounts.VoteAccount> current = response.getCurrent();
+        assertNotNull(current);
+        assertEquals(1, current.size());
+        ResValueVoteAccounts.VoteAccount account = current.get(0);
+
+        assertEquals(0, account.getCommission());
+        assertTrue(account.isEpochVoteAccount());
+        assertEquals(PublicKey.valueOf("B97CCUW3AEZFGy6uUg6zUdnNYvnVq5VG8PUtb2HayTDD"), account.getNodePubkey());
+        assertEquals(UnsignedLong.valueOf(147), account.getLastVote());
+        assertEquals(UnsignedLong.valueOf(42), account.getActivatedStake());
+        assertEquals(PublicKey.valueOf("3ZT31jkAGhUaw8jsy4bTknwBMP8i4Eueh52By4zXcsVw"), account.getVotePubkey());
+        assertEquals(List.of(EpochCredits.of(1, 64, 0), EpochCredits.of(2, 192, 64)), account.getEpochCredits());
+
+        // Delinquent vote accounts validation
+        List<ResValueVoteAccounts.VoteAccount> delinquent = response.getDelinquent();
+        assertNotNull(delinquent);
+        assertTrue(delinquent.isEmpty());
+    }
+
+    @Test
+    void testIsBlockhashValid() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "context": {
+                    "slot": 2483
+                  },
+                  "value": false
+                },
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        Blockhash blockhash = Blockhash.of("J7rBdM6AecPDEZp8aPq5iPSNKVkU5Q76F3oAV4eW5wsW");
+        Commitment commitment = Commitment.PROCESSED;
+        RpcResultObject<Boolean> response = clientApi.isBlockhashValid(blockhash, BlockhashValidConfig.builder().commitment(commitment).build());
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "id": 45,
+      "jsonrpc": "2.0",
+      "method": "isBlockhashValid",
+      "params": [
+        "J7rBdM6AecPDEZp8aPq5iPSNKVkU5Q76F3oAV4eW5wsW",
+        {"commitment": "processed"}
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+
+        // Context 검증
+        RpcResultObject.Context context = response.getContext();
+        assertNotNull(context);
+        assertEquals(2483, context.getSlot());
+
+        // Value 검증
+        assertFalse(response.getValue());
+    }
+
+    @Test
+    void testMinimumLedgerSlot() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": 1234,
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        UnsignedLong minimumSlot = clientApi.minimumLedgerSlot();
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "minimumLedgerSlot"
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertEquals(UnsignedLong.valueOf(1234), minimumSlot);
+    }
+
+    @Test
+    void testRequestAirdrop() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": "5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW",
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        PublicKey pubKey = PublicKey.valueOf("83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri");
+        UnsignedLong lamports = UnsignedLong.valueOf(1000000000L);
+        Signature transactionId = clientApi.requestAirdrop(pubKey, lamports, null);
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "requestAirdrop",
+      "params": [
+        "83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri",
+        1000000000
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(transactionId);
+        assertEquals(Signature.of("5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW"), transactionId);
+    }
+
+    @Test
+    void testSendTransaction() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": "2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb",
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        String encodedTransaction = "4hXTCkRzt9WyecNzV1XPgCDfGAZzQKNxLXgynz5QDuWWPSAZBZSHptvWRL3BjCvzUXRdKvHL2b7yGrRQcWyaqsaBCncVG7BFggS8w9snUts67BSh3EqKpXLUm5UMHfD7ZBe9GhARjbNQMLJ1QD3Spr6oMTBU6EhdB4RD8CP2xUxr2u3d6fos36PD98XS6oX8TQjLpsMwncs5DAMiD4nNnR8NBfyghGCWvCVifVwvA8B8TJxE1aiyiv2L429BCWfyzAme5sZW8rDb14NeCQHhZbtNqfXhcp2tAnaAT";
+        Transaction transaction = Transaction.deserialize(Base58.decode(encodedTransaction));
+        Signature transactionId = clientApi.sendTransaction(transaction, null);
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "sendTransaction",
+      "params": [
+        "4hXTCkRzt9WyecNzV1XPgCDfGAZzQKNxLXgynz5QDuWWPSAZBZSHptvWRL3BjCvzUXRdKvHL2b7yGrRQcWyaqsaBCncVG7BFggS8w9snUts67BSh3EqKpXLUm5UMHfD7ZBe9GhARjbNQMLJ1QD3Spr6oMTBU6EhdB4RD8CP2xUxr2u3d6fos36PD98XS6oX8TQjLpsMwncs5DAMiD4nNnR8NBfyghGCWvCVifVwvA8B8TJxE1aiyiv2L429BCWfyzAme5sZW8rDb14NeCQHhZbtNqfXhcp2tAnaAT"
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(transactionId);
+        assertEquals(Signature.of("2id3YC2jK9G5Wo2phDx4gJVAew8DcY5NAojnVuao8rkxwPYPe8cSwE5GzhEgJA2y8fVjDEo6iR6ykBvDxrTQrtpb"), transactionId);
+    }
+
+    @Test
+    void testSimulateTransaction() throws IOException, RpcException {
+        // 1. Mock Call 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        // 2. Mock 응답 설정
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "context": {
+                    "slot": 218
+                  },
+                  "value": {
+                    "err": null,
+                    "accounts": null,
+                    "logs": [
+                      "Program 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri invoke [1]",
+                      "Program 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri consumed 2366 of 1400000 compute units",
+                      "Program return: 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri KgAAAAAAAAA=",
+                      "Program 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri success"
+                    ],
+                    "returnData": {
+                      "data": ["Kg==", "base64"],
+                      "programId": "83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri"
+                    },
+                    "unitsConsumed": 2366
+                  }
+                },
+                "id": 1
+              }
+            """, MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // 3. 메서드 호출
+        String encodedTransaction = "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAEDArczbMia1tLmq7zz4DinMNN0pJ1JtLdqIJPUw3YrGCzYAMHBsgN27lcgB6H2WQvFgyZuJYHa46puOQo9yQ8CVQbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCp20C7Wj2aiuk5TReAXo+VTVg8QTHjs0UjNMMKCvpzZ+ABAgEBARU=";
+        Transaction transaction = Transaction.deserialize(Base64.decode(encodedTransaction));
+        RpcResultObject<ResValueSimulatedTransaction> response = clientApi.simulateTransaction(transaction, SimulateTransactionConfig.builder().encoding(Encoding.BASE64).build());
+
+        // 4. 요청 데이터 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+
+        // 요청 본문 추출
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        // 기대 요청 JSON
+        String expectedRequestJson = """
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "simulateTransaction",
+      "params": [
+        "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAEDArczbMia1tLmq7zz4DinMNN0pJ1JtLdqIJPUw3YrGCzYAMHBsgN27lcgB6H2WQvFgyZuJYHa46puOQo9yQ8CVQbd9uHXZaGT2cvhRs7reawctIXtX1s3kTqM9YV+/wCp20C7Wj2aiuk5TReAXo+VTVg8QTHjs0UjNMMKCvpzZ+ABAgEBARU=",
+        {
+          "encoding": "base64"
+        }
+      ]
+    }
+    """;
+
+        // JSON 비교
+        assertJsonEqualsIgnoringId(expectedRequestJson, actualRequestJson);
+
+        // 5. 응답 데이터 검증
+        assertNotNull(response);
+
+        // Context 검증
+        RpcResultObject.Context context = response.getContext();
+        assertNotNull(context);
+        assertEquals(218, context.getSlot());
+
+        // Value 검증
+        ResValueSimulatedTransaction value = response.getValue();
+        assertNull(value.getErr());
+        assertNull(value.getAccounts());
+        assertEquals(UnsignedLong.valueOf(2366), value.getUnitsConsumed());
+
+        // Logs 검증
+        List<String> logs = value.getLogs();
+        assertNotNull(logs);
+        assertEquals(4, logs.size());
+        assertEquals("Program 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri invoke [1]", logs.get(0));
+        assertEquals("Program 83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri success", logs.get(3));
+
+        // Return Data 검증
+        ResValueSimulatedTransaction.ReturnData returnData = value.getReturnData();
+        assertNotNull(returnData);
+        assertEquals(PublicKey.valueOf("83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri"), returnData.getProgramId());
+        assertEquals("Kg==", returnData.getData().getValue());
+        assertEquals(Encoding.BASE64, returnData.getData().getEncoding());
     }
 }

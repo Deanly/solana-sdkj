@@ -497,7 +497,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettransaction">getTransaction RPC Method</a>
      */
-    ResValueConfirmedTransaction getTransaction(String signature, TransactionConfig configuration) throws RpcException;
+    ResValueConfirmedTransaction getTransaction(Signature signature, TransactionConfig configuration) throws RpcException;
 
     /**
      * Returns the current transaction count from the ledger.

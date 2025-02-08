@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.transaction.message;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
+import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.annotation.StructTypeSelector;
 import net.deanly.structlayout.codec.helpers.ByteArrayHelper;
 import net.deanly.structlayout.dispatcher.StructTypeDispatcher;

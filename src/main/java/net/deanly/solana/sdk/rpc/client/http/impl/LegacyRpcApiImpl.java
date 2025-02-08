@@ -90,7 +90,7 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         if (recentBlockHash == null) {
             recentBlockHash = getLatestBlockhash().getBlockhash().getValue();
         }
-        transaction.setRecentBlockhash(Blockhash.of(recentBlockHash));
+        transaction.setRecentBlockhashForCompile(Blockhash.of(recentBlockHash));
 
         if (!transaction.isSigned()) {
             transaction.sign(signers);

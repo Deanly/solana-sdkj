@@ -143,7 +143,7 @@ public class BPFLoaderProgramTest {
         );
 
         String hash = client.getApi().getRecentBlockhash();
-        transaction.setRecentBlockhash(Blockhash.of(hash));
+        transaction.setRecentBlockhashForCompile(Blockhash.of(hash));
 
         String txId = client.getApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
         assertNotNull(txId);

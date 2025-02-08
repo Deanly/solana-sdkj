@@ -39,8 +39,8 @@ public class Transaction {
 
     private final List<TransactionInstruction> instructions;
     private final List<AddressLookupTableAccount> addressTableLookups;
-    private Blockhash recentBlockhash;
-    private PublicKey feePayer;
+    private Blockhash recentBlockhashForCompile;
+    private PublicKey feePayerForCompile;
 
     /**
      * Constructs a new Transaction instance.
@@ -88,21 +88,23 @@ public class Transaction {
     /**
      * Sets the fee payer for the transaction.
      *
-     * @param feePayer The public key of the account responsible for paying the transaction fee. Must not be null.
+     * @param feePayerForCompile The public key of the account responsible for paying the transaction fee. Must not be null.
      */
-    public void setFeePayer(@NonNull PublicKey feePayer) {
-        this.feePayer = feePayer;
+    public void setFeePayerForCompile(@NonNull PublicKey feePayerForCompile) {
+        this.feePayerForCompile = feePayerForCompile;
     }
 
     /**
      * Sets the recent blockhash for the transaction.
      *
-     * @param recentBlockhash The recent blockhash to set
+     * @param recentBlockhashForCompile The recent blockhash to set
      * @throws NullPointerException if the recentBlockhash is null
      */
-    public void setRecentBlockhash(Blockhash recentBlockhash) {
-        this.recentBlockhash = Objects.requireNonNull(recentBlockhash, "Recent blockhash cannot be null");
+    public void setRecentBlockhashForCompile(Blockhash recentBlockhashForCompile) {
+        this.recentBlockhashForCompile = Objects.requireNonNull(recentBlockhashForCompile, "Recent blockhash cannot be null");
     }
+
+
 
     /**
      * Signs the transaction with a single signer.
@@ -124,11 +126,11 @@ public class Transaction {
         if (signers == null || signers.isEmpty()) {
             throw new IllegalArgumentException("No signers provided");
         }
-        if (feePayer == null) {
-            feePayer = signers.get(0).getPublicKey();
-        } else if (!feePayer.equals(signers.get(0).getPublicKey())) {
+        if (feePayerForCompile == null) {
+            feePayerForCompile = signers.get(0).getPublicKey();
+        } else if (!feePayerForCompile.equals(signers.get(0).getPublicKey())) {
             message = null;
-            feePayer = signers.get(0).getPublicKey();
+            feePayerForCompile = signers.get(0).getPublicKey();
         }
         if (!isCompiled()) {
             compile();
@@ -159,7 +161,7 @@ public class Transaction {
      * based on the presence of address lookup tables.
      */
     public void compile() {
-        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+        compile(feePayerForCompile, recentBlockhashForCompile, instructions, addressTableLookups);
     }
 
     /**
@@ -169,7 +171,7 @@ public class Transaction {
      * @param feePayer The public key of the account responsible for paying the transaction fee.
      */
     public void compile(PublicKey feePayer) {
-        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+        compile(feePayer, recentBlockhashForCompile, instructions, addressTableLookups);
     }
 
     /**
@@ -271,8 +273,8 @@ public class Transaction {
     public String toString() {
         return "Transaction{" +
                 "version=" + message.getVersion().name() +
-                ", recentBlockhash='" + recentBlockhash + '\'' +
-                ", feePayer=" + feePayer +
+                ", recentBlockhash='" + recentBlockhashForCompile + '\'' +
+                ", feePayer=" + feePayerForCompile +
                 ", isCompiled=" + isCompiled() +
                 ", isSigned=" + isSigned() +
                 ", signatures.count=" + signatures.size() +

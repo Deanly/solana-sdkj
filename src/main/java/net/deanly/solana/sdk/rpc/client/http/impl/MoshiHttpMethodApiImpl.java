@@ -14,6 +14,7 @@ import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.*;
+import net.deanly.solana.sdk.types.codec.Base58;
 import net.deanly.solana.sdk.types.codec.Base64Checker;
 import okhttp3.*;
 
@@ -476,52 +477,103 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
 
     @Override
     public RpcResultObject<ResValueTokenSupply> getTokenSupply(PublicKey mint, TokenSupplyConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(mint, "mint must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueTokenSupply.class);
+        return this.call("getTokenSupply", this.getParams(mint, configuration), type, null);
     }
 
     @Override
-    public ResValueConfirmedTransaction getTransaction(String signature, TransactionConfig configuration) throws RpcException {
-        return null;
+    public ResValueConfirmedTransaction getTransaction(Signature signature, TransactionConfig configuration) throws RpcException {
+        Objects.requireNonNull(signature, "signature must not be null");
+        Type type = Types.newParameterizedType(RpcResponse.class, ResValueConfirmedTransaction.class);
+        return this.call("getTransaction", this.getParams(signature, configuration), type, null);
     }
 
     @Override
     public UnsignedLong getTransactionCount(TransactionCountConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, UnsignedLong.class);
+        return this.call("getTransactionCount", this.getParams(configuration), type, null);
     }
 
     @Override
     public ResValueVersion getVersion() throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, ResValueVersion.class);
+        return this.call("getVersion", this.getParams(), type, null);
     }
 
     @Override
     public ResValueVoteAccounts getVoteAccounts(VoteAccountsConfig configuration) throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, ResValueVoteAccounts.class);
+        return this.call("getVoteAccounts", this.getParams(configuration), type, null);
     }
 
     @Override
     public RpcResultObject<Boolean> isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(blockhash, "blockhash must not be null");
+        Type type = Types.newParameterizedType(RpcResponseV2.class, Boolean.class);
+        return this.call("isBlockhashValid", this.getParams(blockhash, configuration), type, null);
     }
 
     @Override
     public UnsignedLong minimumLedgerSlot() throws RpcException {
-        return null;
+        Type type = Types.newParameterizedType(RpcResponse.class, UnsignedLong.class);
+        return this.call("minimumLedgerSlot", this.getParams(), type, null);
     }
 
     @Override
     public Signature requestAirdrop(PublicKey pubkey, UnsignedLong lamports, RequestAirdropConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(pubkey, "pubkey must not be null");
+        Objects.requireNonNull(lamports, "lamports must not be null");
+        Type type = Types.newParameterizedType(RpcResponse.class, Signature.class);
+        return this.call("requestAirdrop", this.getParams(pubkey, lamports, configuration), type, null);
     }
 
     @Override
     public Signature sendTransaction(Transaction transaction, SendTransactionConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(transaction, "transaction must not be null");
+        if (!transaction.isSigned()) {
+            throw new IllegalArgumentException("transaction must be signed");
+        }
+
+        byte[] serializedTransaction = transaction.serialize();
+        Encoding encoding = Optional.ofNullable(configuration).map(SendTransactionConfig::getEncoding)
+                .orElse(Encoding.BASE58); // Default: Base58
+        if (!(encoding == Encoding.BASE64 || encoding == Encoding.BASE58)) {
+            throw new IllegalArgumentException("encoding must be base58 or base64");
+        }
+
+        String encodedTransaction = encodeTransaction(serializedTransaction, encoding);
+
+        Type type = Types.newParameterizedType(RpcResponse.class, Signature.class);
+        return this.call("sendTransaction", this.getParams(encodedTransaction, configuration), type, null);
     }
 
     @Override
     public RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException {
-        return null;
+        Objects.requireNonNull(transaction, "transaction must not be null");
+
+        byte[] serializedTransaction = transaction.serialize();
+        Encoding encoding = Optional.ofNullable(configuration).map(SimulateTransactionConfig::getEncoding)
+                .orElse(Encoding.BASE58); // Default: Base58
+        if (!(encoding == Encoding.BASE64 || encoding == Encoding.BASE58)) {
+            throw new IllegalArgumentException("encoding must be base58 or base64");
+        }
+
+        String encodedTransaction = encodeTransaction(serializedTransaction, encoding);
+
+        Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueSimulatedTransaction.class);
+        return this.call("simulateTransaction", this.getParams(encodedTransaction, configuration), type, null);
+    }
+
+    private String encodeTransaction(byte[] serializedTransaction, Encoding encoding) {
+        if (encoding == Encoding.BASE64) {
+            return Base64.getEncoder().encodeToString(serializedTransaction);
+        } else if (encoding == Encoding.BASE58) {
+            return Base58.encode(serializedTransaction);
+        } else {
+            // This exception is explicitly written to ensure no unknown encoding cases are missed.
+            throw new IllegalStateException("unknown encoding: " + encoding);
+        }
     }
 
 }

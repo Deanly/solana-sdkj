@@ -4,6 +4,8 @@ import com.google.common.primitives.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByDelegateFilter;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByOwnerFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.Blockhash;
@@ -498,6 +500,17 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettransaction">getTransaction RPC Method</a>
      */
     ResValueConfirmedTransaction getTransaction(Signature signature, TransactionConfig configuration) throws RpcException;
+
+    /**
+     * Retrieves a parsed transaction after applying the provided signature and configuration.
+     * Note that the encoding value in the configuration will be forcibly replaced with `jsonParsed`.
+     *
+     * @param signature the signature of the transaction to be parsed
+     * @param configuration the transaction configuration, where the encoding will be replaced with `jsonParsed`
+     * @return the parsed transaction as a ResValueParsedTransaction object
+     * @throws RpcException if an error occurs during the parsing process
+     */
+    ResValueParsedTransaction getParsedTransaction(Signature signature, TransactionConfig configuration) throws RpcException;
 
     /**
      * Returns the current transaction count from the ledger.

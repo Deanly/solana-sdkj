@@ -9,7 +9,7 @@ public class Signature {
 
     public Signature(String signature) {
         if (!this.isValidBase58(signature)) {
-            throw new IllegalArgumentException("Invalid Signature format");
+            throw new IllegalArgumentException("Invalid Signature format: " + signature);
         }
         this.signature = signature;
     }
@@ -19,7 +19,7 @@ public class Signature {
     }
 
     private boolean isValidBase58(String input) {
-        if (input.length() < 86 || input.length() > 88) {
+        if (input.length() != 64 && (input.length() < 86 || input.length() > 88)) {
             return false;
         }
         return Base58.isValidBase58Char(input);

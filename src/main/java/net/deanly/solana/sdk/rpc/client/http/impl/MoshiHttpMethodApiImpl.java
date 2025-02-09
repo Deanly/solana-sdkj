@@ -11,6 +11,8 @@ import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.request.config.*;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByDelegateFilter;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByOwnerFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.*;
@@ -32,14 +34,16 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private OkHttpClient httpClient;
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
+            .add(MoshiResValueTransactionJsonAdapter.FACTORY)
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
-            .add(StateData.class, new MoshiEncodedDataJsonAdapter())
+            .add(StateData.class, new MoshiStateDataJsonAdapter())
             .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
             .add(Blockhash.class, new MoshiBlockhashJsonAdapter())
             .add(GenesisHash.class, new MoshiGenesisHashJsonAdapter())
             .add(Signature.class, new MoshiSignatureJsonAdapter())
             .add(EpochCredits.class, new MoshiEpochCreditsJsonAdapter())
             .add(ValidatorIdentityInfo.class, new MoshiValidatorIdentityInfoJsonAdapter())
+//            .add(ResValueTransaction.class, new MoshiResValueTransactionJsonAdapter())
             .build();
 
     private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
@@ -191,19 +195,21 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     private static final EnumSet<Encoding> SUPPORTED_ENCODINGS_BLOCK = EnumSet.of(
-            Encoding.BASE64,
-            Encoding.JSON,
             Encoding.BASE58,
-            Encoding.JSON_PARSED
+            Encoding.BASE64,
+//            Encoding.JSON_PARSED,  // TODO: jsonParsed 를 위한 API 추가
+            Encoding.JSON
     );
     @Override
     public ResValueBlock getBlock(UnsignedLong slot, BlockConfig configuration) throws RpcException {
         Objects.requireNonNull(slot, "slot must not be null");
-        if (configuration.getEncoding() != null && !SUPPORTED_ENCODINGS_BLOCK.contains(configuration.getEncoding())) {
-            throw new IllegalArgumentException("Unsupported encoding: " + configuration.getEncoding());
-        }
-        if (Commitment.PROCESSED.equals(configuration.getCommitment())) {
-            throw new IllegalArgumentException("PROCESSED commitment is not supported for getBalance");
+        if (configuration != null) {
+            if (configuration.getEncoding() != null && !SUPPORTED_ENCODINGS_BLOCK.contains(configuration.getEncoding())) {
+                throw new IllegalArgumentException("Unsupported encoding: " + configuration.getEncoding());
+            }
+            if (Commitment.PROCESSED.equals(configuration.getCommitment())) {
+                throw new IllegalArgumentException("PROCESSED commitment is not supported for getBlock");
+            }
         }
         Type type = Types.newParameterizedType(RpcResponse.class, ResValueBlock.class);
         return this.call("getBlock", this.getParams(slot, configuration), type, null);
@@ -485,6 +491,22 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     @Override
     public ResValueConfirmedTransaction getTransaction(Signature signature, TransactionConfig configuration) throws RpcException {
         Objects.requireNonNull(signature, "signature must not be null");
+        if (configuration != null && configuration.getEncoding() != null && configuration.getEncoding().equals(Encoding.JSON_PARSED)) {
+            throw new IllegalArgumentException("encoding JSON_PARSED is not supported for getTransaction");
+        }
+        Type type = Types.newParameterizedType(RpcResponse.class, ResValueConfirmedTransaction.class);
+        return this.call("getTransaction", this.getParams(signature, configuration), type, null);
+    }
+
+    @Override
+    public ResValueParsedTransaction getParsedTransaction(Signature signature, TransactionConfig configuration) throws RpcException {
+        Objects.requireNonNull(signature, "signature must not be null");
+        if (configuration == null) {
+            configuration = new TransactionConfig();
+            configuration.setEncoding(Encoding.JSON_PARSED);
+        } else {
+            configuration.setEncoding(Encoding.JSON_PARSED);
+        }
         Type type = Types.newParameterizedType(RpcResponse.class, ResValueConfirmedTransaction.class);
         return this.call("getTransaction", this.getParams(signature, configuration), type, null);
     }

@@ -1,11 +1,10 @@
 package net.deanly.solana.sdk.rpc.request.config;
 
-import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
 import net.deanly.solana.sdk.types.Commitment;
 import net.deanly.solana.sdk.types.Encoding;
-import net.deanly.solana.sdk.types.FilterCriteria;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
 
 import java.util.List;
 
@@ -32,6 +31,6 @@ public class ProgramAccountsConfig {
     private Encoding.DataSlice dataSlice; // Optional: Request a slice of the account's data.
 
     @Json(name = "filters")
-    private List<FilterCriteria> filters; // Optional: Filter results using up to 4 filter objects.
+    private List<ProgramAccountFilter> filters; // Optional: Filter results using up to 4 filter objects.
 
 }

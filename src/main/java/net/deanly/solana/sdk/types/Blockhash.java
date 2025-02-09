@@ -24,7 +24,7 @@ public class Blockhash implements Comparable<Blockhash> {
     }
 
     private boolean isValidBase58(String input) {
-        if (input.length() < 43 || input.length() > 44) {
+        if (input.length() != 32 && (input.length() < 43 || input.length() > 44)) {
             return false;
         }
         return Base58.isValidBase58Char(input);

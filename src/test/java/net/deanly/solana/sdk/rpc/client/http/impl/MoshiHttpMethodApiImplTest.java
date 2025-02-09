@@ -9,6 +9,9 @@ import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.adapter.MoshiNumberJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByDelegateFilter;
+import net.deanly.solana.sdk.rpc.request.filter.TokenAccountsByOwnerFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.types.*;
@@ -2188,10 +2191,10 @@ class MoshiHttpMethodApiImplTest {
                 ProgramAccountsConfig.builder()
                         .filters(
                                 List.of(
-                                        FilterCriteria.builder()
+                                        ProgramAccountFilter.builder()
                                                 .dataSize(UnsignedLong.valueOf(17))
                                                 .memcmp(
-                                                        FilterCriteria.Memcmp.builder()
+                                                        ProgramAccountFilter.Memcmp.builder()
                                                                 .offset(4)
                                                                 .bytes("3Mc6vR")
                                                                 .build()

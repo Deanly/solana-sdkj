@@ -130,7 +130,7 @@ public class MessageTest {
 
         assertEquals(header, message.getHeader(), "Message header mismatch!");
         assertEquals(accountKeys, message.getStaticAccountKeys(), "Account keys mismatch!");
-        assertEquals(recentBlockhash, message.getRecentBlockhash(), "Recent blockhash mismatch!");
+        assertEquals(Blockhash.of(recentBlockhash), message.getRecentBlockhash(), "Recent blockhash mismatch!");
         assertEquals(instructions, message.getInstructions(), "Instructions mismatch!");
     }
 

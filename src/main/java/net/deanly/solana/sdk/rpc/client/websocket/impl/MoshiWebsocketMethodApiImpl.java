@@ -6,19 +6,19 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.adapter.*;
-import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.exception.RpcWebSocketException;
 import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
 import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
-import net.deanly.solana.sdk.rpc.request.config.AccountSubscriptionConfig;
+import net.deanly.solana.sdk.rpc.request.config.*;
+import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
+import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import net.deanly.solana.sdk.rpc.response.ResValueProgram;
@@ -26,7 +26,6 @@ import okhttp3.*;
 import com.google.common.cache.Cache;
 import org.jetbrains.annotations.NotNull;
 
-import javax.net.ssl.SSLHandshakeException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
@@ -40,10 +39,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     private final Cache<SubscriptionId, SubscriptionContext<?>> listeners = CacheBuilder.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .removalListener(notification -> {
+                log.debug("Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+            })
             .build(); // Concurrency Safe
     private final Cache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions = CacheBuilder.newBuilder()
-            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .removalListener(notification -> {
+                log.debug("Pending Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+            })
+            .build(); // Concurrency Safe
+    private final Cache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions = CacheBuilder.newBuilder()
+            .expireAfterAccess(5, TimeUnit.MINUTES)
+            .removalListener(notification -> {
+                log.debug("Pending Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+            })
             .build(); // Concurrency Safe
 
     private final RpcClient.ClientConfig config;
@@ -52,8 +63,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
+            .add(MoshiResValueTransactionJsonAdapter.FACTORY)
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
-            .add(StateData.class, new MoshiEncodedDataJsonAdapter())
+            .add(StateData.class, new MoshiStateDataJsonAdapter())
             .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
             .add(Blockhash.class, new MoshiBlockhashJsonAdapter())
             .add(GenesisHash.class, new MoshiGenesisHashJsonAdapter())
@@ -61,6 +73,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             .add(EpochCredits.class, new MoshiEpochCreditsJsonAdapter())
             .add(ValidatorIdentityInfo.class, new MoshiValidatorIdentityInfoJsonAdapter())
             .add(SubscriptionId.class, new MoshiSubscriptionIdJsonAdapter())
+            .add(BlockFilter.class, new MoshiBlockFilterJsonAdapter())
+            .add(LogsFilter.class, new MoshiLogsFilterJsonAdapter())
+//            .add(ResValueTransaction.class, new MoshiResValueTransactionJsonAdapter())
             .build();
 
     private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
@@ -248,23 +263,45 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     private void handleSubscriptionResponse(String message, Long id) throws IOException {
-        JsonAdapter<RpcResponse<SubscriptionId>> responseAdapter = this.getCachedAdapter(Types.newParameterizedType(RpcResponse.class, SubscriptionId.class));
-        RpcResponse<SubscriptionId> response = responseAdapter.fromJson(message);
+        if (this.getPendingSubscription(id) != null) {
+            JsonAdapter<RpcResponse<SubscriptionId>> responseAdapter = this.getCachedAdapter(Types.newParameterizedType(RpcResponse.class, SubscriptionId.class));
+            RpcResponse<SubscriptionId> response = responseAdapter.fromJson(message);
 
-        if (response != null) {
-            Long requestId = response.getId();
-            CompletableFuture<SubscriptionId> future = getPendingSubscription(requestId);
-            removePendingSubscription(requestId);
+            if (response != null) {
+                Long requestId = response.getId(); // same id
+                CompletableFuture<SubscriptionId> future = this.getPendingSubscription(requestId);
+                this.removePendingSubscription(requestId);
 
-            if (future != null) {
-                if (response.getError() != null) {
-                    future.completeExceptionally(new RpcWebSocketException(response.getError().getMessage()));
-                    log.error("Subscription error: {}", response.getError().getMessage());
+                if (future != null) {
+                    if (response.getError() != null) {
+                        future.completeExceptionally(new RpcWebSocketException(response.getError().getMessage()));
+                        log.error("Subscription error: {}", response.getError().getMessage());
+                    } else {
+                        future.complete(response.getResult());
+                    }
                 } else {
-                    future.complete(response.getResult());
+                    log.warn("No pending subscription found for request ID: {}", requestId);
                 }
-            } else {
-                log.warn("No pending subscription found for request ID: {}", requestId);
+            }
+        } else if (this.getPendingUnsubscription(id) != null) {
+            JsonAdapter<RpcResponse<Boolean>> responseAdapter = this.getCachedAdapter(Types.newParameterizedType(RpcResponse.class, Boolean.class));
+            RpcResponse<Boolean> response = responseAdapter.fromJson(message);
+
+            if (response != null) {
+                Long requestId = response.getId(); // same id
+                CompletableFuture<Boolean> future = this.getPendingUnsubscription(requestId);
+                this.removePendingUnsubscription(requestId);
+
+                if (future != null) {
+                    if (response.getError() != null) {
+                        future.completeExceptionally(new RpcWebSocketException(response.getError().getMessage()));
+                        log.error("Unsubscription error: {}", response.getError().getMessage());
+                    } else {
+                        future.complete(response.getResult());
+                    }
+                } else {
+                    log.warn("No pending unsubscription found for request ID: {}", requestId);
+                }
             }
         }
     }
@@ -318,7 +355,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         List<Object> params = context.params;
 
 //        return new RpcRequest(method, params);
-        return new RpcRequest(method, params, subscriptionId.getValue());
+        return new RpcRequest(method, params, subscriptionId.getValue()); // 구독을 요청 ID로 재사용 🤣
     }
 
     private SubscriptionContext<?> getListener(SubscriptionId id) {
@@ -329,6 +366,10 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         return pendingSubscriptions.getIfPresent(id);
     }
 
+    private CompletableFuture<Boolean> getPendingUnsubscription(Long id) {
+        return pendingUnsubscriptions.getIfPresent(id);
+    }
+
     private void removeListener(SubscriptionId id) {
         listeners.invalidate(id);
     }
@@ -337,12 +378,12 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         pendingSubscriptions.invalidate(id);
     }
 
-    public Long countListeners() {
-        return this.listeners.size();
+    private void removePendingUnsubscription(Long id) {
+        pendingUnsubscriptions.invalidate(id);
     }
 
-    public void cleanupListeners() {
-        this.listeners.cleanUp();
+    public Long countListeners() {
+        return this.listeners.size();
     }
 
     /// Moshi Adapter Cache
@@ -383,60 +424,6 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         return result;
     }
 
-    private <T> T call(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException {
-        RpcRequest rpcRequest = createRpcRequest(method, params);
-
-        JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
-
-        Request request = new Request.Builder().url(this.config.getEndpoint())
-                .post(RequestBody.create(rpcRequestJsonAdapter.toJson(rpcRequest), this.config.getMediaType()))
-                .build();
-
-        try {
-            Response response = httpClient.newCall(request).execute();
-            final String result = Objects.requireNonNull(response.body()).string();
-            RpcResponse<T> rpcResponse = resultAdapter.fromJson(result);
-
-            if (rpcResponse == null) {
-                throw new RpcException("Failed to parse RpcResponse: Response is null");
-            }
-
-            if (rpcResponse.getError() != null) {
-                RpcResponse.Error error = rpcResponse.getError();
-
-                Map<String, Object> errorData = null;
-                if (error.getData() != null) {
-                    try {
-                        if (errorDataType != null) {
-                            JsonAdapter<Map<String, Object>> mapAdapter = getCachedAdapter(errorDataType);
-                            errorData = mapAdapter.fromJsonValue(error.getData());
-                        } else {
-                            Type mapType = Types.newParameterizedType(Map.class, String.class, Object.class);
-                            JsonAdapter<Map<String, Object>> mapAdapter = getCachedAdapter(mapType);
-                            errorData = mapAdapter.fromJsonValue(error.getData());
-                        }
-                    } catch (Exception e) {
-                        throw new RpcException(
-                                "Failed to parse error data: " + e.getMessage(),
-                                (int) error.getCode(),
-                                null
-                        );
-                    }
-                }
-
-                throw new RpcException(error.getMessage(), (int) error.getCode(), errorData);
-            }
-
-            return rpcResponse.getResult();
-
-        } catch (SSLHandshakeException e) {
-            this.httpClient = this.createHttpClient();
-            throw new RpcException("SSL Handshake failed: " + e.getMessage());
-        } catch (IOException e) {
-            throw new RpcException("IO error during RPC call: " + e.getMessage());
-        }
-    }
-
     protected RpcRequest createRpcRequest(String method, List<Object> params) {
         return new RpcRequest(method, params);
     }
@@ -462,20 +449,35 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
             this.listeners.put(subscriptionId, new SubscriptionContext<>(type, listener, method, params));
             return RpcResponse.<SubscriptionId>builder().result(subscriptionId).build();
+
         } catch (Exception e) {
             log.error("Subscription failed: {}", e.getMessage());
             throw new RpcWebSocketException("Subscription timeout", e);
+
         }
     }
 
     ///  공통 Unsubscribe
     private RpcResponse<Boolean> unsubscribe(String method, SubscriptionId subscriptionId) {
         try {
-            Type type = Types.newParameterizedType(RpcResponse.class, Boolean.class);
-            return this.call(method, List.of(subscriptionId), type, null);
-        } catch (RpcException e) {
+            RpcRequest request = createRpcRequest(method, List.of(subscriptionId));
+
+            String requestJson = rpcRequestJsonAdapter.toJson(request);
+            webSocket.send(requestJson);
+            log.info("Unsubscribe request sent: {}", requestJson);
+
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+            this.pendingUnsubscriptions.put(request.getId(), future);
+
+            Boolean result = future.get(5, TimeUnit.SECONDS); // 타임아웃 설정
+            return RpcResponse.<Boolean>builder().result(result).build();
+
+        } catch (Exception e) {
+            log.error("Unsubscribe failed: {}", e.getMessage());
             throw new RpcWebSocketException(e.getMessage(), e);
+
         } finally {
+            // 요청 완료 후 Listener 제거
             this.removeListener(subscriptionId);
         }
     }
@@ -488,146 +490,142 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     public RpcResponse<SubscriptionId> accountSubscribe(
             PublicKey accountKey,
             AccountSubscriptionConfig config,
-            NotificationListener<RpcNotificationV2<ResValueAccountInfo>> listener
+            NotificationListener<RpcNotificationV2<NotiValueAccountInfo>> listener
     ) {
         Objects.requireNonNull(accountKey, "accountKey must not be null");
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotificationV2.class, ResValueAccountInfo.class);
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueAccountInfo.class);
         return this.subscribe("accountSubscribe", this.getParams(accountKey, config), type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> accountUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("accountUnsubscribe", subscriptionId);
     }
 
+    private static final EnumSet<Encoding> SUPPORTED_ENCODINGS_BLOCK = EnumSet.of(
+            Encoding.BASE58,
+            Encoding.BASE64,
+//            Encoding.JSON_PARSED,  // TODO: jsonParsed 를 위한 API 추가
+            Encoding.JSON
+    );
     @Override
-    public RpcResponse<SubscriptionId> blockSubscribe(Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueBlock>> listener) {
-        List<Object> params = List.of(
-                Map.of("commitment", commitment, "encoding", encoding)
-        );
-        Type type = Types.newParameterizedType(
-                RpcNotificationV2.class,
-                ResValueBlock.class
-        );
-        return this.subscribe("blockSubscribe", params, type, listener);
+    public RpcResponse<SubscriptionId> blockSubscribe(
+            BlockFilter filter, BlockConfig2 config,
+            NotificationListener<RpcNotificationV2<NotiValueBlock>> listener) {
+        Objects.requireNonNull(filter, "filter must not be null");
+        Objects.requireNonNull(listener, "listener must not be null");
+        if (config != null && !SUPPORTED_ENCODINGS_BLOCK.contains(config.getEncoding())) {
+            throw new IllegalArgumentException("Unsupported encoding: " + config.getEncoding());
+        }
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueBlock.class);
+        return this.subscribe("blockSubscribe", this.getParams(filter, config), type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> blockUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("blockUnsubscribe", subscriptionId);
     }
 
     @Override
-    public RpcResponse<SubscriptionId> logsSubscribe(List<String> mention, Commitment commitment, NotificationListener<RpcNotificationV2<ResValueLog>> listener) {
-        List<Object> params = List.of(
-                mention,
-                Map.of("commitment", commitment)
-        );
-        Type type = Types.newParameterizedType(
-                RpcNotificationV2.class,
-                ResValueLog.class
-        );
-        return this.subscribe("logsSubscribe", params, type, listener);
+    public RpcResponse<SubscriptionId> logsSubscribe(
+            LogsFilter filter, LogsConfig config,
+            NotificationListener<RpcNotificationV2<ResValueLog>> listener) {
+        Objects.requireNonNull(filter, "filter must not be null");
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, ResValueLog.class);
+        return this.subscribe("logsSubscribe", this.getParams(filter, config), type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> logsUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("logsUnsubscribe", subscriptionId);
     }
 
     @Override
-    public RpcResponse<SubscriptionId> programSubscribe(String programId, Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueProgram>> listener) {
-        List<Object> params = List.of(
-                programId,
-                Map.of("commitment", commitment, "encoding", encoding)
-        );
-        Type type = Types.newParameterizedType(
-                RpcNotificationV2.class,
-                ResValueProgram.class
-        );
-        return this.subscribe("programSubscribe", params, type, listener);
+    public RpcResponse<SubscriptionId> programSubscribe(
+            PublicKey programId, ProgramConfig config,
+            NotificationListener<RpcNotificationV2<ResValueProgram>> listener) {
+        Objects.requireNonNull(programId, "programId must not be null");
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, ResValueProgram.class);
+        return this.subscribe("programSubscribe", this.getParams(programId, config), type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> programUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("programUnsubscribe", subscriptionId);
     }
 
     @Override
     public RpcResponse<SubscriptionId> rootSubscribe(NotificationListener<RpcNotification<Long>> listener) {
-        List<Object> params = List.of(); // 루트 구독에는 추가 파라미터가 없음
-        Type type = Types.newParameterizedType(
-                RpcNotification.class,
-                Long.class
-        );
-        return this.subscribe("rootSubscribe", params, type, listener);
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotification.class, UnsignedLong.class);
+        return this.subscribe("rootSubscribe", null, type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> rootUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("rootUnsubscribe", subscriptionId);
     }
 
     @Override
-    public RpcResponse<SubscriptionId> signatureSubscribe(String signature, NotificationListener<RpcNotificationV2<String>> listener) {
-        List<Object> params = List.of(
-                signature
-        );
-        Type type = Types.newParameterizedType(
-                RpcNotificationV2.class,
-                String.class
-        );
-        return this.subscribe("signatureSubscribe", params, type, listener);
+    public RpcResponse<SubscriptionId> signatureSubscribe(
+            PublicKey signature, SignatureConfig config,
+            NotificationListener<RpcNotificationV2<String>> listener) {
+        Objects.requireNonNull(signature, "signature must not be null");
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, String.class);
+        return this.subscribe("signatureSubscribe", this.getParams(signature, config), type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> signatureUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("signatureUnsubscribe", subscriptionId);
     }
 
     @Override
     public RpcResponse<SubscriptionId> slotSubscribe(NotificationListener<RpcNotification<ResValueSlot>> listener) {
-        List<Object> params = List.of(); // 슬롯 구독에는 추가 파라미터가 없음
-        Type type = Types.newParameterizedType(
-                RpcNotification.class,
-                ResValueSlot.class
-        );
-        return this.subscribe("slotSubscribe", params, type, listener);
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotification.class, ResValueSlot.class);
+        return this.subscribe("slotSubscribe", null, type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> slotUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("slotUnsubscribe", subscriptionId);
     }
 
     @Override
     public RpcResponse<SubscriptionId> slotsUpdatesSubscribe(NotificationListener<RpcNotification<ResValueSlotUpdates>> listener) {
-        List<Object> params = List.of(); // 슬롯 업데이트 구독에는 추가 파라미터가 없음
-        Type type = Types.newParameterizedType(
-                RpcNotification.class,
-                ResValueSlotUpdates.class
-        );
-        return this.subscribe("slotsUpdatesSubscribe", params, type, listener);
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotification.class, ResValueSlotUpdates.class);
+        return this.subscribe("slotsUpdatesSubscribe", null, type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> slotsUpdatesUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("slotsUpdatesUnsubscribe", subscriptionId);
     }
 
     @Override
     public RpcResponse<SubscriptionId> voteSubscribe(NotificationListener<RpcNotification<ResValueVote>> listener) {
-        List<Object> params = List.of(); // 투표 구독에는 추가 파라미터가 없음
-        Type type = Types.newParameterizedType(
-                RpcNotification.class,
-                ResValueVote.class
-        );
-        return this.subscribe("voteSubscribe", params, type, listener);
+        Objects.requireNonNull(listener, "listener must not be null");
+        Type type = Types.newParameterizedType(RpcNotification.class, ResValueVote.class);
+        return this.subscribe("voteSubscribe", null, type, listener);
     }
 
     @Override
     public RpcResponse<Boolean> voteUnsubscribe(SubscriptionId subscriptionId) {
+        Objects.requireNonNull(subscriptionId, "subscriptionId must not be null");
         return this.unsubscribe("voteUnsubscribe", subscriptionId);
     }
 }

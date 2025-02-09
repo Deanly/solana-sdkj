@@ -2,10 +2,7 @@ package net.deanly.solana.sdk.rpc.response;
 
 
 import com.squareup.moshi.Json;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import net.deanly.solana.sdk.types.StateData;
 
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class ResValueInstruction {
     /// Index into the message.accountKeys array indicating the program account that executes this instruction.
     @Json(name = "programIdIndex")

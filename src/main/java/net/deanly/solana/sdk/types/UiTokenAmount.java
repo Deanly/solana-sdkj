@@ -22,7 +22,7 @@ public class UiTokenAmount {
     /// Token amount as a float, accounting for decimals. DEPRECATED
     @Deprecated
     @Json(name = "uiAmount")
-    private Long uiAmount;
+    private Float uiAmount;
 
     /// Token amount as a string, accounting for decimals.
     @Json(name = "uiAmountString")

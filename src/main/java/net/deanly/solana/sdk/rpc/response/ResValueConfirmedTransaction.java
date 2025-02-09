@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -67,8 +68,8 @@ public class ResValueConfirmedTransaction {
         private List<TokenBalance> postTokenBalances;
 
         /// array of string log messages or null if log message recording was not enabled during this transaction
-        @Json(name = "logMessage")
-        private List<String> logMessage;
+        @Json(name = "logMessages")
+        private List<String> logMessages;
 
 //        /// DEPRECATED: status: <object> - Transaction status
 //        @Json(name = "status")
@@ -123,6 +124,11 @@ public class ResValueConfirmedTransaction {
         /// the return data itself, as base-64 encoded binary data
         @Json(name = "data")
         private StateData data;
+    }
+
+    public static PolymorphicJsonAdapterFactory<ResValueTransaction> getPolymorphicAdapter() {
+        return PolymorphicJsonAdapterFactory.of(ResValueTransaction.class, "type")
+                .withSubtype(ResValueTransaction.class, "transaction");
     }
 
 }

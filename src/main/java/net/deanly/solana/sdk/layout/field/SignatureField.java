@@ -1,22 +1,23 @@
 package net.deanly.solana.sdk.layout.field;
 
+import net.deanly.solana.sdk.types.Signature;
 import net.deanly.solana.sdk.types.codec.Base58;
 import net.deanly.structlayout.type.FieldBase;
 
-public class Base58Bytes64Field extends FieldBase<String> {
+public class SignatureField extends FieldBase<Signature> {
 
-    private static final int LENGTH = 64; // 32 bytes
+    private static final int LENGTH = 64; // 64 bytes
 
-    public Base58Bytes64Field() {
+    public SignatureField() {
         super(LENGTH);
     }
 
     @Override
-    public byte[] encode(String value) {
+    public byte[] encode(Signature value) {
         if (value == null) {
             throw new IllegalArgumentException("value cannot be null.");
         }
-        byte[] bytes = Base58.decode(value);
+        byte[] bytes = Base58.decode(value.toString());
 
         if (bytes.length != LENGTH) {
             throw new IllegalArgumentException("must be exactly " + LENGTH + " bytes.");
@@ -26,15 +27,15 @@ public class Base58Bytes64Field extends FieldBase<String> {
     }
 
     @Override
-    public String decode(byte[] buffer, int offset) {
+    public Signature decode(byte[] buffer, int offset) {
         if (buffer == null || buffer.length - offset < LENGTH) {
-            throw new IllegalArgumentException("Buffer does not contain enough data for a base58 field.");
+            throw new IllegalArgumentException("Buffer does not contain enough data for a base58 field. offset=" + offset + ", " +  (buffer != null ? buffer.length : 0) + " bytes remaining.");
         }
 
         byte[] blockhashBytes = new byte[LENGTH];
         System.arraycopy(buffer, offset, blockhashBytes, 0, LENGTH);
 
-        return Base58.encode(blockhashBytes);
+        return Signature.of(Base58.encode(blockhashBytes));
     }
 
 

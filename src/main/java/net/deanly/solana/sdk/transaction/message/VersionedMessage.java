@@ -1,6 +1,9 @@
 package net.deanly.solana.sdk.transaction.message;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
+import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
+import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.annotation.StructTypeSelector;
@@ -16,6 +19,10 @@ public interface VersionedMessage {
     byte[] serialize();
     MessageHeader getHeader();
     List<PublicKey> getSigners();
+    List<PublicKey> getStaticAccountKeys();
+    Blockhash getRecentBlockhash();
+    List<MessageCompiledInstruction> getInstructions();
+    List<MessageAddressTableLookup> getAddressTableLookups();
 
     /**
      * Deserialize a versioned message from a byte array.

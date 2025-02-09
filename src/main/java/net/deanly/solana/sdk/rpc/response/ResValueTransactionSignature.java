@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.rpc.response;
 
 import com.squareup.moshi.Json;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import com.google.common.primitives.UnsignedLong;
@@ -10,6 +11,7 @@ import net.deanly.solana.sdk.types.TransactionError;
 
 @Getter
 @ToString
+@Builder
 public class ResValueTransactionSignature {
 
     @Json(name = "signature")

@@ -11,6 +11,4 @@ public interface TransactionInstruction {
     PublicKey getProgramId();
     List<AccountMeta> getKeys();
     byte[] getData();
-
-
 }

@@ -4,7 +4,8 @@ import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
-import net.deanly.solana.sdk.layout.field.Base58Bytes32Field;
+import net.deanly.solana.sdk.layout.field.BlockhashField;
+import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -34,8 +35,8 @@ public class Message extends Struct implements VersionedMessage {
     protected List<PublicKey> staticAccountKeys;
 
     @Setter
-    @StructField(order = 3, type = Base58Bytes32Field.class)
-    protected String recentBlockhash;
+    @StructField(order = 3, type = BlockhashField.class)
+    protected Blockhash recentBlockhash;
 
     @StructSequenceObjectField(order = 4, lengthType = ShortVecField.class)
     protected List<MessageCompiledInstruction> instructions;
@@ -43,7 +44,7 @@ public class Message extends Struct implements VersionedMessage {
     public Message(MessageHeader messageHeader, List<PublicKey> staticAccountKeys, Blockhash recentBlockhash, List<MessageCompiledInstruction> instructions) {
         this.header = messageHeader;
         this.staticAccountKeys = staticAccountKeys;
-        this.recentBlockhash = recentBlockhash.getValue();
+        this.recentBlockhash = recentBlockhash;
         this.instructions = instructions;
     }
 
@@ -59,6 +60,11 @@ public class Message extends Struct implements VersionedMessage {
             signers.add(staticAccountKeys.get(i));
         }
         return signers;
+    }
+
+    @Override
+    public List<MessageAddressTableLookup> getAddressTableLookups() {
+        return List.of();
     }
 
     /**

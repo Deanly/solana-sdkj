@@ -2,15 +2,15 @@ package net.deanly.solana.sdk.rpc.client.adapter;
 
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.*;
-import net.deanly.solana.sdk.types.FilterCriteria;
-import net.deanly.solana.sdk.types.FilterCriteria.Memcmp;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter.Memcmp;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<FilterCriteria>> {
+public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<ProgramAccountFilter>> {
 
     private final JsonAdapter<Memcmp> memcmpAdapter;
 
@@ -20,16 +20,16 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<FilterCrite
 
     @Nullable
     @Override
-    public List<FilterCriteria> fromJson(JsonReader reader) throws IOException {
-        List<FilterCriteria> filters = new ArrayList<>();
+    public List<ProgramAccountFilter> fromJson(JsonReader reader) throws IOException {
+        List<ProgramAccountFilter> filters = new ArrayList<>();
         reader.beginArray();
 
-        FilterCriteria dataSizeCriteria = null;
-        FilterCriteria memcmpCriteria = null;
+        ProgramAccountFilter dataSizeCriteria = null;
+        ProgramAccountFilter memcmpCriteria = null;
 
         while (reader.hasNext()) {
             reader.beginObject();
-            FilterCriteria criteria = new FilterCriteria();
+            ProgramAccountFilter criteria = new ProgramAccountFilter();
 
             while (reader.hasNext()) {
                 String name = reader.nextName();
@@ -50,26 +50,25 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<FilterCrite
         reader.endArray();
 
         if (dataSizeCriteria != null) {
-            filters.add(dataSizeCriteria); // ✅ 인덱스 0에 `dataSize`
+            filters.add(dataSizeCriteria);
         }
         if (memcmpCriteria != null) {
-            filters.add(memcmpCriteria); // ✅ 인덱스 1에 `memcmp`
+            filters.add(memcmpCriteria);
         }
 
         return filters;
     }
 
     @Override
-    public void toJson(JsonWriter writer, @Nullable List<FilterCriteria> filters) throws IOException {
+    public void toJson(JsonWriter writer, @Nullable List<ProgramAccountFilter> filters) throws IOException {
         if (filters == null) {
             writer.nullValue();
             return;
         }
 
-        writer.beginArray(); // ✅ `filters` 배열 시작
+        writer.beginArray();
 
-        // ✅ `dataSize`가 있는 경우 먼저 추가
-        for (FilterCriteria filter : filters) {
+        for (ProgramAccountFilter filter : filters) {
             if (filter.getDataSize() != null) {
                 writer.beginObject();
                 writer.name("dataSize").value(filter.getDataSize().longValue());
@@ -77,8 +76,7 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<FilterCrite
             }
         }
 
-        // ✅ `memcmp`가 있는 경우 추가
-        for (FilterCriteria filter : filters) {
+        for (ProgramAccountFilter filter : filters) {
             if (filter.getMemcmp() != null) {
                 writer.beginObject();
                 writer.name("memcmp");
@@ -87,11 +85,11 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<FilterCrite
             }
         }
 
-        writer.endArray(); // ✅ `filters` 배열 끝
+        writer.endArray();
     }
 
     public static final JsonAdapter.Factory FACTORY = (type, annotations, moshi) -> {
-        if (Types.equals(type, Types.newParameterizedType(List.class, FilterCriteria.class))) {
+        if (Types.equals(type, Types.newParameterizedType(List.class, ProgramAccountFilter.class))) {
             return new MoshiFilterCriteriaJsonAdapter(moshi);
         }
         return null;

@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.rpc.response;
 
 import com.squareup.moshi.Json;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -14,15 +15,11 @@ import java.util.List;
 /// transactions on Solana.
 @Getter
 @ToString
+@Builder
 public class ResValueTransaction {
     /// Defines the content of the transaction
     @Json(name = "message")
     private Message message;
-
-    /// List of address table lookups used by a transaction to dynamically load addresses
-    /// from on-chain address lookup tables. Undefined if maxSupportedTransactionVersion is not set.
-    @Json(name = "addressTableLookups")
-    private List<AddressTableLookup> addressTableLookups;
 
     /// A list of base-58 encoded signatures applied to the transaction. The list is always of length
     /// `message.header.numRequiredSignatures` and not empty. The signature at index i corresponds to t
@@ -30,9 +27,9 @@ public class ResValueTransaction {
     @Json(name = "signatures")
     private List<Signature> signatures;
 
-
     @Getter
     @ToString
+    @Builder
     public static class Message {
         /// List of base-58 encoded public keys used by the transaction, including by the instructions
         /// and for signatures. The first `message.header.numRequiredSignatures` public keys must
@@ -54,8 +51,14 @@ public class ResValueTransaction {
         @Json(name = "instructions")
         private List<ResValueInstruction> instructions;
 
+        /// List of address table lookups used by a transaction to dynamically load addresses
+        /// from on-chain address lookup tables. Undefined if maxSupportedTransactionVersion is not set.
+        @Json(name = "addressTableLookups")
+        private List<AddressTableLookup> addressTableLookups;
+
         @Getter
         @ToString
+        @Builder
         public static class Header {
             /// The total number of signatures required to make the transaction valid.
             /// The signatures must match the first `numRequiredSignatures` of `message.accountKeys`.
@@ -73,21 +76,22 @@ public class ResValueTransaction {
             @Json(name = "numRequiredSignatures")
             private Integer numRequiredSignatures;
         }
-    }
 
-    @Getter
-    @ToString
-    public static class AddressTableLookup {
-        /// base-58 encoded public key for an address lookup table account.
-        @Json(name = "accountKey")
-        private PublicKey accountKey;
+        @Getter
+        @ToString
+        @Builder
+        public static class AddressTableLookup {
+            /// base-58 encoded public key for an address lookup table account.
+            @Json(name = "accountKey")
+            private PublicKey accountKey;
 
-        /// List of indices used to load addresses of writable accounts from a lookup table.
-        @Json(name = "writableIndexes")
-        private List<Integer> writableIndexes;
+            /// List of indices used to load addresses of writable accounts from a lookup table.
+            @Json(name = "writableIndexes")
+            private List<Integer> writableIndexes;
 
-        /// List of indices used to load addresses of readonly accounts from a lookup table.
-        @Json(name = "readonlyIndexes")
-        private List<Integer> readonlyIndexes;
+            /// List of indices used to load addresses of readonly accounts from a lookup table.
+            @Json(name = "readonlyIndexes")
+            private List<Integer> readonlyIndexes;
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class MoshiEncodedDataJsonAdapter extends JsonAdapter<StateData> {
+public class MoshiStateDataJsonAdapter extends JsonAdapter<StateData> {
 
     private static final Pattern BASE58_PATTERN = Pattern.compile("^[1-9A-HJ-NP-Za-km-z]+$");
     private static final Pattern BASE64_PATTERN = Pattern.compile("^[A-Za-z0-9+/=]+$");

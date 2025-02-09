@@ -5,9 +5,15 @@ import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.crypto.Ed25519Signer;
+import net.deanly.solana.sdk.rpc.response.ResValueInstruction;
+import net.deanly.solana.sdk.rpc.response.ResValueTransaction;
+import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.types.Encoding;
+import net.deanly.solana.sdk.types.Signature;
+import net.deanly.solana.sdk.types.StateData;
 import net.deanly.solana.sdk.types.codec.Base58;
-import net.deanly.solana.sdk.layout.field.Base58Bytes64Field;
+import net.deanly.solana.sdk.layout.field.SignatureField;
 import net.deanly.solana.sdk.layout.field.ShortVecField;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.MessageV0;
@@ -21,6 +27,7 @@ import net.deanly.structlayout.annotation.StructSequenceField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Represents a Solana transaction.
@@ -29,16 +36,14 @@ import java.util.Objects;
 @Getter
 public class Transaction {
 
-    public static final int SIGNATURE_LENGTH = 64;
-
-    @StructSequenceField(order = 1, elementType = Base58Bytes64Field.class, lengthType = ShortVecField.class)
-    private final List<String> signatures;
+    @StructSequenceField(order = 1, elementType = SignatureField.class, lengthType = ShortVecField.class)
+    private final List<Signature> signatures;
 
     @StructObjectField(order = 2)
     private VersionedMessage message;
 
-    private final List<TransactionInstruction> instructions;
-    private final List<AddressLookupTableAccount> addressTableLookups;
+    private final List<TransactionInstruction> instructionsForCompile;
+    private final List<AddressLookupTableAccount> addressTableLookupsForCompile;
     private Blockhash recentBlockhashForCompile;
     private PublicKey feePayerForCompile;
 
@@ -46,9 +51,9 @@ public class Transaction {
      * Constructs a new Transaction instance.
      */
     public Transaction() {
-        this.instructions = new ArrayList<>();
+        this.instructionsForCompile = new ArrayList<>();
         this.signatures = new ArrayList<>();
-        this.addressTableLookups = new ArrayList<>();
+        this.addressTableLookupsForCompile = new ArrayList<>();
     }
 
     /**
@@ -60,7 +65,7 @@ public class Transaction {
      */
     public Transaction addInstruction(TransactionInstruction instruction) {
         Objects.requireNonNull(instruction, "Instruction cannot be null"); // Add input validation
-        instructions.add(instruction);
+        instructionsForCompile.add(instruction);
         return this;
     }
 
@@ -81,7 +86,7 @@ public class Transaction {
      */
     public Transaction addAddressTableLookups(AddressLookupTableAccount addressTableLookup) {
         Objects.requireNonNull(addressTableLookup, "ATL cannot be null"); // Add input validation
-        addressTableLookups.add(addressTableLookup);
+        addressTableLookupsForCompile.add(addressTableLookup);
         return this;
     }
 
@@ -141,7 +146,7 @@ public class Transaction {
         signatures.clear();
         for (KeyPair signer : signers) {
             byte[] signature = Ed25519Signer.sign(serializedMessage, signer.toByteArray());
-            signatures.add(Base58.encode(signature));
+            signatures.add(Signature.of(Base58.encode(signature)));
         }
     }
 
@@ -161,7 +166,7 @@ public class Transaction {
      * based on the presence of address lookup tables.
      */
     public void compile() {
-        compile(feePayerForCompile, recentBlockhashForCompile, instructions, addressTableLookups);
+        compile(feePayerForCompile, recentBlockhashForCompile, instructionsForCompile, addressTableLookupsForCompile);
     }
 
     /**
@@ -171,7 +176,7 @@ public class Transaction {
      * @param feePayer The public key of the account responsible for paying the transaction fee.
      */
     public void compile(PublicKey feePayer) {
-        compile(feePayer, recentBlockhashForCompile, instructions, addressTableLookups);
+        compile(feePayer, recentBlockhashForCompile, instructionsForCompile, addressTableLookupsForCompile);
     }
 
     /**
@@ -183,7 +188,7 @@ public class Transaction {
      * @param instructions   The list of transaction instructions.
      */
     public void compile(PublicKey feePayer, Blockhash recentBlockhash, List<TransactionInstruction> instructions) {
-        compile(feePayer, recentBlockhash, instructions, addressTableLookups);
+        compile(feePayer, recentBlockhash, instructions, addressTableLookupsForCompile);
     }
 
     /**
@@ -226,47 +231,101 @@ public class Transaction {
         }
 
         return StructLayout.encode(this);
-
-//        if (serializedMessage == null) {
-//            serializedMessage = message.serialize();
-//        }
-//
-//        int signatureCount = signatures.size();
-//        byte[] signatureCountEncoded = ShortvecEncoding.encodeLength(signatureCount);
-//
-//        int totalSize = signatureCountEncoded.length + signatureCount * SIGNATURE_LENGTH + serializedMessage.length;
-//        ByteBuffer buffer = ByteBuffer.allocate(totalSize);
-//
-//        buffer.put(signatureCountEncoded);
-//        for (String signature : signatures) {
-//            buffer.put(Base58.decode(signature));
-//        }
-//        buffer.put(serializedMessage);
-//
-//        return buffer.array();
     }
 
     /**
      * Deserializes a transaction from a byte array.
      */
     public static Transaction deserialize(byte[] serializedTransaction) {
-//        ByteBuffer buffer = ByteBuffer.wrap(serializedTransaction);
-//
-//        int signatureCount = ShortvecEncoding.decodeLength(buffer);
-//        List<String> signatures = new ArrayList<>();
-//        for (int i = 0; i < signatureCount; i++) {
-//            byte[] signatureBytes = new byte[SIGNATURE_LENGTH];
-//            buffer.get(signatureBytes);
-//            signatures.add(Base58.encode(signatureBytes));
-//        }
-//
-//        VersionedMessage message = VersionedMessage.deserialize(buffer.array());
-//
-//        Transaction transaction = new Transaction();
-//        transaction.message = message;
-//        transaction.signatures.addAll(signatures);
-//        return transaction;
         return StructLayout.decode(serializedTransaction, Transaction.class);
+    }
+    /**
+     * Converts this `Transaction` into a `ResValueTransaction`.
+     *
+     * @return ResValueTransaction representation of this Transaction.
+     */
+    public ResValueTransaction toResValueTransaction() {
+        // 1. Static Account Keys
+        List<PublicKey> staticAccountKeys = this.message.getStaticAccountKeys();
+
+        // 2. Check if the message is MessageV0
+        List<PublicKey> allAccountKeys = new ArrayList<>(staticAccountKeys);
+        List<ResValueTransaction.Message.AddressTableLookup> resAddressTableLookups = new ArrayList<>();
+
+        if (this.message instanceof MessageV0 messageV0) {
+
+            // Load ALT Keys
+            for (MessageAddressTableLookup atl : messageV0.getAddressTableLookups()) {
+                AddressLookupTableAccount matchingAccount = this.addressTableLookupsForCompile.stream()
+                        .filter(account -> account.getKey().equals(atl.getAccountKey()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(
+                                "Address lookup table not found for account key: " + atl.getAccountKey().toBase58()
+                        ));
+
+                // Add Writable ALT Keys
+                for (Integer writableIndex : atl.getWritableIndexes()) {
+                    if (writableIndex >= 0 && writableIndex < matchingAccount.getState().getAddresses().size()) {
+                        allAccountKeys.add(matchingAccount.getState().getAddresses().get(writableIndex));
+                    } else {
+                        throw new IllegalArgumentException("Writable index out of bounds for ATL: " + atl.getAccountKey().toBase58());
+                    }
+                }
+
+                // Add Readonly ALT Keys
+                for (Integer readonlyIndex : atl.getReadonlyIndexes()) {
+                    if (readonlyIndex >= 0 && readonlyIndex < matchingAccount.getState().getAddresses().size()) {
+                        allAccountKeys.add(matchingAccount.getState().getAddresses().get(readonlyIndex));
+                    } else {
+                        throw new IllegalArgumentException("Readonly index out of bounds for ATL: " + atl.getAccountKey().toBase58());
+                    }
+                }
+
+                // Add ATL details to the result
+                resAddressTableLookups.add(
+                        ResValueTransaction.Message.AddressTableLookup.builder()
+                                .accountKey(atl.getAccountKey())
+                                .writableIndexes(atl.getWritableIndexes())
+                                .readonlyIndexes(atl.getReadonlyIndexes())
+                                .build()
+                );
+            }
+        }
+
+        // 3. Instructions (Resolve Account Indexes)
+        List<ResValueInstruction> instructions = this.message.getInstructions().stream()
+                .map(instruction -> {
+                    List<Integer> accountIndexes = instruction.getAccountKeyIndexes();
+                    int programIdIndex = instruction.getProgramIdIndex();
+                    return ResValueInstruction.builder()
+                            .accounts(accountIndexes)
+                            .data(new StateData(Encoding.BASE58, Base58.encode(instruction.getData()), true))
+                            .programIdIndex(programIdIndex)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        // 4. Header
+        ResValueTransaction.Message.Header header = ResValueTransaction.Message.Header.builder()
+                .numReadonlySignedAccounts(this.message.getHeader().getNumReadonlySignedAccounts())
+                .numReadonlyUnsignedAccounts(this.message.getHeader().getNumReadonlyUnsignedAccounts())
+                .numRequiredSignatures(this.message.getHeader().getNumRequiredSignatures())
+                .build();
+
+        // 5. Message
+        ResValueTransaction.Message resMessage = ResValueTransaction.Message.builder()
+                .accountKeys(allAccountKeys) // Combined Static and ALT keys
+                .recentBlockhash(this.message.getRecentBlockhash())
+                .instructions(instructions) // Resolved instructions
+                .addressTableLookups(resAddressTableLookups) // ATL information if MessageV0
+                .header(header) // Header information
+                .build();
+
+        // 6. Final ResValueTransaction
+        return ResValueTransaction.builder()
+                .message(resMessage)
+                .signatures(this.signatures) // Transaction signatures
+                .build();
     }
 
     @Override

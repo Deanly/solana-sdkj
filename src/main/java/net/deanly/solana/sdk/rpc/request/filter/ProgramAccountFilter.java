@@ -1,15 +1,16 @@
-package net.deanly.solana.sdk.types;
+package net.deanly.solana.sdk.rpc.request.filter;
 
 import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
+import net.deanly.solana.sdk.types.Encoding;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FilterCriteria {
+public class ProgramAccountFilter {
 
     // array element 1
     @Json(name = "dataSize")

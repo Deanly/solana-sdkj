@@ -56,6 +56,30 @@ public class MessageV0 extends Message implements VersionedMessage {
         return MessageCompiler.compileV0(payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
     }
 
+    /**
+     * Resolves the address table lookups to extract writable and readonly keys.
+     * <p>
+     * This method processes a list of {@link MessageAddressTableLookup} objects along with their corresponding
+     * {@link AddressLookupTableAccount} instances to determine the final list of writable and readonly keys.
+     * </p>
+     * <p>
+     * <b>Important Note:</b>
+     * The order of writable and readonly keys returned by this method is not guaranteed to preserve the
+     * original Address Lookup Table (ALT) order as defined in the Solana specification. This may lead
+     * to issues if the order of keys is significant in downstream logic. Be cautious when using this method
+     * in scenarios where key order must be strictly maintained.
+     * </p>
+     * <p>
+     * <b>Recommendation:</b>
+     * If maintaining the ALT order is critical, refactor this method to preserve the original order of
+     * writable and readonly keys within each {@link MessageAddressTableLookup}.
+     * </p>
+     *
+     * @param addressTableLookups The list of {@link MessageAddressTableLookup} objects to resolve.
+     * @param addressLookupTableAccounts The list of corresponding {@link AddressLookupTableAccount} objects.
+     * @return A {@link LoadedAddresses} object containing writable and readonly keys.
+     * @throws IllegalArgumentException If an address lookup table is not found or if index bounds are invalid.
+     */
     public static LoadedAddresses resolveAddressTableLookups(
             List<MessageAddressTableLookup> addressTableLookups,
             List<AddressLookupTableAccount> addressLookupTableAccounts) {

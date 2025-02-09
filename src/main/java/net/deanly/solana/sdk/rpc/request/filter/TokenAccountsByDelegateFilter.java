@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.request.config;
+package net.deanly.solana.sdk.rpc.request.filter;
 
 import com.squareup.moshi.Json;
 import lombok.*;

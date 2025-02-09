@@ -2,35 +2,36 @@ package net.deanly.solana.sdk.rpc.client.websocket;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.request.config.*;
+import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
+import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.types.Commitment;
 import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 import net.deanly.solana.sdk.types.SubscriptionId;
-
-import java.util.List;
 
 public interface WebsocketMethodApi {
 
     // https://solana.com/ko/docs/rpc/websocket/accountsubscribe
-    RpcResponse<SubscriptionId> accountSubscribe(PublicKey accountKey, AccountSubscriptionConfig config, NotificationListener<RpcNotificationV2<ResValueAccountInfo>> listener);
+    RpcResponse<SubscriptionId> accountSubscribe(PublicKey accountKey, AccountSubscriptionConfig config,
+                                                 NotificationListener<RpcNotificationV2<NotiValueAccountInfo>> listener);
 
     // https://solana.com/ko/docs/rpc/websocket/accountunsubscribe
     RpcResponse<Boolean> accountUnsubscribe(SubscriptionId subscriptionId);
 
     // https://solana.com/ko/docs/rpc/websocket/blocksubscribe
-    RpcResponse<SubscriptionId> blockSubscribe(Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueBlock>> listener);
+    RpcResponse<SubscriptionId> blockSubscribe(BlockFilter filter, BlockConfig2 config,
+                                               NotificationListener<RpcNotificationV2<NotiValueBlock>> listener);
 
     // https://solana.com/ko/docs/rpc/websocket/blockunsubscribe
     RpcResponse<Boolean> blockUnsubscribe(SubscriptionId subscriptionId);
 
     // https://solana.com/ko/docs/rpc/websocket/logssubscribe
-    RpcResponse<SubscriptionId> logsSubscribe(List<String> mention, Commitment commitment, NotificationListener<RpcNotificationV2<ResValueLog>> listener);
+    RpcResponse<SubscriptionId> logsSubscribe(LogsFilter filter, LogsConfig config, NotificationListener<RpcNotificationV2<ResValueLog>> listener);
 
     // https://solana.com/ko/docs/rpc/websocket/logsunsubscribe
     RpcResponse<Boolean> logsUnsubscribe(SubscriptionId subscriptionId);
 
     // https://solana.com/ko/docs/rpc/websocket/programsubscribe
-    RpcResponse<SubscriptionId> programSubscribe(String programId, Commitment commitment, String encoding, NotificationListener<RpcNotificationV2<ResValueProgram>> listener);
+    RpcResponse<SubscriptionId> programSubscribe(PublicKey programId, ProgramConfig config, NotificationListener<RpcNotificationV2<ResValueProgram>> listener);
 
     // https://solana.com/ko/docs/rpc/websocket/programunsubscribe
     RpcResponse<Boolean> programUnsubscribe(SubscriptionId subscriptionId);
@@ -42,7 +43,7 @@ public interface WebsocketMethodApi {
     RpcResponse<Boolean> rootUnsubscribe(SubscriptionId subscriptionId);
 
     // https://solana.com/ko/docs/rpc/websocket/signaturesubscribe
-    RpcResponse<SubscriptionId> signatureSubscribe(String signature, NotificationListener<RpcNotificationV2<String>> listener);
+    RpcResponse<SubscriptionId> signatureSubscribe(PublicKey signature, SignatureConfig config, NotificationListener<RpcNotificationV2<String>> listener);
 
     // https://solana.com/ko/docs/rpc/websocket/signatureunsubscribe
     RpcResponse<Boolean> signatureUnsubscribe(SubscriptionId subscriptionId);

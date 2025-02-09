@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
 
@@ -10,7 +11,7 @@ public class RpcResultObject<T> {
     @ToString
     public static class Context {
         @Json(name = "slot")
-        private long slot;
+        private UnsignedLong slot;
 
         @Json(name = "apiVersion")
         private String apiVersion;

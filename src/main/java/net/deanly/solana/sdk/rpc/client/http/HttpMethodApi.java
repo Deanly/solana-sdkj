@@ -318,11 +318,11 @@ public interface HttpMethodApi {
      *
      * @param programId     The Pubkey of the program, as a base-58 encoded string.
      * @param configuration Optional configuration parameters.
-     * @return A list of ResValueProgramAccount objects containing the account information.
+     * @return A list of ResValueProgram objects containing the account information.
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getprogramaccounts">getProgramAccounts RPC Method</a>
      */
-    List<ResValueProgramAccount> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException;
+    List<ResValueProgram> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException;
 
     /**
      * Returns a list of recent performance samples, in reverse slot order.

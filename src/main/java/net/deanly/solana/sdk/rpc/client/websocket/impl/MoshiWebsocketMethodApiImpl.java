@@ -41,19 +41,19 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     private final Cache<SubscriptionId, SubscriptionContext<?>> listeners = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
             .removalListener(notification -> {
-                log.debug("Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+                log.debug("Listener Removed: SubscriptionID={}, Cause={}", notification.getKey(), notification.getCause());
             })
             .build(); // Concurrency Safe
     private final Cache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .removalListener(notification -> {
-                log.debug("Pending Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+                log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
             })
             .build(); // Concurrency Safe
     private final Cache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .removalListener(notification -> {
-                log.debug("Pending Listener removed: Key={}, Cause={}", notification.getKey(), notification.getCause());
+                log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
             })
             .build(); // Concurrency Safe
 
@@ -64,6 +64,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
             .add(MoshiResValueTransactionJsonAdapter.FACTORY)
+            .add(MoshiNotiValueSignatureJsonAdapter.FACTORY)
             .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
             .add(StateData.class, new MoshiStateDataJsonAdapter())
             .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
@@ -179,7 +180,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
 
     @Getter
-    public class IdSubscriptionTuple {
+    private static class IdSubscriptionTuple {
         private final Long requestId;
         private final SubscriptionId subscription;
         public IdSubscriptionTuple(Long requestId, Long subscription) {
@@ -192,6 +193,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         try {
             // "id"와 "subscription" 값을 한 번에 추출
             IdSubscriptionTuple tuple = extractIdAndSubscription(message);
+            log.debug("Received Message: RequestID={}, SubscriptionID={}", tuple.getRequestId(), tuple.getSubscription() != null ? tuple.getSubscription().getValue() : null);
 
             if (tuple.getRequestId() != null) {
                 handleSubscriptionResponse(message, tuple.getRequestId()); // id와 함께 처리
@@ -336,6 +338,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         return adapter.fromJson(message);
     }
 
+    // TODO: 테스트 및 안정성 개선
     private void resubscribeAll() {
         log.info("Resubscribing to all active subscriptions...");
 
@@ -439,6 +442,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         Long id = request.getId();
         CompletableFuture<SubscriptionId> subscriptionFuture = new CompletableFuture<>();
         this.pendingSubscriptions.put(id, subscriptionFuture);
+        log.debug("Pending Listener Added: RequestID={}, Method={}", id, method);
 
         Type requestType = Types.newParameterizedType(RpcRequest.class, RpcRequest.class);
         JsonAdapter<RpcRequest> requestJsonAdapter = this.getCachedAdapter(requestType);
@@ -448,12 +452,18 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             SubscriptionId subscriptionId = subscriptionFuture.get(5, TimeUnit.SECONDS);
 
             this.listeners.put(subscriptionId, new SubscriptionContext<>(type, listener, method, params));
-            return RpcResponse.<SubscriptionId>builder().result(subscriptionId).build();
+            log.debug("Listener Added: SubscriptionID={}, Method={}", subscriptionId, method);
+            log.info("Subscribe \"{}\" Started: SubscriptionID={}", method, subscriptionId);
+
+            return RpcResponse.<SubscriptionId>builder()
+                    .id(id)
+                    .jsonrpc(request.getJsonrpc())
+                    .result(subscriptionId)
+                    .build();
 
         } catch (Exception e) {
             log.error("Subscription failed: {}", e.getMessage());
             throw new RpcWebSocketException("Subscription timeout", e);
-
         }
     }
 
@@ -462,12 +472,13 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         try {
             RpcRequest request = createRpcRequest(method, List.of(subscriptionId));
 
+            Long id = request.getId();
+            CompletableFuture<Boolean> future = new CompletableFuture<>();
+            this.pendingUnsubscriptions.put(id, future);
+            log.debug("Pending Listener Added: RequestID={}, Method={}", id, method);
+
             String requestJson = rpcRequestJsonAdapter.toJson(request);
             webSocket.send(requestJson);
-            log.info("Unsubscribe request sent: {}", requestJson);
-
-            CompletableFuture<Boolean> future = new CompletableFuture<>();
-            this.pendingUnsubscriptions.put(request.getId(), future);
 
             Boolean result = future.get(5, TimeUnit.SECONDS); // 타임아웃 설정
             return RpcResponse.<Boolean>builder().result(result).build();
@@ -479,12 +490,21 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         } finally {
             // 요청 완료 후 Listener 제거
             this.removeListener(subscriptionId);
+            log.info("Subscribe \"{}\" Ended: SubscriptionID={}", method, subscriptionId);
         }
     }
 
     /*
        API Methods
      */
+
+    private static final EnumSet<Encoding> SUPPORTED_ENCODINGS = EnumSet.of(
+            Encoding.BASE58,
+            Encoding.BASE64,
+//            Encoding.JSON_PARSED, // TODO: jsonParsed 를 위한 API 추가
+//            Encoding.BASE64_ZSTD, // TODO: base64+zstd 파서 기능 추가
+            Encoding.JSON
+    );
 
     @Override
     public RpcResponse<SubscriptionId> accountSubscribe(
@@ -504,19 +524,14 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         return this.unsubscribe("accountUnsubscribe", subscriptionId);
     }
 
-    private static final EnumSet<Encoding> SUPPORTED_ENCODINGS_BLOCK = EnumSet.of(
-            Encoding.BASE58,
-            Encoding.BASE64,
-//            Encoding.JSON_PARSED,  // TODO: jsonParsed 를 위한 API 추가
-            Encoding.JSON
-    );
+
     @Override
     public RpcResponse<SubscriptionId> blockSubscribe(
             BlockFilter filter, BlockConfig2 config,
             NotificationListener<RpcNotificationV2<NotiValueBlock>> listener) {
         Objects.requireNonNull(filter, "filter must not be null");
         Objects.requireNonNull(listener, "listener must not be null");
-        if (config != null && !SUPPORTED_ENCODINGS_BLOCK.contains(config.getEncoding())) {
+        if (config != null && !SUPPORTED_ENCODINGS.contains(config.getEncoding())) {
             throw new IllegalArgumentException("Unsupported encoding: " + config.getEncoding());
         }
         Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueBlock.class);
@@ -532,10 +547,10 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     @Override
     public RpcResponse<SubscriptionId> logsSubscribe(
             LogsFilter filter, LogsConfig config,
-            NotificationListener<RpcNotificationV2<ResValueLog>> listener) {
+            NotificationListener<RpcNotificationV2<NotiValueLog>> listener) {
         Objects.requireNonNull(filter, "filter must not be null");
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotificationV2.class, ResValueLog.class);
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueLog.class);
         return this.subscribe("logsSubscribe", this.getParams(filter, config), type, listener);
     }
 
@@ -548,10 +563,13 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     @Override
     public RpcResponse<SubscriptionId> programSubscribe(
             PublicKey programId, ProgramConfig config,
-            NotificationListener<RpcNotificationV2<ResValueProgram>> listener) {
+            NotificationListener<RpcNotificationV2<NotiValueProgram>> listener) {
         Objects.requireNonNull(programId, "programId must not be null");
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotificationV2.class, ResValueProgram.class);
+        if (config != null && !SUPPORTED_ENCODINGS.contains(config.getEncoding())) {
+            throw new IllegalArgumentException("Unsupported encoding: " + config.getEncoding());
+        }
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueProgram.class);
         return this.subscribe("programSubscribe", this.getParams(programId, config), type, listener);
     }
 
@@ -562,7 +580,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     @Override
-    public RpcResponse<SubscriptionId> rootSubscribe(NotificationListener<RpcNotification<Long>> listener) {
+    public RpcResponse<SubscriptionId> rootSubscribe(NotificationListener<RpcNotification<UnsignedLong>> listener) {
         Objects.requireNonNull(listener, "listener must not be null");
         Type type = Types.newParameterizedType(RpcNotification.class, UnsignedLong.class);
         return this.subscribe("rootSubscribe", null, type, listener);
@@ -576,11 +594,11 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
     @Override
     public RpcResponse<SubscriptionId> signatureSubscribe(
-            PublicKey signature, SignatureConfig config,
-            NotificationListener<RpcNotificationV2<String>> listener) {
+            Signature signature, SignatureConfig config,
+            NotificationListener<RpcNotificationV2<NotiValueSignature>> listener) {
         Objects.requireNonNull(signature, "signature must not be null");
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotificationV2.class, String.class);
+        Type type = Types.newParameterizedType(RpcNotificationV2.class, NotiValueSignature.class);
         return this.subscribe("signatureSubscribe", this.getParams(signature, config), type, listener);
     }
 
@@ -591,9 +609,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     @Override
-    public RpcResponse<SubscriptionId> slotSubscribe(NotificationListener<RpcNotification<ResValueSlot>> listener) {
+    public RpcResponse<SubscriptionId> slotSubscribe(NotificationListener<RpcNotification<NotiValueSlot>> listener) {
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotification.class, ResValueSlot.class);
+        Type type = Types.newParameterizedType(RpcNotification.class, NotiValueSlot.class);
         return this.subscribe("slotSubscribe", null, type, listener);
     }
 
@@ -604,9 +622,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     @Override
-    public RpcResponse<SubscriptionId> slotsUpdatesSubscribe(NotificationListener<RpcNotification<ResValueSlotUpdates>> listener) {
+    public RpcResponse<SubscriptionId> slotsUpdatesSubscribe(NotificationListener<RpcNotification<NotiValueSlotUpdates>> listener) {
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotification.class, ResValueSlotUpdates.class);
+        Type type = Types.newParameterizedType(RpcNotification.class, NotiValueSlotUpdates.class);
         return this.subscribe("slotsUpdatesSubscribe", null, type, listener);
     }
 
@@ -617,9 +635,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     @Override
-    public RpcResponse<SubscriptionId> voteSubscribe(NotificationListener<RpcNotification<ResValueVote>> listener) {
+    public RpcResponse<SubscriptionId> voteSubscribe(NotificationListener<RpcNotification<NotiValueVote>> listener) {
         Objects.requireNonNull(listener, "listener must not be null");
-        Type type = Types.newParameterizedType(RpcNotification.class, ResValueVote.class);
+        Type type = Types.newParameterizedType(RpcNotification.class, NotiValueVote.class);
         return this.subscribe("voteSubscribe", null, type, listener);
     }
 

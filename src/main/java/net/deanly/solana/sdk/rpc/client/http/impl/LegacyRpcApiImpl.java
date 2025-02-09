@@ -242,7 +242,7 @@ public class LegacyRpcApiImpl implements LegacyRpcApi {
         AbstractMap pa = (AbstractMap) acc;
         AbstractMap account = (AbstractMap) pa.get("account");
 
-        programBuilder.pubkey((String) pa.get("pubkey"));
+        programBuilder.pubkey((PublicKey) pa.get("pubkey"));
 
         Object rawData = account.get("data");
         if (rawData instanceof List) {

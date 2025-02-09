@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
@@ -8,11 +9,11 @@ import lombok.ToString;
 @ToString
 public class ResValueSlot {
     @Json(name = "parent")
-    private Long parent;
+    private UnsignedLong parent;
 
     @Json(name = "root")
-    private Long root;
+    private UnsignedLong root;
 
     @Json(name = "slot")
-    private Long slot;
+    private UnsignedLong slot;
 }

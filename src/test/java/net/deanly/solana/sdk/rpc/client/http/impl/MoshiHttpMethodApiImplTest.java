@@ -665,7 +665,7 @@ class MoshiHttpMethodApiImplTest {
         // 5. 응답 데이터 검증
         assertNotNull(result);
         assertNotNull(result.getContext());
-        assertEquals(9887L, result.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(9887L), result.getContext().getSlot());
 
         // Slot Range 검증
         assertNotNull(result.getValue().getRange());
@@ -1140,7 +1140,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 6. 응답 데이터 검증
         assertNotNull(feeResult);
-        assertEquals(5068L, feeResult.getContext().getSlot()); // 응답 context.slot 값 검증
+        assertEquals(UnsignedLong.valueOf(5068L), feeResult.getContext().getSlot()); // 응답 context.slot 값 검증
         assertEquals(UnsignedLong.valueOf(5000), feeResult.getValue()); // 응답에서 반환된 value 값 검증
     }
 
@@ -1717,7 +1717,7 @@ class MoshiHttpMethodApiImplTest {
         List<ResValueLargestAccount> valueList =  result.getValue();
 
         // 컨텍스트 검증
-        assertEquals(54L, context.getSlot());
+        assertEquals(UnsignedLong.valueOf(54L), context.getSlot());
 
         // 첫 번째 항목 검증
         assertEquals(2, valueList.size());
@@ -1800,7 +1800,7 @@ class MoshiHttpMethodApiImplTest {
 
         // Context 데이터 검증
         RpcResultObject.Context context = result.getContext();
-        assertEquals(2792, context.getSlot());
+        assertEquals(UnsignedLong.valueOf(2792), context.getSlot());
 
         // Value 데이터 검증
         ResValueLatestBlockhash value = result.getValue();
@@ -2186,7 +2186,7 @@ class MoshiHttpMethodApiImplTest {
         when(mockCall.execute()).thenReturn(mockResponse);
 
         // 3. 메서드 호출
-        List<ResValueProgramAccount> result = clientApi.getProgramAccounts(
+        List<ResValueProgram> result = clientApi.getProgramAccounts(
                 PublicKey.valueOf("4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T"),
                 ProgramAccountsConfig.builder()
                         .filters(
@@ -2246,7 +2246,7 @@ class MoshiHttpMethodApiImplTest {
         assertEquals(1, result.size());
 
         // 첫 번째 응답 데이터 검증
-        ResValueProgramAccount programAccount = result.get(0);
+        ResValueProgram programAccount = result.get(0);
         assertEquals("2R9jLfiAQ9bgdcw6h8s44439", programAccount.getAccount().getData().getValue());
         assertFalse(programAccount.getAccount().getExecutable());
         assertEquals(UnsignedLong.valueOf(15298080), programAccount.getAccount().getLamports());
@@ -2615,7 +2615,7 @@ class MoshiHttpMethodApiImplTest {
         // 5. 응답 데이터 검증
         assertNotNull(result);
         assertNotNull(result.getContext());
-        assertEquals(82, result.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(82), result.getContext().getSlot());
 
         // 응답 값 검증
         List<ResValueSignatureStatus> statuses = result.getValue();
@@ -2924,7 +2924,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 5. 응답 데이터 검증
         assertNotNull(supply);
-        assertEquals(1114L, supply.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(1114L), supply.getContext().getSlot());
         assertEquals(UnsignedLong.valueOf(16000L), supply.getValue().getCirculating());
         assertEquals(UnsignedLong.valueOf(1000000L), supply.getValue().getNonCirculating());
         assertEquals(UnsignedLong.valueOf(1016000L), supply.getValue().getTotal());
@@ -2996,7 +2996,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 5. 응답 데이터 검증
         assertNotNull(balance);
-        assertEquals(1114, balance.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(1114), balance.getContext().getSlot());
         assertEquals(UnsignedLong.valueOf("9864"), balance.getValue().getAmount());
         assertEquals(2, balance.getValue().getDecimals());
         assertEquals(98.64, balance.getValue().getUiAmount(), 0.01);
@@ -3112,7 +3112,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 5. 응답 데이터 검증
         assertNotNull(response);
-        assertEquals(1114, response.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(1114), response.getContext().getSlot());
 
         // 토큰 계정 데이터 검증
         List<ResValueTokenAccount> accounts = response.getValue();
@@ -3267,7 +3267,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 5. 응답 데이터 검증
         assertNotNull(response);
-        assertEquals(341197933, response.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(341197933), response.getContext().getSlot());
         assertEquals("2.0.15", response.getContext().getApiVersion());
 
         // 계정 목록 검증
@@ -3373,7 +3373,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 5. 응답 데이터 검증
         assertNotNull(response);
-        assertEquals(1114, response.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(1114), response.getContext().getSlot());
         assertNotNull(response.getValue());
         assertEquals(2, response.getValue().size());
 
@@ -3458,7 +3458,7 @@ class MoshiHttpMethodApiImplTest {
         // 5. 응답 데이터 검증
         assertNotNull(response);
         assertNotNull(response.getContext());
-        assertEquals(1114, response.getContext().getSlot());
+        assertEquals(UnsignedLong.valueOf(1114), response.getContext().getSlot());
 
         ResValueTokenSupply value = response.getValue();
         assertNotNull(value);
@@ -3856,7 +3856,7 @@ class MoshiHttpMethodApiImplTest {
         // Context 검증
         RpcResultObject.Context context = response.getContext();
         assertNotNull(context);
-        assertEquals(2483, context.getSlot());
+        assertEquals(UnsignedLong.valueOf(2483), context.getSlot());
 
         // Value 검증
         assertFalse(response.getValue());
@@ -4108,7 +4108,7 @@ class MoshiHttpMethodApiImplTest {
         // Context 검증
         RpcResultObject.Context context = response.getContext();
         assertNotNull(context);
-        assertEquals(218, context.getSlot());
+        assertEquals(UnsignedLong.valueOf(218), context.getSlot());
 
         // Value 검증
         ResValueSimulatedTransaction value = response.getValue();

@@ -4,6 +4,7 @@ import com.squareup.moshi.Json;
 
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solana.sdk.crypto.PublicKey;
 
 @Getter
 @ToString
@@ -14,6 +15,6 @@ public class ResValueProgram {
     private ResValueAccountInfo account;
 
     @Json(name = "pubkey")
-    private String pubkey;
+    private PublicKey pubkey;
 
 }

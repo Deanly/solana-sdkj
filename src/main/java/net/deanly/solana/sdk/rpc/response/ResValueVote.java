@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
@@ -13,7 +14,7 @@ public class ResValueVote {
     private String hash;
 
     @Json(name = "slots")
-    private List<Long> slots;
+    private List<UnsignedLong> slots;
 
     @Json(name = "timestamp")
     private Long timestamp;

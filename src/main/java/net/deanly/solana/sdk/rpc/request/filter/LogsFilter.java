@@ -15,7 +15,8 @@ public class LogsFilter {
     /// - `ALL` : subscribe to all transactions except for simple vote transactions
     /// - `ALL_WITH_VOTES` : subscribe to all transactions, including simple vote transactions
     /// - `MENTIONS` : using `mentions` field
-    private Type type;
+    @lombok.Builder.Default
+    private Type type = Type.MENTIONS;
 
     /// Array containing a single Pubkey (as base-58 encoded string); if present, subscribe to only transactions mentioning this address
     /// The mentions field currently only supports one Pubkey string per method call. Listing additional addresses will result in an error.

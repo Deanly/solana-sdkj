@@ -390,9 +390,9 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public List<ResValueProgramAccount> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException {
+    public List<ResValueProgram> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException {
         Objects.requireNonNull(programId, "programId must not be null");
-        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValueProgramAccount.class));
+        Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValueProgram.class));
         return this.call("getProgramAccounts", this.getParams(programId, configuration), type, null);
     }
 

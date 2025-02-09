@@ -1,8 +1,10 @@
 package net.deanly.solana.sdk.rpc.response;
 
+import com.google.common.primitives.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
+import net.deanly.solana.sdk.types.SlotUpdateType;
 
 @Getter
 @ToString
@@ -12,16 +14,16 @@ public class ResValueSlotUpdates {
     private String err;
 
     @Json(name = "parent")
-    private Long parent;
+    private UnsignedLong parent;
 
     @Json(name = "slot")
-    private Long slot;
+    private UnsignedLong slot;
 
     @Json(name = "stats")
     private SlotStats stats;
 
     @Json(name = "type")
-    private String type;
+    private SlotUpdateType type;
 
     @Json(name = "timestamp")
     private Long timestamp;
@@ -31,15 +33,15 @@ public class ResValueSlotUpdates {
     public static class SlotStats {
 
         @Json(name = "maxTransactionsPerEntry")
-        private Long maxTransactionsPerEntry;
+        private UnsignedLong maxTransactionsPerEntry;
 
         @Json(name = "numFailedTransactions")
-        private Long numFailedTransactions;
+        private UnsignedLong numFailedTransactions;
 
         @Json(name = "numSuccessfulTransactions")
-        private Long numSuccessfulTransactions;
+        private UnsignedLong numSuccessfulTransactions;
 
         @Json(name = "numTransactionEntries")
-        private Long numTransactionEntries;
+        private UnsignedLong numTransactionEntries;
     }
 }

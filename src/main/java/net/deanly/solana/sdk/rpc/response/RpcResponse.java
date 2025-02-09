@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.rpc.response;
 
 import com.squareup.moshi.Json;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -16,6 +17,7 @@ public class RpcResponse<T> {
 
     @Getter
     @ToString
+    @lombok.Builder
     public static class Error {
         @Json(name = "code")
         private long code;

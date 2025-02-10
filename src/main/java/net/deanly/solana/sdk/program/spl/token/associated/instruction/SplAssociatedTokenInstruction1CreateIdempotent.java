@@ -49,7 +49,7 @@ public class SplAssociatedTokenInstruction1CreateIdempotent extends SplAssociate
     /**
      * Set account metadata and order used in the accounts field for Solana.
      *
-     * @param payer Funding account (writer & signer).
+     * @param payer Funding account (writer and signer).
      * @param owner Wallet address for the new associated token account (readonly).
      * @param mint The token mint (readonly).
      */

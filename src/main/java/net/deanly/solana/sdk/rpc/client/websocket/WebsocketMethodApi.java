@@ -6,7 +6,6 @@ import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
 import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
-import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 import net.deanly.solana.sdk.types.Signature;
 import net.deanly.solana.sdk.types.SubscriptionId;
 

@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.rpc.client.websocket.impl;
 import com.google.common.primitives.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.request.config.*;
 import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
@@ -14,13 +15,22 @@ import net.deanly.solana.sdk.types.*;
 import net.deanly.structlayout.StructLayout;
 import okhttp3.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Base64;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static net.deanly.solana.sdk.rpc.client.MoshiTestUtil.assertJsonEqualsIgnoringId;
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,7 +86,7 @@ public class MoshiWebsocketMethodApiImplTest {
     }
 
     private void setupResponseThread(String responseJson) {
-        setupResponseThread(responseJson, 200);
+        setupResponseThread(responseJson, 100);
     }
     private void setupResponseThread(String responseJson, int delayMs) {
         // WebSocket 응답 처리 비동기 스레드 생성
@@ -345,9 +355,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // 요청 호출 전 WebSocket 응답 준비
-        setupResponseThread(responseJson);
-
         // Spy 객체 생성 및 createRpcRequest Mocking
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -355,6 +362,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID 값은 1
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // 요청 호출 전 WebSocket 응답 준비
+        setupResponseThread(responseJson);
 
         // 요청 호출: accountUnsubscribe 실행
         RpcResponse<Boolean> unsubResponse = spyClientApi.accountUnsubscribe(SubscriptionId.of(0));
@@ -709,9 +719,6 @@ public class MoshiWebsocketMethodApiImplTest {
         }
         """;
 
-        // WebSocket 응답을 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 구성
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -719,6 +726,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID 값 1
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답을 설정
+        setupResponseThread(responseJson);
 
         // blockUnsubscribe 호출 및 응답 처리
         RpcResponse<Boolean> unsubResponse = spyClientApi.blockUnsubscribe(SubscriptionId.of(0));
@@ -942,9 +952,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답을 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 설정
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -952,6 +959,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // ID는 항상 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답을 설정
+        setupResponseThread(responseJson);
 
         // logsUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.logsUnsubscribe(SubscriptionId.of(0));
@@ -1169,9 +1179,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답을 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 설정
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1179,6 +1186,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // ID는 항상 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답을 설정
+        setupResponseThread(responseJson);
 
         // programUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.programUnsubscribe(SubscriptionId.of(0));
@@ -1286,9 +1296,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 설정
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1296,6 +1303,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID는 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답 설정
+        setupResponseThread(responseJson);
 
         // rootUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.rootUnsubscribe(SubscriptionId.of(0));
@@ -1454,9 +1464,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 생성
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1464,6 +1471,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID를 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답 설정
+        setupResponseThread(responseJson);
 
         // signatureUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.signatureUnsubscribe(SubscriptionId.of(0));
@@ -1659,9 +1669,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 생성
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1669,6 +1676,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID를 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답 설정
+        setupResponseThread(responseJson);
 
         // slotsUpdatesUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.slotsUpdatesUnsubscribe(SubscriptionId.of(0));
@@ -1706,9 +1716,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 생성
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1716,6 +1723,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID를 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답 설정
+        setupResponseThread(responseJson);
 
         // slotUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.slotUnsubscribe(SubscriptionId.of(0));
@@ -1831,9 +1841,6 @@ public class MoshiWebsocketMethodApiImplTest {
     }
     """;
 
-        // WebSocket 응답 설정
-        setupResponseThread(responseJson);
-
         // Spy 객체 생성
         MoshiWebsocketMethodApiImpl spyClientApi = spy(clientApi);
         doAnswer(invocation -> {
@@ -1841,6 +1848,9 @@ public class MoshiWebsocketMethodApiImplTest {
             List<Object> params = invocation.getArgument(1);
             return new RpcRequest(method, params, 1L); // 항상 ID는 1로 설정
         }).when(spyClientApi).createRpcRequest(anyString(), anyList());
+
+        // WebSocket 응답 설정
+        setupResponseThread(responseJson);
 
         // voteUnsubscribe 호출
         RpcResponse<Boolean> unsubResponse = spyClientApi.voteUnsubscribe(SubscriptionId.of(0));
@@ -1855,5 +1865,202 @@ public class MoshiWebsocketMethodApiImplTest {
         assertNotNull(unsubResponse, "응답 객체는 null이 아니어야 합니다.");
         assertNotNull(unsubResponse.getResult(), "응답의 결과 값(result)은 null이 아니어야 합니다.");
         assertTrue(unsubResponse.getResult(), "voteUnsubscribe 요청이 성공적이어야 합니다.");
+    }
+
+    @Test
+    void testResubscribeAll() throws IOException {
+        // Mock SubscriptionId 및 SubscriptionContext 추가
+        SubscriptionId mockId1 = SubscriptionId.of(1L);
+        SubscriptionId mockId2 = SubscriptionId.of(2L);
+
+        Type type1 = String.class; // 테스트 타입
+        NotificationListener<RpcRequest> listener1 = mock(NotificationListener.class);
+        MoshiWebsocketMethodApiImpl.SubscriptionContext<?> context1 =
+                new MoshiWebsocketMethodApiImpl.SubscriptionContext<>(RpcRequest.class, listener1, "mockMethod1", List.of("param1"));
+
+        Type type2 = Integer.class; // 다른 테스트 타입
+        NotificationListener<RpcRequest> listener2 = mock(NotificationListener.class);
+        MoshiWebsocketMethodApiImpl.SubscriptionContext<?> context2 =
+                new MoshiWebsocketMethodApiImpl.SubscriptionContext<>(RpcRequest.class, listener2, "mockMethod2", List.of("param2"));
+
+        // listeners에 mock된 구독 추가
+        clientApi.listeners.put(mockId1, context1);
+        clientApi.listeners.put(mockId2, context2);
+
+        // Resubscribe 요청을 전송하기 전에 WebSocket 응답을 준비
+        String expectedResponseJson1 = """
+    {
+      "jsonrpc": "2.0",
+      "result": 1,
+      "id": 1
+    }
+    """;
+
+        String expectedResponseJson2 = """
+    {
+      "jsonrpc": "2.0",
+      "result": 2,
+      "id": 2
+    }
+    """;
+        setupResponseThread(expectedResponseJson1, 100); // 비동기적으로 첫 번째 응답 생성
+        setupResponseThread(expectedResponseJson2, 200); // 비동기적으로 두 번째 응답 생성
+
+        // ResubscribeAll 호출 (테스트 대상 메서드)
+        clientApi.resubscribeAll();
+
+        // WebSocket 요청이 전송되었는지 검증
+        ArgumentCaptor<String> requestCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockWebSocket, times(2)).send(requestCaptor.capture()); // 두 번 전송되었는지 확인
+        List<String> capturedRequests = requestCaptor.getAllValues();
+        capturedRequests.sort((req1, req2) -> {
+            if (req1.contains("mockMethod1")) {
+                return -1;
+            } else if (req2.contains("mockMethod1")) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
+
+        // 요청된 메시지가 예상 값과 일치하는지 확인
+        assertTrue(capturedRequests.get(0).contains("mockMethod1"), "첫 번째 재구독 요청이 올바르지 않습니다.");
+        assertTrue(capturedRequests.get(0).contains("param1"), "첫 번째 재구독 요청의 매개변수가 잘못되었습니다.");
+        assertTrue(capturedRequests.get(1).contains("mockMethod2"), "두 번째 재구독 요청이 올바르지 않습니다.");
+        assertTrue(capturedRequests.get(1).contains("param2"), "두 번째 재구독 요청의 매개변수가 잘못되었습니다.");
+
+        // Pending Subscription 갱신이 제대로 이루어졌는지 확인
+        assertEquals(2, clientApi.countListeners().longValue(), "Listener 개수가 일치하지 않습니다.");
+    }
+
+    @Test
+    void testReconnectWebSocket_FirstAttemptSuccess() throws InterruptedException {
+        OkHttpClient mockHttpClient = mock(OkHttpClient.class);
+        WebSocket mockWebSocket = mock(WebSocket.class);
+
+        // Request와 Listener를 캡처하기 위한 AtomicReferences
+        AtomicReference<Request> capturedRequest = new AtomicReference<>();
+        AtomicReference<WebSocketListener> listenerRef = new AtomicReference<>();
+
+        // 동기화를 위한 CountDownLatch 추가
+        CountDownLatch latch = new CountDownLatch(1);
+
+        when(mockHttpClient.newWebSocket(any(Request.class), any(WebSocketListener.class)))
+                .thenAnswer(invocation -> {
+                    capturedRequest.set(invocation.getArgument(0, Request.class));
+                    WebSocketListener listener = invocation.getArgument(1, WebSocketListener.class);
+                    listenerRef.set(listener);
+
+                    // Listener 설정이 완료되었음을 알림
+                    latch.countDown();
+
+                    return mockWebSocket;
+                });
+
+        // 테스트 대상 클래스 스파이
+        MoshiWebsocketMethodApiImpl clientApi = spy(new MoshiWebsocketMethodApiImpl(mockConfig) {
+            @Override
+            protected OkHttpClient createHttpClient() {
+                return mockHttpClient;
+            }
+        });
+        doReturn(mockHttpClient).when(clientApi).createHttpClient();
+        doReturn(mockWebSocket).when(clientApi).connectWebSocket();
+
+        // WebSocket 연결 트리거
+        clientApi.triggerReconnect();
+
+        // Listener 설정 확인 및 대기
+        boolean listenerSet = latch.await(2, TimeUnit.SECONDS); // 최대 2초 대기
+        assertTrue(listenerSet, "WebSocketListener 설정이 완료되지 않았습니다.");
+        assertNotNull(listenerRef.get(), "WebSocketListener는 null이 아니어야 합니다.");
+
+        // WebSocket 연결 실패 시뮬레이션
+        RuntimeException exception = new RuntimeException("Test failure");
+        WebSocketListener webSocketListener = listenerRef.get();
+        webSocketListener.onFailure(mockWebSocket, exception, null);
+
+        // 비동기 작업 대기
+        Thread.sleep(1500);
+
+        // connectWebSocket 호출 확인
+        verify(clientApi, atLeastOnce()).connectWebSocket();
+    }
+
+    @Test
+    @Disabled // 테스트에 3분 소요되서 Disable 처리함
+    void testReconnectWebSocket_NinthAttemptSuccess() throws InterruptedException {
+        // 재연결 시도 횟수 추적
+        AtomicInteger reconnectAttempts = new AtomicInteger(0);
+        AtomicBoolean successfullyConnected = new AtomicBoolean(false);
+        AtomicInteger concurrentAttempts = new AtomicInteger(0);
+
+        CountDownLatch successLatch = new CountDownLatch(1); // 연결 성공 대기를 위한 CountDownLatch
+
+        // Mock 대상 생성
+        OkHttpClient mockHttpClient = mock(OkHttpClient.class);
+        WebSocket mockWebSocket = mock(WebSocket.class);
+
+        AtomicReference<WebSocketListener> listenerRef = new AtomicReference<>();
+
+        // HttpClient Mocking: Listener를 설정하고 반환
+        when(mockHttpClient.newWebSocket(any(Request.class), any(WebSocketListener.class)))
+                .thenAnswer(invocation -> {
+                    WebSocketListener listener = invocation.getArgument(1, WebSocketListener.class);
+                    listenerRef.set(listener);
+                    return mockWebSocket;
+                });
+
+        // 테스트 대상 클래스
+        MoshiWebsocketMethodApiImpl clientApi = spy(new MoshiWebsocketMethodApiImpl(mockConfig) {
+            @Override
+            protected OkHttpClient createHttpClient() {
+                return mockHttpClient;
+            }
+        });
+
+        // 9번째 시도에서만 연결 성공하도록 Mocking
+        doAnswer(invocation -> {
+            int attempt = reconnectAttempts.incrementAndGet();
+
+            // 동시성 체크
+            if (concurrentAttempts.incrementAndGet() > 1) {
+                concurrentAttempts.decrementAndGet();
+                fail("Concurrent reconnect attempts detected!");
+            }
+
+            concurrentAttempts.decrementAndGet();
+
+            // 9번째 재연결에서 성공 처리
+            if (attempt == 9) {
+                successfullyConnected.set(true);
+                successLatch.countDown(); // 연결 성공 상태를 알림
+                return mockWebSocket;
+            }
+
+            // 실패 처리
+            throw new RuntimeException("Reconnect failed");
+        }).when(clientApi).connectWebSocket();
+
+        // WebSocketListener에서 연결 실패를 트리거
+        clientApi.triggerReconnect();
+        WebSocketListener listener = listenerRef.get();
+        assertNotNull(listener, "WebSocketListener는 null이 아니어야 합니다.");
+        listener.onFailure(mockWebSocket, new RuntimeException("WebSocket failed"), null);
+
+        // 연결 성공을 대기
+        // - 1번째 시도: 1초 (1000 ms)
+        // - 2번째 시도: 2초 (2000 ms)
+        // - 3번째 시도: 4초 (4000 ms)
+        // - 4번째 시도: 8초 (8000 ms)
+        // - 5번째 시도: 16초 (16000 ms)
+        // - 6번째 시도 이후: 최대 지연 시간인 30초로 고정
+        // 총 121초 (2분 1초) 재연결 30초 대기까지 포함해서 3분 대기 설정
+        boolean success = successLatch.await(3, TimeUnit.MINUTES); // 12초 내로 연결 성공 대기
+        assertTrue(success, "WebSocket이 9번째 시도에서 성공적으로 연결되지 않았습니다.");
+
+        // 검증
+        assertEquals(9, reconnectAttempts.get(), "9번째 시도에서 연결 성공해야 합니다.");
+        verify(clientApi, times(9)).connectWebSocket(); // 정확히 9번 호출되었는지 확인
     }
 }

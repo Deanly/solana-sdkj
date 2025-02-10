@@ -12,7 +12,7 @@ import java.util.Map;
 @ToString
 @NoArgsConstructor
 @lombok.AllArgsConstructor
-@lombok.Builder(builderClassName = "Builder")
+@lombok.experimental.SuperBuilder
 public class RpcResponse<T> {
 
     @Getter

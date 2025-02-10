@@ -18,7 +18,7 @@ import net.deanly.structlayout.StructLayout;
  * in binary transformations.
  * </p>
  *
- * <h3>Usage Example:</h3>
+ * Usage Example:
  * <pre>
  * {@code
  *      public class ExampleStruct extends Struct {

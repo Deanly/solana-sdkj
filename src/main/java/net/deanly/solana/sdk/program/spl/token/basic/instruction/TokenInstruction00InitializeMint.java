@@ -23,7 +23,7 @@ import java.util.*;
  *
  * <p>Once initialized, the mint account becomes the governing account for a specific token.</p>
  *
- * <h3>Structure</h3>
+ * Structure
  * <ul>
  *   <li><b>Discriminator:</b> Identifies the instruction type.</li>
  *   <li><b>Decimals:</b> The number of decimal places for the token (base 10 representation).</li>

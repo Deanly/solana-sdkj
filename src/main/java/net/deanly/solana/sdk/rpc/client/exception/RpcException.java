@@ -28,6 +28,12 @@ public class RpcException extends Exception {
         this.errorData = errorData;
     }
 
+    public RpcException(String message, Throwable cause) {
+        super(message, cause);
+        this.errorCode = null;
+        this.errorData = null;
+    }
+
     @Override
     public String toString() {
         return "RpcException(" + super.getMessage() + ", errorCode=" + errorCode + ")";

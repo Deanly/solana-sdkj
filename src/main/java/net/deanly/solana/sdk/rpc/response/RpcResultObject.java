@@ -6,9 +6,11 @@ import lombok.*;
 
 @Getter
 @ToString
+@lombok.experimental.SuperBuilder
 public class RpcResultObject<T> {
     @Getter
     @ToString
+    @lombok.experimental.SuperBuilder
     public static class Context {
         @Json(name = "slot")
         private UnsignedLong slot;

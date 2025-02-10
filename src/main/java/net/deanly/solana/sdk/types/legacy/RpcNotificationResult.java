@@ -11,7 +11,7 @@ public class RpcNotificationResult {
 
     @Getter
     @ToString
-    public static class Result extends RpcResultObject {
+    public static class Result {
 
         @Json(name = "value")
         private Object value;

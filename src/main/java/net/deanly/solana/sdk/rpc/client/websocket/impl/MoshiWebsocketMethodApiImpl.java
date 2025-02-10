@@ -21,7 +21,6 @@ import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
 import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
-import net.deanly.solana.sdk.rpc.response.ResValueProgram;
 import okhttp3.*;
 import com.google.common.cache.Cache;
 import org.jetbrains.annotations.NotNull;
@@ -32,25 +31,24 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
-    private final Cache<SubscriptionId, SubscriptionContext<?>> listeners = CacheBuilder.newBuilder()
+    protected final Cache<SubscriptionId, SubscriptionContext<?>> listeners = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
             .removalListener(notification -> {
                 log.debug("Listener Removed: SubscriptionID={}, Cause={}", notification.getKey(), notification.getCause());
             })
             .build(); // Concurrency Safe
-    private final Cache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions = CacheBuilder.newBuilder()
+    protected final Cache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .removalListener(notification -> {
                 log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
             })
             .build(); // Concurrency Safe
-    private final Cache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions = CacheBuilder.newBuilder()
+    protected final Cache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions = CacheBuilder.newBuilder()
             .expireAfterAccess(5, TimeUnit.MINUTES)
             .removalListener(notification -> {
                 log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
@@ -82,7 +80,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
 
     @RequiredArgsConstructor
-    private static class SubscriptionContext<T> {
+    protected static class SubscriptionContext<T> {
         final Type type;
         final NotificationListener<T> listener;
         final String method;
@@ -145,14 +143,14 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
                 public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
                     log.warn("WebSocket closed: " + reason);
                     // 재연결 처리
-                    reconnectWebSocket();
+                    triggerReconnect();
                 }
 
                 @Override
                 public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, Response response) {
                     log.error("WebSocket failure: " + t.getMessage());
                     // 재연결 처리
-                    reconnectWebSocket();
+                    triggerReconnect();
                 }
             });
         } catch (Exception e) {
@@ -160,24 +158,62 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         }
     }
 
-    private int reconnectDelay = 1000; // 초기 1초
-
-    private void reconnectWebSocket() {
-        log.info("Reconnecting WebSocket... (delay: {} ms)", reconnectDelay);
-        try {
-            Thread.sleep(reconnectDelay);
-            connectWebSocket();
-            resubscribeAll();
-            reconnectDelay = 1000; // 성공 시 초기화
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        } catch (Exception e) {
-            // 지수 백오프 방식
-            reconnectDelay = Math.min(reconnectDelay * 2, 30000); // 최대 30초
+    private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+    protected void triggerReconnect() {
+        if (reconnecting.compareAndSet(false, true)) {
             reconnectWebSocket();
         }
     }
 
+    private int reconnectDelay = 1000; // 초기 1초
+    private int reconnectAttempts = 0;
+    protected static final int MAX_RECONNECT_ATTEMPTS = 10; // 재연결 최대 시도 횟수
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    protected void reconnectWebSocket() {
+        if (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+            log.error("Max reconnect attempts reached. Cannot reconnect.");
+            return;
+        }
+        this.reconnectAttempts++;
+
+        log.info("Reconnecting WebSocket... (attempt: {}, delay: {} ms)", this.reconnectAttempts, this.reconnectDelay);
+
+        scheduler.schedule(() -> {
+            try {
+                this.webSocket = connectWebSocket();
+                resubscribeAll();
+                this.reconnectDelay = 1000; // 성공 시 초기화
+                this.reconnectAttempts = 0; // 재시도 횟수 초기화
+            } catch (Exception e) {
+                // 지수 백오프 방식
+                this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // 최대 30초
+                log.warn("Reconnect attempt failed. Retrying... (next delay: {} ms)", this.reconnectDelay);
+                reconnectWebSocket();
+            }
+        }, this.reconnectDelay, TimeUnit.MILLISECONDS);
+    }
+
+    protected void resubscribeAll() {
+        log.info("Resubscribing to all active subscriptions...");
+
+        listeners.asMap().forEach((subscriptionId, context) -> {
+            try {
+                RpcRequest request = buildResubscribeRequest(subscriptionId, context);
+                webSocket.send(getCachedAdapter(context.type).toJson(request)); // 재구독 요청 전송
+                log.info("Resubscribed to subscription ID: {}", subscriptionId);
+            } catch (Exception e) {
+                log.error("Failed to resubscribe for ID: {}", subscriptionId, e);
+            }
+        });
+    }
+
+    private RpcRequest buildResubscribeRequest(SubscriptionId subscriptionId, SubscriptionContext<?> context) {
+        String method = context.method;
+        List<Object> params = context.params;
+
+//        return new RpcRequest(method, params);
+        return new RpcRequest(method, params, subscriptionId.getValue()); // 구독을 요청 ID로 재사용 🤣
+    }
 
     @Getter
     private static class IdSubscriptionTuple {
@@ -338,29 +374,6 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         return adapter.fromJson(message);
     }
 
-    // TODO: 테스트 및 안정성 개선
-    private void resubscribeAll() {
-        log.info("Resubscribing to all active subscriptions...");
-
-        listeners.asMap().forEach((subscriptionId, context) -> {
-            try {
-                RpcRequest request = buildResubscribeRequest(subscriptionId, context);
-                webSocket.send(toJson(request, context.type)); // 재구독 요청 전송
-                log.info("Resubscribed to subscription ID: {}", subscriptionId);
-            } catch (Exception e) {
-                log.error("Failed to resubscribe for ID: {}", subscriptionId, e);
-            }
-        });
-    }
-
-    private RpcRequest buildResubscribeRequest(SubscriptionId subscriptionId, SubscriptionContext<?> context) {
-        String method = context.method;
-        List<Object> params = context.params;
-
-//        return new RpcRequest(method, params);
-        return new RpcRequest(method, params, subscriptionId.getValue()); // 구독을 요청 ID로 재사용 🤣
-    }
-
     private SubscriptionContext<?> getListener(SubscriptionId id) {
         return listeners.getIfPresent(id);  // 없으면 null 반환
     }
@@ -395,15 +408,6 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     @SuppressWarnings("unchecked")
     private <T> JsonAdapter<T> getCachedAdapter(Type responseType) {
         return (JsonAdapter<T>) adapterCache.computeIfAbsent(responseType, moshi::adapter);
-    }
-
-    private String toJson(Object obj, Type type) {
-        try {
-            JsonAdapter<Type> adapter = this.getCachedAdapter(type);
-            return adapter.toJson((Type) obj);
-        } catch (Exception e) {
-            throw new RpcWebSocketException("JSON serialization failed", e);
-        }
     }
 
     private List<Object> getParams(Object... params) {

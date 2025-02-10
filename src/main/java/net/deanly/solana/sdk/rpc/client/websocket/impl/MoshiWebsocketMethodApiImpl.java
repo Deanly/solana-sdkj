@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
 import com.google.common.cache.CacheBuilder;
-import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;

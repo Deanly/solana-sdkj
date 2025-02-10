@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
-import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;

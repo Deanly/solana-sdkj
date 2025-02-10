@@ -2,7 +2,7 @@ package net.deanly.solana.sdk.rpc.response;
 
 import java.util.List;
 
-import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.Json;
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory;
 import lombok.Getter;

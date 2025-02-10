@@ -142,10 +142,10 @@ public class BPFLoaderProgramTest {
                 )
         );
 
-        String hash = client.getApi().getRecentBlockhash();
+        String hash = client.getLegacyApi().getRecentBlockhash();
         transaction.setRecentBlockhashForCompile(Blockhash.of(hash));
 
-        String txId = client.getApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
+        String txId = client.getLegacyApi().sendTransaction(transaction, List.of(KeyPair, bufferKeyPair), hash);
         assertNotNull(txId);
         System.out.println("Transaction ID: " + txId);
     }

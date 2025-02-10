@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.request.config;
 
-import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;

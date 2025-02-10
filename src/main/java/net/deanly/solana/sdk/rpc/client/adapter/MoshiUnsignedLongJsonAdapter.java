@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.adapter;
 
-import com.google.common.primitives.UnsignedLong;
+import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

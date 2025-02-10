@@ -2,9 +2,11 @@ package net.deanly.solana.sdk.rpc.client;
 
 import lombok.Getter;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
+import net.deanly.solana.sdk.rpc.client.http.SyncApi;
 import net.deanly.solana.sdk.rpc.client.http.impl.MoshiHttpMethodApiImpl;
 import net.deanly.solana.sdk.rpc.client.http.LegacyRpcApi;
 import net.deanly.solana.sdk.rpc.client.http.impl.LegacyRpcApiImpl;
+import net.deanly.solana.sdk.rpc.client.http.impl.MoshiSyncApiImpl;
 import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.client.websocket.impl.MoshiWebsocketMethodApiImpl;
 import okhttp3.MediaType;
@@ -17,18 +19,20 @@ public class RpcClient {
     private final ClientConfig config;
     private final HttpMethodApi httpMethodApi;
     private final WebsocketMethodApi websocketMethodApi;
+    private final SyncApi syncApi;
 
     @Deprecated
-    private final LegacyRpcApiImpl rpcApi;
+    private final LegacyRpcApiImpl legacyRpcApi;
 
 
     public RpcClient(ClientConfig config) {
         this.config = config;
         this.httpMethodApi = new MoshiHttpMethodApiImpl(config);
         this.websocketMethodApi = new MoshiWebsocketMethodApiImpl(config);
+        this.syncApi = new MoshiSyncApiImpl(this.httpMethodApi, this.websocketMethodApi);
 
-        this.rpcApi = new LegacyRpcApiImpl();
-        this.rpcApi.setClient((MoshiHttpMethodApiImpl) this.httpMethodApi);
+        this.legacyRpcApi = new LegacyRpcApiImpl();
+        this.legacyRpcApi.setClient((MoshiHttpMethodApiImpl) this.httpMethodApi);
     }
 
     public RpcClient(Cluster cluster) {
@@ -129,13 +133,13 @@ public class RpcClient {
     }
 
     /**
-     * Returns the RpcApi instance associated with this client.
+     * Returns the LegacyRpcApi instance associated with this client.
      *
-     * @return the RpcApi instance
+     * @return the LegacyRpcApi instance
      */
     @Deprecated
-    public LegacyRpcApi getApi() {
-        return this.rpcApi;
+    public LegacyRpcApi getLegacyApi() {
+        return this.legacyRpcApi;
     }
 
     /**
@@ -143,7 +147,7 @@ public class RpcClient {
      *
      * @return the HttpMethodApi instance
      */
-    public HttpMethodApi getHttpApi() {
+    public HttpMethodApi getRpcHttpApi() {
         return this.httpMethodApi;
     }
 
@@ -152,8 +156,17 @@ public class RpcClient {
      *
      * @return the WebsocketMethodApi instance
      */
-    public WebsocketMethodApi getWsApi() {
+    public WebsocketMethodApi getRpcWebSocketApi() {
         return this.websocketMethodApi;
+    }
+
+    /**
+     * Returns the SyncApi instance associated with this client.
+     *
+     * @return the SyncApi instance
+     */
+    public SyncApi getSyncApi() {
+        return this.syncApi;
     }
 
     /**

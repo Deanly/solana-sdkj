@@ -35,13 +35,21 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
 
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
 
-    public static final UnsignedLong ZERO = new UnsignedLong(0);
-    public static final UnsignedLong ONE = new UnsignedLong(1);
+    private static final int CACHE_SIZE = 2048;
+    private static final UnsignedLong[] CACHE = new UnsignedLong[CACHE_SIZE];
+    public static final UnsignedLong ZERO = CACHE[0];
+    public static final UnsignedLong ONE = CACHE[1];
     public static final UnsignedLong MAX_VALUE = new UnsignedLong(-1L);
+
+    static {
+        for (int i = 0; i < CACHE_SIZE; i++) {
+            CACHE[i] = new UnsignedLong(i);
+        }
+    }
 
     private final long value;
 
-    private UnsignedLong(long value) {
+    UnsignedLong(long value) {
         this.value = value;
     }
 
@@ -59,7 +67,9 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
      * @since 14.0
      */
     public static UnsignedLong fromLongBits(long bits) {
-        // TODO(lowasser): consider caching small values, like Long.valueOf
+        if (bits >= 0 && bits < CACHE_SIZE) {
+            return CACHE[(int) bits];
+        }
         return new UnsignedLong(bits);
     }
 

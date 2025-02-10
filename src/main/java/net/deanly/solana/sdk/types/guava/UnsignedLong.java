@@ -14,6 +14,7 @@ package net.deanly.solana.sdk.types.guava;
  * the License.
  */
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 /**
@@ -224,6 +225,13 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
             bigInt = bigInt.setBit(Long.SIZE - 1);
         }
         return bigInt;
+    }
+
+    /**
+     * Returns the value of this {@code UnsignedLong} as a {@link BigDecimal}.
+     */
+    public BigDecimal bigDecimalValue() {
+        return new BigDecimal(bigIntegerValue());
     }
 
     @Override

@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
-import com.google.common.cache.CacheBuilder;
+import net.deanly.solana.sdk.cache.RemovalAwareLRUCache;
 import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
@@ -22,8 +22,6 @@ import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import okhttp3.*;
-import com.google.common.cache.Cache;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -36,28 +34,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
-    protected final Cache<SubscriptionId, SubscriptionContext<?>> listeners = CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
-            .removalListener(notification -> {
-                log.debug("Listener Removed: SubscriptionID={}, Cause={}", notification.getKey(), notification.getCause());
-            })
-            .build(); // Concurrency Safe
-    protected final Cache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions = CacheBuilder.newBuilder()
-            .expireAfterAccess(5, TimeUnit.MINUTES)
-            .removalListener(notification -> {
-                log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
-            })
-            .build(); // Concurrency Safe
-    protected final Cache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions = CacheBuilder.newBuilder()
-            .expireAfterAccess(5, TimeUnit.MINUTES)
-            .removalListener(notification -> {
-                log.debug("Pending Listener Removed: RequestID={}, Cause={}", notification.getKey(), notification.getCause());
-            })
-            .build(); // Concurrency Safe
 
     private final RpcClient.ClientConfig config;
     private OkHttpClient httpClient;
     private WebSocket webSocket;
+
+    protected final RemovalAwareLRUCache<SubscriptionId, SubscriptionContext<?>> listeners;
+    protected final RemovalAwareLRUCache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions;
+    protected final RemovalAwareLRUCache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions;
+
 
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
@@ -91,6 +76,24 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         this.config = config;
         this.httpClient = createHttpClient();
         this.webSocket = connectWebSocket();
+
+        this.listeners = new RemovalAwareLRUCache<>(
+                this.config.getWebsocketListenerCacheMaxSize(),
+                this.config.getWebsocketListenerExpireTimeMs(),
+                (key, cause) -> log.debug("Subscribe Listener Removed: SubscriptionID={}, Cause={}", key, cause)
+        );
+
+        this.pendingSubscriptions = new RemovalAwareLRUCache<>(
+                this.config.getWebsocketPendingSubscriptionCacheMaxSize(),
+                this.config.getWebsocketPendingSubscriptionExpireTimeMs(),
+                (key, cause) -> log.debug("Pending Listener Removed: RequestID={}, Cause={}", key, cause)
+        );
+
+        this.pendingUnsubscriptions = new RemovalAwareLRUCache<>(
+                this.config.getWebsocketPendingUnsubscriptionCacheMaxSize(),
+                this.config.getWebsocketPendingUnsubscriptionExpireTimeMs(),
+                (key, cause) -> log.debug("Pending Listener Removed: RequestID={}, Cause={}", key, cause)
+        );
     }
 
     protected OkHttpClient createHttpClient() {
@@ -130,24 +133,24 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
             return this.httpClient.newWebSocket(request, new WebSocketListener() {
                 @Override
-                public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
+                public void onOpen(WebSocket webSocket, Response response) {
                     log.info("WebSocket connected");
                 }
 
                 @Override
-                public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
+                public void onMessage(WebSocket webSocket, String text) {
                     handleMessage(text); // 메시지 핸들링
                 }
 
                 @Override
-                public void onClosed(@NotNull WebSocket webSocket, int code, @NotNull String reason) {
+                public void onClosed(WebSocket webSocket, int code, String reason) {
                     log.warn("WebSocket closed: " + reason);
                     // 재연결 처리
                     triggerReconnect();
                 }
 
                 @Override
-                public void onFailure(@NotNull WebSocket webSocket, @NotNull Throwable t, Response response) {
+                public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                     log.error("WebSocket failure: " + t.getMessage());
                     // 재연결 처리
                     triggerReconnect();
@@ -398,7 +401,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         pendingUnsubscriptions.invalidate(id);
     }
 
-    public Long countListeners() {
+    public int countListeners() {
         return this.listeners.size();
     }
 

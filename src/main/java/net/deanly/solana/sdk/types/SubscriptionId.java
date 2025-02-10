@@ -1,7 +1,6 @@
 package net.deanly.solana.sdk.types;
 
 import lombok.EqualsAndHashCode;
-import org.jetbrains.annotations.NotNull;
 
 @EqualsAndHashCode
 public class SubscriptionId implements Comparable<SubscriptionId> {
@@ -25,7 +24,7 @@ public class SubscriptionId implements Comparable<SubscriptionId> {
     }
 
     @Override
-    public int compareTo(@NotNull SubscriptionId o) {
+    public int compareTo(SubscriptionId o) {
         return Long.compare(this.id, o.id);
     }
 }

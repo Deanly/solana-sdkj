@@ -4,7 +4,6 @@ import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.*;
 import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
 import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter.Memcmp;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<ProgramAcco
         this.memcmpAdapter = moshi.adapter(Memcmp.class);
     }
 
-    @Nullable
     @Override
     public List<ProgramAccountFilter> fromJson(JsonReader reader) throws IOException {
         List<ProgramAccountFilter> filters = new ArrayList<>();
@@ -60,7 +58,7 @@ public class MoshiFilterCriteriaJsonAdapter extends JsonAdapter<List<ProgramAcco
     }
 
     @Override
-    public void toJson(JsonWriter writer, @Nullable List<ProgramAccountFilter> filters) throws IOException {
+    public void toJson(JsonWriter writer, List<ProgramAccountFilter> filters) throws IOException {
         if (filters == null) {
             writer.nullValue();
             return;

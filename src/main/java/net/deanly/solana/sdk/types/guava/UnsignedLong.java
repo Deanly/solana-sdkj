@@ -14,7 +14,6 @@ package net.deanly.solana.sdk.types.guava;
  * the License.
  */
 
-import org.jetbrains.annotations.NotNull;
 import java.math.BigInteger;
 
 /**
@@ -228,7 +227,7 @@ public final class UnsignedLong extends Number implements Comparable<UnsignedLon
     }
 
     @Override
-    public int compareTo(@NotNull UnsignedLong o) {
+    public int compareTo(UnsignedLong o) {
         checkNotNull(o);
         return UnsignedLongs.compare(value, o.value);
     }

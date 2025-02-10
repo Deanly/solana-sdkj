@@ -11,6 +11,8 @@ import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.client.websocket.impl.MoshiWebsocketMethodApiImpl;
 import okhttp3.MediaType;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * RpcClient is responsible for making RPC calls to a Solana cluster.
  */
@@ -130,6 +132,24 @@ public class RpcClient {
         private Integer proxyPort;
 
         private String userAgent;
+
+        @lombok.Builder.Default
+        private Integer websocketListenerCacheMaxSize = 1000;
+
+        @lombok.Builder.Default
+        private Integer websocketPendingSubscriptionCacheMaxSize = 500;
+
+        @lombok.Builder.Default
+        private Integer websocketPendingUnsubscriptionCacheMaxSize = 500;
+
+        @lombok.Builder.Default
+        private Long websocketListenerExpireTimeMs = TimeUnit.HOURS.toMillis(1);
+
+        @lombok.Builder.Default
+        private Long websocketPendingSubscriptionExpireTimeMs = TimeUnit.MINUTES.toMillis(5);
+
+        @lombok.Builder.Default
+        private Long websocketPendingUnsubscriptionExpireTimeMs = TimeUnit.MINUTES.toMillis(5);
     }
 
     /**

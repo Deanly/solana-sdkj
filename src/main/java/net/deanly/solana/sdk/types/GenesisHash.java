@@ -2,7 +2,6 @@ package net.deanly.solana.sdk.types;
 
 import lombok.EqualsAndHashCode;
 import net.deanly.solana.sdk.types.codec.Base58;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 
@@ -72,7 +71,7 @@ public class GenesisHash implements Comparable<GenesisHash> {
     }
 
     @Override
-    public int compareTo(@NotNull GenesisHash o) {
+    public int compareTo(GenesisHash o) {
         return this.genesisHash.compareTo(o.genesisHash);
     }
 }

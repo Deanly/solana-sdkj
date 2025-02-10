@@ -25,7 +25,6 @@ dependencies {
     api 'com.squareup.moshi:moshi:1.15.2'
     api 'com.squareup.moshi:moshi-adapters:1.15.2'
     api 'org.java-websocket:Java-WebSocket:1.6.0'
-    api 'com.google.guava:guava:33.4.0-jre'
 
     implementation project(":struct-layout")
 //    implementation 'net.deanly:struct-layout:0.1.1'

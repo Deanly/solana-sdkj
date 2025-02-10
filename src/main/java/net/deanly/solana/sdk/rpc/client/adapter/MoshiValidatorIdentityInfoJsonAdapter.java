@@ -4,14 +4,11 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import net.deanly.solana.sdk.types.ValidatorIdentityInfo;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 public class MoshiValidatorIdentityInfoJsonAdapter extends JsonAdapter<ValidatorIdentityInfo> {
 
-    @Nullable
     @Override
     public ValidatorIdentityInfo fromJson(JsonReader jsonReader) throws IOException {
         ValidatorIdentityInfo info = null;
@@ -26,7 +23,7 @@ public class MoshiValidatorIdentityInfoJsonAdapter extends JsonAdapter<Validator
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable ValidatorIdentityInfo info) throws IOException {
+    public void toJson(JsonWriter jsonWriter, ValidatorIdentityInfo info) throws IOException {
         if (info == null) {
             jsonWriter.nullValue();
             return;

@@ -20,7 +20,7 @@ import java.util.Comparator;
 /**
  * Static utility methods pertaining to {@code long} primitives that interpret values as
  * <i>unsigned</i> (that is, any negative value {@code x} is treated as the positive value {@code
- * 2^64 + x}). The methods for which signedness is not an issue are in {@link Longs}, as well as
+ * 2^64 + x}). The methods for which signedness is not an issue are in Longs, as well as
  * signed versions of methods for which signedness is an issue.
  *
  * <p>In addition, this class provides several static methods for converting a {@code long} to a

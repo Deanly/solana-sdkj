@@ -2,13 +2,10 @@ package net.deanly.solana.sdk.rpc.client.adapter;
 
 import net.deanly.solana.sdk.types.guava.UnsignedLong;
 import com.squareup.moshi.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 public class MoshiUnsignedLongJsonAdapter extends JsonAdapter<UnsignedLong> {
-    @Nullable
     @Override
     public UnsignedLong fromJson(JsonReader jsonReader) throws IOException {
         String value = jsonReader.nextString();
@@ -19,7 +16,7 @@ public class MoshiUnsignedLongJsonAdapter extends JsonAdapter<UnsignedLong> {
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable UnsignedLong unsignedLong) throws IOException {
+    public void toJson(JsonWriter jsonWriter, UnsignedLong unsignedLong) throws IOException {
         if (unsignedLong == null) {
             jsonWriter.nullValue();
             return;

@@ -6,12 +6,10 @@ import com.squareup.moshi.JsonWriter;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.request.filter.BlockFilter;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class MoshiBlockFilterJsonAdapter extends JsonAdapter<BlockFilter> {
 
-    @Nullable
     @Override
     public BlockFilter fromJson(JsonReader reader) throws IOException {
         BlockFilter criteria = new BlockFilter();
@@ -43,7 +41,7 @@ public class MoshiBlockFilterJsonAdapter extends JsonAdapter<BlockFilter> {
     }
 
     @Override
-    public void toJson(JsonWriter writer, @Nullable BlockFilter criteria) throws IOException {
+    public void toJson(JsonWriter writer, BlockFilter criteria) throws IOException {
         if (criteria == null || criteria.getMentionsAccountOrProgram() == null) {
             // mentionsAccountOrProgram이 null인 경우 "all"로 직렬화
             writer.value("all");

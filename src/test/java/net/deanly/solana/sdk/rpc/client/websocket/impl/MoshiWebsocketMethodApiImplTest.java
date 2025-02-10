@@ -1930,7 +1930,7 @@ public class MoshiWebsocketMethodApiImplTest {
         assertTrue(capturedRequests.get(1).contains("param2"), "두 번째 재구독 요청의 매개변수가 잘못되었습니다.");
 
         // Pending Subscription 갱신이 제대로 이루어졌는지 확인
-        assertEquals(2, clientApi.countListeners().longValue(), "Listener 개수가 일치하지 않습니다.");
+        assertEquals(2, clientApi.countListeners(), "Listener 개수가 일치하지 않습니다.");
     }
 
     @Test
@@ -1981,7 +1981,7 @@ public class MoshiWebsocketMethodApiImplTest {
         webSocketListener.onFailure(mockWebSocket, exception, null);
 
         // 비동기 작업 대기
-        Thread.sleep(1500);
+        Thread.sleep(1100);
 
         // connectWebSocket 호출 확인
         verify(clientApi, atLeastOnce()).connectWebSocket();

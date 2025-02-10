@@ -4,13 +4,10 @@ import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.JsonWriter;
 import net.deanly.solana.sdk.types.GenesisHash;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
 public class MoshiGenesisHashJsonAdapter extends JsonAdapter<GenesisHash> {
-    @Nullable
     @Override
     public GenesisHash fromJson(JsonReader jsonReader) throws IOException {
         String value = jsonReader.nextString();
@@ -18,7 +15,7 @@ public class MoshiGenesisHashJsonAdapter extends JsonAdapter<GenesisHash> {
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable GenesisHash hash) throws IOException {
+    public void toJson(JsonWriter jsonWriter, GenesisHash hash) throws IOException {
         if (hash != null) {
             jsonWriter.value(hash.toString());
         } else {

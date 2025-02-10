@@ -8,7 +8,6 @@ import com.squareup.moshi.internal.Util;
 import net.deanly.solana.sdk.rpc.response.NotiValueSignature;
 import net.deanly.solana.sdk.types.TransactionError;
 import net.deanly.solana.sdk.types.SignatureStatus;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -29,7 +28,6 @@ public class MoshiNotiValueSignatureJsonAdapter extends JsonAdapter<NotiValueSig
         );
     }
 
-    @Nullable
     @Override
     public NotiValueSignature fromJson(JsonReader reader) throws IOException {
         if (reader.peek() == JsonReader.Token.BEGIN_OBJECT) {
@@ -63,7 +61,7 @@ public class MoshiNotiValueSignatureJsonAdapter extends JsonAdapter<NotiValueSig
     }
 
     @Override
-    public void toJson(JsonWriter writer, @Nullable NotiValueSignature value) throws IOException {
+    public void toJson(JsonWriter writer, NotiValueSignature value) throws IOException {
         if (value == null) {
             writer.nullValue();
             return;

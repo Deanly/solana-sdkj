@@ -3,8 +3,6 @@ package net.deanly.solana.sdk.rpc.client.adapter;
 import com.squareup.moshi.*;
 import net.deanly.solana.sdk.types.StateData;
 import net.deanly.solana.sdk.types.Encoding;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Map;
@@ -18,7 +16,6 @@ public class MoshiStateDataJsonAdapter extends JsonAdapter<StateData> {
     private final Moshi moshi = new Moshi.Builder().build();
     private final JsonAdapter<Map<String, Object>> mapJsonAdapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
 
-    @Nullable
     @Override
     public StateData fromJson(JsonReader jsonReader) throws IOException {
         JsonReader.Token token = jsonReader.peek();
@@ -54,7 +51,7 @@ public class MoshiStateDataJsonAdapter extends JsonAdapter<StateData> {
     }
 
     @Override
-    public void toJson(@NotNull JsonWriter jsonWriter, @Nullable StateData data) throws IOException {
+    public void toJson(JsonWriter jsonWriter, StateData data) throws IOException {
         if (data == null) {
             jsonWriter.nullValue();
             return;

@@ -98,13 +98,13 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
     protected OkHttpClient createHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MICROSECONDS);
+        builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MILLISECONDS);
 
         if (this.config.getWriteTimeoutMs() != null) {
-            builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MICROSECONDS);
+            builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         if (this.config.getConnectTimeoutMs() != null) {
-            builder.connectTimeout(this.config.getConnectTimeoutMs(), TimeUnit.MICROSECONDS);
+            builder.connectTimeout(this.config.getConnectTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         if (this.config.getProxyHost() != null && this.config.getProxyPort() != null) {
             builder.proxy(new Proxy(
@@ -131,6 +131,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
             Request request = new Request.Builder().url(endpointURL).build();
 
+            log.info("Connecting to WebSocket: {}", endpointURL);
             return this.httpClient.newWebSocket(request, new WebSocketListener() {
                 @Override
                 public void onOpen(WebSocket webSocket, Response response) {

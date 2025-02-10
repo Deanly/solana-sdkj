@@ -56,13 +56,13 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
 
     public OkHttpClient createHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MICROSECONDS);
+        builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MILLISECONDS);
 
         if (this.config.getWriteTimeoutMs() != null) {
-            builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MICROSECONDS);
+            builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         if (this.config.getConnectTimeoutMs() != null) {
-            builder.connectTimeout(this.config.getConnectTimeoutMs(), TimeUnit.MICROSECONDS);
+            builder.connectTimeout(this.config.getConnectTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         if (this.config.getProxyHost() != null && this.config.getProxyPort() != null) {
             builder.proxy(new Proxy(
@@ -97,11 +97,11 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
 
         Request request = new Request.Builder().url(this.config.getEndpoint())
-                .post(RequestBody.create(rpcRequestJsonAdapter.toJson(rpcRequest), this.config.getMediaType()))
+                .post(RequestBody.create(this.rpcRequestJsonAdapter.toJson(rpcRequest), this.config.getMediaType()))
                 .build();
 
         try {
-            Response response = httpClient.newCall(request).execute();
+            Response response = this.httpClient.newCall(request).execute();
             final String result = Objects.requireNonNull(response.body()).string();
             RpcResponse<T> rpcResponse = resultAdapter.fromJson(result);
 

@@ -113,7 +113,7 @@ public class RpcClient {
     }
 
     @Getter
-    @lombok.Builder(builderClassName = "Builder")
+    @lombok.Builder
     public static class ClientConfig {
         @lombok.Builder.Default
         private MediaType mediaType = MediaType.parse("application/json; charset=utf-8");

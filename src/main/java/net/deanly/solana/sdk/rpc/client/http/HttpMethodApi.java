@@ -28,6 +28,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getaccountinfo">getAccountInfo RPC Method</a>
      */
     RpcResultObject<ResValueAccountInfo> getAccountInfo(PublicKey pubkey, AccountInfoConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueAccountInfo> getAccountInfo(PublicKey pubkey) throws RpcException {
+        return getAccountInfo(pubkey, null);
+    }
 
     /**
      * Returns the balance of the account of provided Pubkey.
@@ -39,6 +42,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getbalance">getBalance RPC Method</a>
      */
     RpcResultObject<UnsignedLong> getBalance(PublicKey pubkey, BalanceConfig configuration) throws RpcException;
+    default RpcResultObject<UnsignedLong> getBalance(PublicKey pubkey) throws RpcException {
+        return getBalance(pubkey, null);
+    }
 
     /**
      * Returns identity and transaction information about a confirmed block in the ledger.
@@ -50,6 +56,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getblock">getBlock RPC Method</a>
      */
     ResValueBlock getBlock(UnsignedLong slot, BlockConfig configuration) throws RpcException;
+    default ResValueBlock getBlock(UnsignedLong slot) throws RpcException {
+        return getBlock(slot, null);
+    }
 
     /**
      * Returns commitment information for a particular block.
@@ -70,6 +79,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getblockheight">getBlockHeight RPC Method</a>
      */
     UnsignedLong getBlockHeight(BlockHeightConfig configuration) throws RpcException;
+    default UnsignedLong getBlockHeight() throws RpcException {
+        return getBlockHeight(null);
+    }
 
 
     /**
@@ -81,6 +93,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getblockproduction">getBlockProduction RPC Method</a>
      */
     RpcResultObject<ResValueBlockProduction> getBlockProduction(BlockProductionConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueBlockProduction> getBlockProduction() throws RpcException {
+        return getBlockProduction(null);
+    }
 
     /**
      * Returns a list of confirmed blocks between two slots.
@@ -93,6 +108,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getblocks">getBlocks RPC Method</a>
      */
     List<UnsignedLong> getBlocks(UnsignedLong startSlot, UnsignedLong endSlot, BlocksConfig configuration) throws RpcException;
+    default List<UnsignedLong> getBlocks(UnsignedLong startSlot, UnsignedLong endSlot) throws RpcException {
+        return getBlocks(startSlot, endSlot, null);
+    }
 
     /**
      * Returns a list of confirmed blocks starting at the given slot.
@@ -105,6 +123,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getblockswithlimit">getBlocksWithLimit RPC Method</a>
      */
     List<UnsignedLong> getBlocksWithLimit(UnsignedLong startSlot, UnsignedLong limit, BlocksWithLimitConfig configuration) throws RpcException;
+    default List<UnsignedLong> getBlocksWithLimit(UnsignedLong startSlot, UnsignedLong limit) throws RpcException {
+        return getBlocksWithLimit(startSlot, limit, null);
+    }
 
     /**
      * Returns the estimated production time of a block.
@@ -154,6 +175,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getfeeformessage">getFeeForMessage RPC Method</a>
      */
     RpcResultObject<UnsignedLong> getFeeForMessage(String message, FeeForMessageConfig configuration) throws RpcException;
+    default RpcResultObject<UnsignedLong> getFeeForMessage(String message) throws RpcException {
+        return getFeeForMessage(message, null);
+    }
 
     /**
      * Returns the slot of the lowest confirmed block that has not been purged from the ledger.
@@ -215,11 +239,13 @@ public interface HttpMethodApi {
      * Returns the current inflation governor parameters.
      *
      * @param configuration Optional configuration parameters.
-     * @return An InflationGovernor object containing the current inflation parameters.
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/docs/rpc/http/getinflationgovernor">getInflationGovernor RPC Method</a>
      */
     ResValueInflationGovernor getInflationGovernor(InflationGovernorConfig configuration) throws RpcException;
+    default ResValueInflationGovernor getInflationGovernor() throws RpcException {
+        return getInflationGovernor(null);
+    }
 
     /**
      * Returns the specific inflation values for the current epoch.
@@ -240,6 +266,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getinflationreward">getInflationReward RPC Method</a>
      */
     List<ResValueInflationReward> getInflationReward(List<PublicKey> addresses, InflationRewardConfig configuration) throws RpcException;
+    default List<ResValueInflationReward> getInflationReward(List<PublicKey> addresses) throws RpcException {
+        return getInflationReward(addresses, null);
+    }
 
     /**
      * Returns the 20 largest accounts by lamport balance.
@@ -250,6 +279,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getlargestaccounts">getLargestAccounts RPC Method</a>
      */
     RpcResultObject<List<ResValueLargestAccount>> getLargestAccounts(LargestAccountsConfig configuration) throws RpcException;
+    default RpcResultObject<List<ResValueLargestAccount>> getLargestAccounts() throws RpcException {
+        return getLargestAccounts(null);
+    }
 
     /**
      * Returns the latest blockhash.
@@ -260,6 +292,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getlatestblockhash">getLatestBlockhash RPC Method</a>
      */
     RpcResultObject<ResValueLatestBlockhash> getLatestBlockhash(LatestBlockhashConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueLatestBlockhash> getLatestBlockhash() throws RpcException {
+        return getLatestBlockhash(null);
+    }
 
     /**
      * Returns the leader schedule for an epoch.
@@ -301,6 +336,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getminimumbalanceforrentexemption">getMinimumBalanceForRentExemption RPC Method</a>
      */
     UnsignedLong getMinimumBalanceForRentExemption(Integer dataLength, MinimumBalanceForRentExemptionConfig configuration) throws RpcException;
+    default UnsignedLong getMinimumBalanceForRentExemption(Integer dataLength) throws RpcException {
+        return getMinimumBalanceForRentExemption(dataLength, null);
+    }
 
     /**
      * Returns the account information for a list of Pubkeys.
@@ -312,6 +350,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getmultipleaccounts">getMultipleAccounts RPC Method</a>
      */
     RpcResultObject<List<ResValueAccountInfo>> getMultipleAccounts(List<PublicKey> accounts, MultipleAccountsConfig configuration) throws RpcException;
+    default RpcResultObject<List<ResValueAccountInfo>> getMultipleAccounts(List<PublicKey> accounts) throws RpcException {
+        return getMultipleAccounts(accounts, null);
+    }
 
     /**
      * Returns all accounts owned by the provided program Pubkey.
@@ -323,6 +364,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getprogramaccounts">getProgramAccounts RPC Method</a>
      */
     List<ResValueProgram> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException;
+    default List<ResValueProgram> getProgramAccounts(PublicKey programId) throws RpcException {
+        return getProgramAccounts(programId, null);
+    }
 
     /**
      * Returns a list of recent performance samples, in reverse slot order.
@@ -335,6 +379,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getrecentperformancesamples">getRecentPerformanceSamples RPC Method</a>
      */
     List<ResValuePerformanceSample> getRecentPerformanceSamples(Integer limit) throws RpcException;
+    default List<ResValuePerformanceSample> getRecentPerformanceSamples() throws RpcException {
+        return getRecentPerformanceSamples(null);
+    }
 
     /**
      * Returns a list of prioritization fees from recent blocks.
@@ -346,6 +393,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getrecentprioritizationfees">getRecentPrioritizationFees RPC Method</a>
      */
     List<ResValuePrioritizationFee> getRecentPrioritizationFees(List<PublicKey> accounts) throws RpcException;
+    default List<ResValuePrioritizationFee> getRecentPrioritizationFees() throws RpcException {
+        return getRecentPrioritizationFees(null);
+    }
 
     /**
      * Returns signatures for confirmed transactions that include the given address in their accountKeys list.
@@ -358,6 +408,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsignaturesforaddress">getSignaturesForAddress RPC Method</a>
      */
     List<ResValueTransactionSignature> getSignaturesForAddress(PublicKey account, SignaturesForAddressConfig configuration) throws RpcException;
+    default List<ResValueTransactionSignature> getSignaturesForAddress(PublicKey account) throws RpcException {
+        return getSignaturesForAddress(account, null);
+    }
 
     /**
      * Returns the statuses of a list of signatures. Each signature must be a transaction ID (txid),
@@ -370,6 +423,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsignaturestatuses">getSignatureStatuses RPC Method</a>
      */
     RpcResultObject<List<ResValueSignatureStatus>> getSignatureStatuses(List<Signature> signatures, SignatureStatusesConfig configuration) throws RpcException;
+    default RpcResultObject<List<ResValueSignatureStatus>> getSignatureStatuses(List<Signature> signatures) throws RpcException {
+        return getSignatureStatuses(signatures, null);
+    }
 
     /**
      * Returns the slot that has reached the given or default commitment level.
@@ -380,6 +436,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getslot">getSlot RPC Method</a>
      */
     UnsignedLong getSlot(SlotConfig configuration) throws RpcException;
+    default UnsignedLong getSlot() throws RpcException {
+        return getSlot(null);
+    }
 
     /**
      * Returns the current slot leader.
@@ -390,6 +449,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getslotleader">getSlotLeader RPC Method</a>
      */
     PublicKey getSlotLeader(SlotLeaderConfig configuration) throws RpcException;
+    default PublicKey getSlotLeader() throws RpcException {
+        return getSlotLeader(null);
+    }
 
     /**
      * Returns the slot leaders for a given slot range.
@@ -401,6 +463,12 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getslotleaders">getSlotLeaders RPC Method</a>
      */
     List<PublicKey> getSlotLeaders(UnsignedLong startSlot, UnsignedLong limit) throws RpcException;
+    default List<PublicKey> getSlotLeaders(UnsignedLong startSlot) throws RpcException {
+        return getSlotLeaders(startSlot, null);
+    }
+    default List<PublicKey> getSlotLeaders() throws RpcException {
+        return getSlotLeaders(null, null);
+    }
 
     /**
      * Returns the stake minimum delegation, in lamports.
@@ -411,6 +479,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getstakeminimumdelegation">getStakeMinimumDelegation RPC Method</a>
      */
     RpcResultObject<UnsignedLong> getStakeMinimumDelegation(StakeMinimumDelegationConfig configuration) throws RpcException;
+    default RpcResultObject<UnsignedLong> getStakeMinimumDelegation() throws RpcException {
+        return getStakeMinimumDelegation(null);
+    }
 
     /**
      * Returns information about the current supply.
@@ -421,6 +492,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/getsupply">getSupply RPC Method</a>
      */
     RpcResultObject<ResValueSupply> getSupply(SupplyConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueSupply> getSupply() throws RpcException {
+        return getSupply(null);
+    }
 
     /**
      * Returns the token balance of an SPL Token account.
@@ -432,6 +506,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokenaccountbalance">getTokenAccountBalance RPC Method</a>
      */
     RpcResultObject<ResValueTokenAccountBalance> getTokenAccountBalance(PublicKey account, TokenAccountBalanceConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueTokenAccountBalance> getTokenAccountBalance(PublicKey account) throws RpcException {
+        return getTokenAccountBalance(account, null);
+    }
 
     /**
      * Returns all SPL Token accounts by approved Delegate.
@@ -448,6 +525,12 @@ public interface HttpMethodApi {
             TokenAccountsByDelegateFilter filter,
             TokenAccountsByDelegateConfig configuration
     ) throws RpcException;
+    default RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByDelegate(PublicKey delegate, TokenAccountsByDelegateFilter filter) throws RpcException {
+        return getTokenAccountsByDelegate(delegate, filter, null);
+    }
+    default RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByDelegate(PublicKey delegate) throws RpcException {
+        return getTokenAccountsByDelegate(delegate, null, null);
+    }
 
     /**
      * Returns all SPL Token accounts by token owner.
@@ -464,6 +547,9 @@ public interface HttpMethodApi {
             TokenAccountsByOwnerFilter filter,
             TokenAccountsByOwnerConfig configuration
     ) throws RpcException;
+    default RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByOwner(PublicKey owner, TokenAccountsByOwnerFilter filter) throws RpcException {
+        return getTokenAccountsByOwner(owner, filter, null);
+    }
 
     /**
      * Returns the 20 largest accounts of a particular SPL Token type.
@@ -478,6 +564,9 @@ public interface HttpMethodApi {
             PublicKey mint,
             TokenLargestAccountsConfig configuration
     ) throws RpcException;
+    default RpcResultObject<List<ResValueTokenLargestAccounts>> getTokenLargestAccounts(PublicKey mint) throws RpcException {
+        return getTokenLargestAccounts(mint, null);
+    }
 
     /**
      * Returns the total supply of an SPL Token type.
@@ -489,6 +578,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettokensupply">getTokenSupply RPC Method</a>
      */
     RpcResultObject<ResValueTokenSupply> getTokenSupply(PublicKey mint, TokenSupplyConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueTokenSupply> getTokenSupply(PublicKey mint) throws RpcException {
+        return getTokenSupply(mint, null);
+    }
 
     /**
      * Returns transaction details for a confirmed transaction.
@@ -500,6 +592,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettransaction">getTransaction RPC Method</a>
      */
     ResValueConfirmedTransaction getTransaction(Signature signature, TransactionConfig configuration) throws RpcException;
+    default ResValueConfirmedTransaction getTransaction(Signature signature) throws RpcException {
+        return getTransaction(signature, null);
+    }
 
     /**
      * Retrieves a parsed transaction after applying the provided signature and configuration.
@@ -511,6 +606,9 @@ public interface HttpMethodApi {
      * @throws RpcException if an error occurs during the parsing process
      */
     ResValueParsedTransaction getParsedTransaction(Signature signature, TransactionConfig configuration) throws RpcException;
+    default ResValueParsedTransaction getParsedTransaction(Signature signature) throws RpcException {
+        return getParsedTransaction(signature, null);
+    }
 
     /**
      * Returns the current transaction count from the ledger.
@@ -521,6 +619,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/gettransactioncount">getTransactionCount RPC Method</a>
      */
     UnsignedLong getTransactionCount(TransactionCountConfig configuration) throws RpcException;
+    default UnsignedLong getTransactionCount() throws RpcException {
+        return getTransactionCount(null);
+    }
 
 
     /**
@@ -541,6 +642,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/getvoteaccounts">getVoteAccounts RPC Method</a>
      */
     ResValueVoteAccounts getVoteAccounts(VoteAccountsConfig configuration) throws RpcException;
+    default ResValueVoteAccounts getVoteAccounts() throws RpcException {
+        return getVoteAccounts(null);
+    }
 
     /**
      * Returns whether a blockhash is still valid or not.
@@ -552,6 +656,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/docs/rpc/http/isblockhashvalid">isBlockhashValid RPC Method</a>
      */
     RpcResultObject<Boolean> isBlockhashValid(Blockhash blockhash, BlockhashValidConfig configuration) throws RpcException;
+    default RpcResultObject<Boolean> isBlockhashValid(Blockhash blockhash) throws RpcException {
+        return isBlockhashValid(blockhash, null);
+    }
 
     /**
      * Returns the lowest slot that the node has information about in its ledger.
@@ -573,6 +680,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/requestairdrop">requestAirdrop RPC Method</a>
      */
     Signature requestAirdrop(PublicKey pubkey, UnsignedLong lamports, RequestAirdropConfig configuration) throws RpcException;
+    default Signature requestAirdrop(PublicKey pubkey, UnsignedLong lamports) throws RpcException {
+        return requestAirdrop(pubkey, lamports, null);
+    }
 
     /**
      * Submits a signed transaction to the cluster for processing.
@@ -584,6 +694,9 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/sendtransaction">sendTransaction RPC Method</a>
      */
     Signature sendTransaction(Transaction transaction, SendTransactionConfig configuration) throws RpcException;
+    default Signature sendTransaction(Transaction transaction) throws RpcException {
+        return sendTransaction(transaction, null);
+    }
 
     /**
      * Simulates sending a transaction.
@@ -595,5 +708,8 @@ public interface HttpMethodApi {
      * @see <a href="https://solana.com/ko/docs/rpc/http/simulatetransaction">simulateTransaction RPC Method</a>
      */
     RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException;
+    default RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction) throws RpcException {
+        return simulateTransaction(transaction, null);
+    }
 
 }

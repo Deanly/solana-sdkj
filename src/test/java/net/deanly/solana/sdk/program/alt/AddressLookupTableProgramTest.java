@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.alt;
 
 import net.deanly.solana.sdk.program.spl.alt.AddressLookupTableProgram;
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,7 +24,7 @@ public class AddressLookupTableProgramTest {
     public void testCreateLookupTable() {
         TransactionInstruction instruction = AddressLookupTableProgram.createLookupTable(AUTHORITY, PAYER, RECENT_SLOT);
         assertNotNull(instruction);
-        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(4, instruction.getKeys().size()); // Check number of keys
     }
 
@@ -34,7 +35,7 @@ public class AddressLookupTableProgramTest {
     public void testFreezeLookupTable() {
         TransactionInstruction instruction = AddressLookupTableProgram.freezeLookupTable(LOOKUP_TABLE, AUTHORITY);
         assertNotNull(instruction);
-        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size()); // Check number of keys
     }
 
@@ -46,7 +47,7 @@ public class AddressLookupTableProgramTest {
         PublicKey addressToAdd = new PublicKey("SysvarC1ock11111111111111111111111111111111");
         TransactionInstruction instruction = AddressLookupTableProgram.extendLookupTable(LOOKUP_TABLE, AUTHORITY, PAYER, Collections.singletonList(addressToAdd));
         assertNotNull(instruction);
-        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(4, instruction.getKeys().size()); // Check number of keys
     }
 
@@ -57,7 +58,7 @@ public class AddressLookupTableProgramTest {
     public void testDeactivateLookupTable() {
         TransactionInstruction instruction = AddressLookupTableProgram.deactivateLookupTable(LOOKUP_TABLE, AUTHORITY);
         assertNotNull(instruction);
-        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size()); // Check number of keys
     }
 
@@ -69,7 +70,7 @@ public class AddressLookupTableProgramTest {
         PublicKey recipient = new PublicKey("SysvarRent111111111111111111111111111111111");
         TransactionInstruction instruction = AddressLookupTableProgram.closeLookupTable(LOOKUP_TABLE, AUTHORITY, recipient);
         assertNotNull(instruction);
-        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AddressLookupTableProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size()); // Check number of keys
     }
 }

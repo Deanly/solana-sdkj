@@ -44,7 +44,7 @@ public class BPFLoaderProgramTest {
                 payer.getPublicKey()
         );
 
-        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(0, instruction.getData()[0]);
@@ -60,7 +60,7 @@ public class BPFLoaderProgramTest {
                 data
         );
 
-        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size());
         assertEquals(10, instruction.getData().length);
         assertEquals(1, instruction.getData()[0]);
@@ -77,7 +77,7 @@ public class BPFLoaderProgramTest {
                 1000
         );
 
-        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(8, instruction.getKeys().size());
         assertEquals(9, instruction.getData().length);
         assertEquals(2, instruction.getData()[0]);
@@ -93,7 +93,7 @@ public class BPFLoaderProgramTest {
                 payer.getPublicKey()
         );
 
-        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(7, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(3, instruction.getData()[0]);
@@ -107,7 +107,7 @@ public class BPFLoaderProgramTest {
                 new KeyPair().getPublicKey()
         );
 
-        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(BPFLoaderProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(4, instruction.getData()[0]);

@@ -18,8 +18,4 @@ abstract class CpmmInstructionBase {
                 throw new IllegalArgumentException("Unsupported network: " + network);
         }
     }
-
-    public PublicKey getProgramId() {
-        throw new UnsupportedOperationException("Please override this method");
-    }
 }

@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.program.spl.token.basic;
 
 import net.deanly.solana.sdk.program.core.Sysvar;
 import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -31,7 +32,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.initializeMint(mintPubkey, mintAuthority, decimals, freezeAuthority, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size());
         assertEquals(mintPubkey, instruction.getKeys().get(0).getPublicKey());
         assertFalse(instruction.getKeys().get(0).isSigner());
@@ -61,7 +62,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.initializeMultisig(multisigPubkey, signerPubkeys, Sysvar.SYSVAR_RENT_ADDRESS);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(4, instruction.getKeys().size());
         assertEquals(multisigPubkey, instruction.getKeys().get(0).getPublicKey());
         assertFalse(instruction.getKeys().get(0).isSigner());
@@ -85,7 +86,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.approve(sourcePubkey, delegatePubkey, ownerPubkey, amount, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(sourcePubkey, instruction.getKeys().get(0).getPublicKey());
         assertFalse(instruction.getKeys().get(0).isSigner());
@@ -118,7 +119,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.transfer(source, destination, owner, amount, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(source, instruction.getKeys().get(0).getPublicKey());
         assertEquals(destination, instruction.getKeys().get(1).getPublicKey());
@@ -145,7 +146,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.burn(account, mint, owner, amount, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         assertEquals(mint, instruction.getKeys().get(1).getPublicKey());
@@ -172,7 +173,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.mintTo(mint, destination, authority, amount, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(mint, instruction.getKeys().get(0).getPublicKey());
         assertEquals(destination, instruction.getKeys().get(1).getPublicKey());
@@ -198,7 +199,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.freezeAccount(account, mint, authority, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         assertEquals(mint, instruction.getKeys().get(1).getPublicKey());
@@ -220,7 +221,7 @@ public class SplTokenProgramTest {
 
         TransactionInstruction instruction = SplTokenProgram.thawAccount(account, mint, authority, null);
 
-        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplTokenProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(3, instruction.getKeys().size());
         assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         assertEquals(mint, instruction.getKeys().get(1).getPublicKey());

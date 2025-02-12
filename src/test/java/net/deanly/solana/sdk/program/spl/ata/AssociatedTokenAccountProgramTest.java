@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.program.spl.ata;
 
 import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.program.core.system.SystemProgram;
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,7 +28,7 @@ public class AssociatedTokenAccountProgramTest {
     public void testCreate() {
         TransactionInstruction instruction = AssociatedTokenAccountProgram.create(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
 
-        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(6, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(0, instruction.getData()[0]);
@@ -39,7 +40,7 @@ public class AssociatedTokenAccountProgramTest {
     public void testCreateIdempotent() {
         TransactionInstruction instruction = AssociatedTokenAccountProgram.createIdempotent(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
 
-        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(6, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(1, instruction.getData()[0]);
@@ -52,7 +53,7 @@ public class AssociatedTokenAccountProgramTest {
         TransactionInstruction instruction = AssociatedTokenAccountProgram.recoverNested(
                 NESTED_ACCOUNT, NESTED_MINT, DESTINATION_ACCOUNT, OWNER_ACCOUNT, OWNER_MINT, WALLET_ADDRESS);
 
-        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(7, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(2, instruction.getData()[0]);

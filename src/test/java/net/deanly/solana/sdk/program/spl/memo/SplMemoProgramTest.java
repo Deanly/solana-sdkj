@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.program.spl.memo;
 
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,7 +20,7 @@ public class SplMemoProgramTest {
         TransactionInstruction instruction = SplMemoProgram.write(memo, List.of(account));
 
         assertNotNull(instruction);
-        assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(1, instruction.getKeys().size());
         assertEquals(account, instruction.getKeys().get(0).getPublicKey());
         assertTrue(instruction.getKeys().get(0).isSigner());
@@ -52,7 +53,7 @@ public class SplMemoProgramTest {
         TransactionInstruction instruction = SplMemoProgram.write(longMemo, List.of(account));
 
         assertNotNull(instruction);
-        assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SplMemoProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertArrayEquals(longMemo.getBytes(StandardCharsets.UTF_8), instruction.getData());
     }
 }

@@ -10,7 +10,6 @@ import java.util.*;
  */
 public interface TransactionInstruction {
     PublicKey getProgramId(Network network);
-    PublicKey getProgramId();
     List<AccountMeta> getKeys();
     byte[] getData();
 }

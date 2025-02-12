@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.system.bpf;
 
 import net.deanly.solana.sdk.program.core.bpf.ComputeBudgetProgram;
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
@@ -20,7 +21,7 @@ public class ComputeBudgetProgramTest {
         int microLamports = 1000;
         TransactionInstruction instruction = ComputeBudgetProgram.setComputeUnitPrice(microLamports);
 
-        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(0, instruction.getKeys().size());
 
         byte[] expectedData = new byte[]{0x03, (byte) 0xE8, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
@@ -36,7 +37,7 @@ public class ComputeBudgetProgramTest {
         int units = 200000;
         TransactionInstruction instruction = ComputeBudgetProgram.setComputeUnitLimit(units);
 
-        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(0, instruction.getKeys().size());
 
         byte[] expectedData = new byte[]{0x02, 0x40, 0x0D, 0x03, 0x00};
@@ -52,7 +53,7 @@ public class ComputeBudgetProgramTest {
         int bytes = 32768;
         TransactionInstruction instruction = ComputeBudgetProgram.requestHeapFrame(bytes);
 
-        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(0, instruction.getKeys().size());
 
         byte[] expectedData = new byte[]{0x01, 0x00, (byte) 0x80, 0x00, 0x00};
@@ -68,7 +69,7 @@ public class ComputeBudgetProgramTest {
         int bytes = 65536;
         TransactionInstruction instruction = ComputeBudgetProgram.setLoadedAccountsDataSizeLimit(bytes);
 
-        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(ComputeBudgetProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(0, instruction.getKeys().size());
 
         byte[] expectedData = new byte[]{0x04, 0x00, 0x00, 0x01, 0x00};

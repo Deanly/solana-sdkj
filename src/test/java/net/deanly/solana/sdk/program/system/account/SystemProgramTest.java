@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.program.system.account;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.program.core.system.SystemProgram;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ public class SystemProgramTest {
 
         TransactionInstruction instruction = SystemProgram.transfer(fromPublicKey, toPublicKey, lamports);
 
-        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size());
         assertEquals(fromPublicKey, instruction.getKeys().get(0).getPublicKey());
         assertTrue(instruction.getKeys().get(0).isSigner());
@@ -54,7 +55,7 @@ public class SystemProgramTest {
 
         TransactionInstruction instruction = SystemProgram.createAccount(fromPublicKey, newAccountPublicKey, lamports, space, programId);
 
-        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(2, instruction.getKeys().size());
         assertEquals(fromPublicKey, instruction.getKeys().get(0).getPublicKey());
         assertTrue(instruction.getKeys().get(0).isSigner());
@@ -87,7 +88,7 @@ public class SystemProgramTest {
 
         TransactionInstruction instruction = SystemProgram.assign(owner, newOwner);
 
-        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(SystemProgram.PROGRAM_ID, instruction.getProgramId(Network.DEVNET));
         assertEquals(1, instruction.getKeys().size());
         assertEquals(owner, instruction.getKeys().get(0).getPublicKey());
         assertTrue(instruction.getKeys().get(0).isSigner());

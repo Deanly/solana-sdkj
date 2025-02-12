@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.layout.field;
 
-import net.deanly.solana.sdk.program.spl.token.basic.type.AccountStateEnum;
-import net.deanly.solana.sdk.program.spl.token.basic.type.AuthorityType;
+import net.deanly.solana.sdk.program.spl.token.type.AccountStateEnum;
+import net.deanly.solana.sdk.program.spl.token.type.AuthorityType;
 import net.deanly.structlayout.type.FieldBase;
 
 public class AccountStateEnumField extends FieldBase<AccountStateEnum> {

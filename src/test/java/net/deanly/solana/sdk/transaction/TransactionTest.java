@@ -5,7 +5,7 @@ import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.program.spl.memo.SplMemoProgram;
 import net.deanly.solana.sdk.program.spl.memo.instruction.SplMemoInstructionWrite;
-import net.deanly.solana.sdk.program.system.account.SystemProgram;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
 
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;

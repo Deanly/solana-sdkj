@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.program.system.bpf;
 
+import net.deanly.solana.sdk.program.core.bpf.ComputeBudgetProgram;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;

@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.program.spl.token.basic.instruction;
 
+import net.deanly.solana.sdk.program.spl.token.instruction.TokenInstruction20InitializeMint2;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import org.junit.jupiter.api.Assertions;

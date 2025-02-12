@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.layout.field;
 
-import net.deanly.solana.sdk.program.spl.token.basic.type.AuthorityType;
+import net.deanly.solana.sdk.program.spl.token.type.AuthorityType;
 import net.deanly.structlayout.Field;
 import net.deanly.structlayout.type.FieldBase;
 

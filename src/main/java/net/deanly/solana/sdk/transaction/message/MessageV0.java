@@ -16,7 +16,7 @@ import net.deanly.solana.sdk.transaction.message.meta.LoadedAddresses;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
-import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

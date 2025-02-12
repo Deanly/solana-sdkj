@@ -19,7 +19,7 @@ import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.MessageV0;
 import net.deanly.solana.sdk.transaction.message.VersionedMessage;
 import net.deanly.solana.sdk.transaction.message.Message;
-import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructObjectField;
 import net.deanly.structlayout.annotation.StructSequenceField;

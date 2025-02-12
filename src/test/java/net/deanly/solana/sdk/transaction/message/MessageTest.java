@@ -11,7 +11,7 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.field.ShortVecField;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
-import net.deanly.solana.sdk.program.system.account.SystemProgram;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
 import net.deanly.solana.sdk.transaction.codec.ShortvecEncoding;
 
 import java.nio.ByteBuffer;

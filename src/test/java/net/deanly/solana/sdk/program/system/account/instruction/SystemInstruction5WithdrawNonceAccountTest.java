@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.system.account.instruction;
 
-import net.deanly.solana.sdk.program.system.Sysvar;
+import net.deanly.solana.sdk.program.core.system.instruction.SystemInstruction5WithdrawNonceAccount;
+import net.deanly.solana.sdk.program.core.Sysvar;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;

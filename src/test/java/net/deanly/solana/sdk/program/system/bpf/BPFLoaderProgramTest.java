@@ -1,7 +1,8 @@
 package net.deanly.solana.sdk.program.system.bpf;
 
 import net.deanly.solana.sdk.crypto.KeyPair;
-import net.deanly.solana.sdk.program.system.account.SystemProgram;
+import net.deanly.solana.sdk.program.core.bpf.BPFLoaderProgram;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
 import net.deanly.solana.sdk.types.Blockhash;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

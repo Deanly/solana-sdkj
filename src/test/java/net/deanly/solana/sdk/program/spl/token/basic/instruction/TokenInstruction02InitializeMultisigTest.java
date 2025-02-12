@@ -1,8 +1,9 @@
 package net.deanly.solana.sdk.program.spl.token.basic.instruction;
 
+import net.deanly.solana.sdk.program.spl.token.instruction.TokenInstruction02InitializeMultisig;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.program.system.Sysvar;
+import net.deanly.solana.sdk.program.core.Sysvar;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 

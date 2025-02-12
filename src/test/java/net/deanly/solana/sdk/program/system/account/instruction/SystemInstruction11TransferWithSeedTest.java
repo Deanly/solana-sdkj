@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.system.account.instruction;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.program.core.system.instruction.SystemInstruction11TransferWithSeed;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 

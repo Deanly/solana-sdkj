@@ -1,7 +1,8 @@
 package net.deanly.solana.sdk.program.alt.instruction;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.program.system.account.SystemProgram;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
+import net.deanly.solana.sdk.program.spl.alt.instruction.ATLInstruction0CreateLookupTable;
 import net.deanly.structlayout.StructLayout;
 import org.junit.jupiter.api.Test;
 

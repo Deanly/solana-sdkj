@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.transaction.message.compiler;
 
 import lombok.*;
-import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;

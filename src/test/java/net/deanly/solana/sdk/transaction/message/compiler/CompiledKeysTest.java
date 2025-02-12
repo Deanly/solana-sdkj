@@ -2,7 +2,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstructionImpl;
 import org.junit.jupiter.api.Test;
-import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;

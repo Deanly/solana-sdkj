@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.alt.state;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import org.junit.jupiter.api.Test;

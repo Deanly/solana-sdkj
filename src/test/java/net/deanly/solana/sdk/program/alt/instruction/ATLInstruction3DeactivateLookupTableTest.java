@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.program.alt.instruction;
 
+import net.deanly.solana.sdk.program.spl.alt.instruction.ATLInstruction3DeactivateLookupTable;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import org.junit.jupiter.api.Test;

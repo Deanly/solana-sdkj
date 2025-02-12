@@ -8,9 +8,15 @@ import net.deanly.solana.sdk.program.raydium.cpmm.instruction.*;
 
 import java.util.List;
 
+/**
+ * <p>Standard AMM (CP-Swap, New)</p>
+ * The RaydiumCpmmProgram class represents the CPMM (Constant Product Market Maker) program within the Raydium framework.
+ * It provides functionalities to interact with a CPMM Pool, including creating pools, depositing liquidity, withdrawing liquidity,
+ * executing swaps, locking liquidity, and collecting fees.
+ */
 public class RaydiumCpmmProgram {
 
-    public static final PublicKey PROGRAM_ID = new PublicKey("RaydiumCpmmProgramPublicKeyHere");
+    public static final PublicKey PROGRAM_ID = new PublicKey("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
 
     @Getter
     public static class Base extends Struct {

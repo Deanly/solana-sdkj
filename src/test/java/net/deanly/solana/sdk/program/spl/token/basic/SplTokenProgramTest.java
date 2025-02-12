@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.spl.token.basic;
 
-import net.deanly.solana.sdk.program.system.Sysvar;
+import net.deanly.solana.sdk.program.core.Sysvar;
+import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import net.deanly.solana.sdk.crypto.PublicKey;

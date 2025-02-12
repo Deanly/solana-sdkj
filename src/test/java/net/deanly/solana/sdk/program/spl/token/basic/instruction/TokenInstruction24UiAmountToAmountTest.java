@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.program.spl.token.basic.instruction;
 
+import net.deanly.solana.sdk.program.spl.token.instruction.TokenInstruction24UiAmountToAmount;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;

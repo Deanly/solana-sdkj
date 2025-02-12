@@ -10,9 +10,8 @@ import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
-import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 

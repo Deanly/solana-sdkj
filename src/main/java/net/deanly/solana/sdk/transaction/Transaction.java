@@ -5,6 +5,7 @@ import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.crypto.Ed25519Signer;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.rpc.response.ResValueInstruction;
 import net.deanly.solana.sdk.rpc.response.ResValueTransaction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
@@ -46,11 +47,26 @@ public class Transaction {
     private final List<AddressLookupTableAccount> addressTableLookupsForCompile;
     private Blockhash recentBlockhashForCompile;
     private PublicKey feePayerForCompile;
+    private final Network network;
 
     /**
      * Constructs a new Transaction instance.
      */
     public Transaction() {
+        this.instructionsForCompile = new ArrayList<>();
+        this.signatures = new ArrayList<>();
+        this.addressTableLookupsForCompile = new ArrayList<>();
+        this.network = Network.MAINNET;
+    }
+
+    /**
+     * Constructs a new Transaction instance with the specified network.
+     *
+     * @param network The network in which the transaction will operate.
+     *                Must not be null.
+     */
+    public Transaction(Network network) {
+        this.network = Objects.requireNonNull(network, "Network cannot be null");
         this.instructionsForCompile = new ArrayList<>();
         this.signatures = new ArrayList<>();
         this.addressTableLookupsForCompile = new ArrayList<>();
@@ -205,9 +221,9 @@ public class Transaction {
      */
     public void compile(PublicKey feePayer, Blockhash recentBlockhash, List<TransactionInstruction> instructions, List<AddressLookupTableAccount> addressTableLookups) {
         if (!addressTableLookups.isEmpty()) {
-            message = MessageV0.compile(feePayer, instructions, recentBlockhash, addressTableLookups);
+            this.message = MessageV0.compile(this.network, feePayer, instructions, recentBlockhash, addressTableLookups);
         } else {
-            message = Message.compile(feePayer, instructions, recentBlockhash);
+            this.message = Message.compile(this.network, feePayer, instructions, recentBlockhash);
         }
     }
 

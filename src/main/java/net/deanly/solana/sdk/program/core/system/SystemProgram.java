@@ -21,11 +21,6 @@ public class SystemProgram {
 
     public static final PublicKey PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
 
-    @Getter
-    public abstract static class Base extends Struct {
-        private final PublicKey programId = PROGRAM_ID;
-    }
-
     /** Create Account Instruction (0) */
     public static SystemInstruction0Create createAccount(PublicKey fundingAccount, PublicKey newAccount, long lamports, long space, PublicKey ownerProgramId) {
         return SystemInstruction0Create.create(fundingAccount, newAccount, lamports, space, ownerProgramId);

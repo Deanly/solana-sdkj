@@ -8,5 +8,6 @@ import net.deanly.solana.sdk.crypto.PublicKey;
  */
 public class RaydiumClmmProgram {
 
-    public static final PublicKey PROGRAM_ID = new PublicKey("CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK");
+    public static final PublicKey PROGRAM_ID_MAINNET = new PublicKey("CAMMCzo5YL8w4VFF8KVHrK22GGUsp5VTaW7grrKgrWqK");
+    public static final PublicKey PROGRAM_ID_DEVNET = new PublicKey("devi51mZmdwUJGU9hjN27vEz64Gps7uUefqxg27EAtH");
 }

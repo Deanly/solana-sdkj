@@ -1,21 +1,13 @@
 package net.deanly.solana.sdk.program.spl.alt;
 
-import lombok.Getter;
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.program.spl.alt.instruction.*;
 
 import java.util.List;
 
-public abstract class AddressLookupTableProgram {
+public class AddressLookupTableProgram {
     public static final PublicKey PROGRAM_ID = new PublicKey("AddressLookupTab1e1111111111111111111111111");
-
-    @Getter
-    public static class Base extends Struct {
-        private final PublicKey programId = PROGRAM_ID;
-    }
-
 
     /**
      * Static method to create a new Address Lookup Table.

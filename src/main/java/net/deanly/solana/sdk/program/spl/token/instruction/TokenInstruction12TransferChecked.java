@@ -40,7 +40,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction12TransferChecked extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction12TransferChecked extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 12; // Discriminator for TransferChecked (index 12)

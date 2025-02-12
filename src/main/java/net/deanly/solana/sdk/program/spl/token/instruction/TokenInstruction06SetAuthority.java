@@ -34,7 +34,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction06SetAuthority extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction06SetAuthority extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 6; // Discriminator for SetAuthority instruction (index 6).

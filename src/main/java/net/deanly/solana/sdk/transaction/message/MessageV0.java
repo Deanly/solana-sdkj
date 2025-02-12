@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -51,9 +52,14 @@ public class MessageV0 extends Message implements VersionedMessage {
         return Version.V0;
     }
 
+    public static MessageV0 compile(Network network, PublicKey payerKey, List<TransactionInstruction> instructions,
+                                    Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
+        return MessageCompiler.compileV0(network, payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
+    }
+
     public static MessageV0 compile(PublicKey payerKey, List<TransactionInstruction> instructions,
                                     Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
-        return MessageCompiler.compileV0(payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
+        return MessageCompiler.compileV0(Network.MAINNET, payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
     }
 
     /**

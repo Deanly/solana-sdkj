@@ -33,7 +33,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction08Burn extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction08Burn extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 8; // Discriminator for Burn instruction (index 8).

@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.program.spl.memo.instruction;
 
 import lombok.*;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.layout.field.UTF8StringField;
 import net.deanly.solana.sdk.program.spl.memo.SplMemoProgram;
@@ -15,12 +16,28 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SplMemoInstructionWrite extends SplMemoProgram.Base implements TransactionInstruction {
+public class SplMemoInstructionWrite implements TransactionInstruction {
+    private PublicKey programId = SplMemoProgram.PROGRAM_ID;
 
     @StructField(order = 1, type = UTF8StringField.class)
     private String memo; // UTF-8 memo string
 
     private List<AccountMeta> keys = Collections.emptyList();
+
+    public void setProgramId(PublicKey programId) {
+        if (programId == null) {
+            throw new IllegalArgumentException("programId must not be null");
+        }
+        if (!programId.toBase58().startsWith("Memo")) {
+            throw new IllegalArgumentException("programId must be a valid Memo program");
+        }
+        this.programId = programId;
+    }
+
+    @Override
+    public PublicKey getProgramId(Network network) {
+        return this.programId;
+    }
 
     public void setMemo(String memo) {
         if (memo == null || memo.isEmpty()) {

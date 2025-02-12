@@ -33,7 +33,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction09CloseAccount extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction09CloseAccount extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 9; // Discriminator for CloseAccount (index 9).

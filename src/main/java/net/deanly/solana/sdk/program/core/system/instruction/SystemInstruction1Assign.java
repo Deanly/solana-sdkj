@@ -32,7 +32,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction1Assign extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction1Assign extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 1; // Instruction index (1)

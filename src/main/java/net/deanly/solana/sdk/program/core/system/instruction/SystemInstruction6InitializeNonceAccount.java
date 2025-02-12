@@ -32,7 +32,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction6InitializeNonceAccount extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction6InitializeNonceAccount extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 6; // Instruction index (6), directly defined as required

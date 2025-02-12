@@ -29,7 +29,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction02InitializeMultisig extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction02InitializeMultisig extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 2; // Discriminator for InitializeMultisig

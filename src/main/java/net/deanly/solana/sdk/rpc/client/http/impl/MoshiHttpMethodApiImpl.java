@@ -1,11 +1,11 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
+import net.deanly.solana.sdk.rpc.client.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.adapter.*;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class MoshiHttpMethodApiImpl implements HttpMethodApi {
-    private final RpcClient.ClientConfig config;
+    private final ClientConfig config;
     private OkHttpClient httpClient;
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
@@ -49,7 +49,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
     private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
 
-    public MoshiHttpMethodApiImpl(RpcClient.ClientConfig config) {
+    public MoshiHttpMethodApiImpl(ClientConfig config) {
         this.config = config;
         this.httpClient = this.createHttpClient();
     }
@@ -556,6 +556,9 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         if (!transaction.isSigned()) {
             throw new IllegalArgumentException("transaction must be signed");
         }
+        if (!this.config.getNetwork().equals(transaction.getNetwork())) {
+            throw new IllegalArgumentException("transaction network must not be the same as the rpc client network. transaction=" + transaction.getNetwork() + ", rpcClient=" + this.config.getNetwork());
+        }
 
         byte[] serializedTransaction = transaction.serialize();
         Encoding encoding = Optional.ofNullable(configuration).map(SendTransactionConfig::getEncoding)
@@ -573,6 +576,9 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     @Override
     public RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException {
         Objects.requireNonNull(transaction, "transaction must not be null");
+        if (!this.config.getNetwork().equals(transaction.getNetwork())) {
+            throw new IllegalArgumentException("transaction network must not be the same as the rpc client network. transaction=" + transaction.getNetwork() + ", rpcClient=" + this.config.getNetwork());
+        }
 
         byte[] serializedTransaction = transaction.serialize();
         Encoding encoding = Optional.ofNullable(configuration).map(SimulateTransactionConfig::getEncoding)

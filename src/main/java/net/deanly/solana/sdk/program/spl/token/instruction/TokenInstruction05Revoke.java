@@ -31,7 +31,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction05Revoke extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction05Revoke extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 5; // Discriminator for Revoke instruction (index 5).

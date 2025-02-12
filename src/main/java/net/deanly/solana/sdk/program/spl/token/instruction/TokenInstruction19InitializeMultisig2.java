@@ -21,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction19InitializeMultisig2 extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction19InitializeMultisig2 extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 19; // Discriminator for InitializeMultisig2 instruction.

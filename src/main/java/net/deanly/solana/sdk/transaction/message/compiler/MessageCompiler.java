@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.transaction.message.compiler;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.Message;
 import net.deanly.solana.sdk.transaction.message.MessageV0;
@@ -18,14 +19,14 @@ public class MessageCompiler {
     /**
      * Compile the message using the payer key, instructions, and recent blockhash.
      */
-    public static Message compileLegacy(PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
+    public static Message compileLegacy(Network network, PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
         Objects.requireNonNull(payerKey, "Payer key is required");
         Objects.requireNonNull(recentBlockhash, "Recent blockhash is required");
         if (instructions.isEmpty()) {
             throw new IllegalArgumentException("Instructions cannot be empty");
         }
 
-        CompiledKeys compiledKeys = CompiledKeys.compile(instructions, payerKey);
+        CompiledKeys compiledKeys = CompiledKeys.compile(network, instructions, payerKey);
         CompiledKeys.MessageComponents components = compiledKeys.getMessageComponents();
         final List<PublicKey> accountKeys = components.getStaticAccountKeys();
 
@@ -36,7 +37,7 @@ public class MessageCompiler {
 
         List<MessageCompiledInstruction> compiledInstructions = instructions.stream()
                 .map(instr -> new MessageCompiledInstruction(
-                        keyIndexMap.get(instr.getProgramId()),
+                        keyIndexMap.get(instr.getProgramId(network)),
                         instr.getKeys().stream()
                                 .map(meta -> keyIndexMap.get(meta.getPublicKey()))
                                 .toList(),
@@ -51,8 +52,11 @@ public class MessageCompiler {
                 compiledInstructions
         );
     }
+    public static Message compileLegacy(PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
+        return compileLegacy(Network.MAINNET, payerKey, instructions, recentBlockhash);
+    }
 
-    public static MessageV0 compileV0(PublicKey payerKey, List<TransactionInstruction> instructions,
+    public static MessageV0 compileV0(Network network, PublicKey payerKey, List<TransactionInstruction> instructions,
                                       Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
         Objects.requireNonNull(payerKey, "Payer key is required");
         Objects.requireNonNull(recentBlockhash, "Recent blockhash is required");
@@ -61,7 +65,7 @@ public class MessageCompiler {
         }
 
         // Compile static and dynamic account keys
-        CompiledKeys compiledKeys = CompiledKeys.compile(instructions, payerKey);
+        CompiledKeys compiledKeys = CompiledKeys.compile(network, instructions, payerKey);
 
         List<MessageAddressTableLookup> addressTableLookups = new ArrayList<>();
         LoadedAddresses accountKeysFromLookups = new LoadedAddresses(new ArrayList<>(), new ArrayList<>());
@@ -84,6 +88,7 @@ public class MessageCompiler {
 
         // Combine static keys and dynamic keys into account keys
         MessageAccountKeys accountKeys = new MessageAccountKeys(
+                network,
                 staticAccountKeys,
                 accountKeysFromLookups
         );
@@ -93,6 +98,11 @@ public class MessageCompiler {
 
         // Construct the final MessageV0 object
         return new MessageV0(header, staticAccountKeys, recentBlockhash, compiledInstructions, addressTableLookups);
+    }
+
+    public static MessageV0 compileV0(PublicKey payerKey, List<TransactionInstruction> instructions,
+                                      Blockhash recentBlockhash, List<AddressLookupTableAccount> addressLookupTableAccounts) {
+        return MessageV0.compile(Network.MAINNET, payerKey, instructions, recentBlockhash, addressLookupTableAccounts);
     }
 
 }

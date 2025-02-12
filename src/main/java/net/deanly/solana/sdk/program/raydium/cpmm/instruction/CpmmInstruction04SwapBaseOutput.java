@@ -38,7 +38,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CpmmInstruction04SwapBaseOutput extends RaydiumCpmmProgram.Base implements TransactionInstruction {
+public class CpmmInstruction04SwapBaseOutput extends CpmmInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = Bytes8Field.class)
     private final byte[] discriminator = new byte[] {

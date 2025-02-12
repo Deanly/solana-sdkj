@@ -37,9 +37,9 @@ public class RpcClient {
         this.legacyRpcApi.setClient((MoshiHttpMethodApiImpl) this.httpMethodApi);
     }
 
-    public RpcClient(Cluster cluster) {
+    public RpcClient(Network network) {
         this(ClientConfig.builder()
-                .endpoint(cluster.getEndpoint())
+                .network(network)
                 .build());
     }
 
@@ -110,46 +110,6 @@ public class RpcClient {
                 .proxyHost(proxyHost)
                 .proxyPort(proxyPort)
                 .build());
-    }
-
-    @Getter
-    @lombok.Builder
-    public static class ClientConfig {
-        @lombok.Builder.Default
-        private MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-
-        @lombok.Builder.Default
-        private Integer readTimeoutMs = 20_000;
-
-        private String endpoint;
-
-        private Integer connectTimeoutMs;
-
-        private Integer writeTimeoutMs;
-
-        private String proxyHost;
-
-        private Integer proxyPort;
-
-        private String userAgent;
-
-        @lombok.Builder.Default
-        private Integer websocketListenerCacheMaxSize = 1000;
-
-        @lombok.Builder.Default
-        private Integer websocketPendingSubscriptionCacheMaxSize = 500;
-
-        @lombok.Builder.Default
-        private Integer websocketPendingUnsubscriptionCacheMaxSize = 500;
-
-        @lombok.Builder.Default
-        private Long websocketListenerExpireTimeMs = TimeUnit.HOURS.toMillis(1);
-
-        @lombok.Builder.Default
-        private Long websocketPendingSubscriptionExpireTimeMs = TimeUnit.MINUTES.toMillis(5);
-
-        @lombok.Builder.Default
-        private Long websocketPendingUnsubscriptionExpireTimeMs = TimeUnit.MINUTES.toMillis(5);
     }
 
     /**

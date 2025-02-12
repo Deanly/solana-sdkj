@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message;
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.layout.field.BlockhashField;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
@@ -70,8 +71,15 @@ public class Message extends Struct implements VersionedMessage {
     /**
      * Compile the message using the payer key, instructions, and recent blockhash.
      */
+    public static Message compile(Network network, PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
+        return MessageCompiler.compileLegacy(network, payerKey, instructions, recentBlockhash);
+    }
+
+    /**
+     * Compile the message using the payer key, instructions, and recent blockhash.
+     */
     public static Message compile(PublicKey payerKey, List<TransactionInstruction> instructions, Blockhash recentBlockhash) {
-        return MessageCompiler.compileLegacy(payerKey, instructions, recentBlockhash);
+        return MessageCompiler.compileLegacy(Network.MAINNET, payerKey, instructions, recentBlockhash);
     }
 
     /**

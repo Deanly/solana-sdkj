@@ -7,7 +7,7 @@ import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.program.core.system.SystemProgram;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.program.spl.ata.SplAssociatedTokenProgram;
+import net.deanly.solana.sdk.program.spl.ata.AssociatedTokenAccountProgram;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 @Getter
 @NoArgsConstructor
-public class SplAssociatedTokenInstruction1CreateIdempotent extends SplAssociatedTokenProgram.Base implements TransactionInstruction {
+public class AssociatedTokenAccountInstruction1CreateIdempotent extends SplAtaInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 1; // Fixed identifier for this instruction.
@@ -90,12 +90,12 @@ public class SplAssociatedTokenInstruction1CreateIdempotent extends SplAssociate
      * @param mint Token mint public key.
      * @return Instance of AssociatedTokenInstruction01CreateIdempotent.
      */
-    public static SplAssociatedTokenInstruction1CreateIdempotent create(
+    public static AssociatedTokenAccountInstruction1CreateIdempotent create(
             PublicKey payer,
             PublicKey owner,
             PublicKey mint
     ) {
-        SplAssociatedTokenInstruction1CreateIdempotent instruction = new SplAssociatedTokenInstruction1CreateIdempotent();
+        AssociatedTokenAccountInstruction1CreateIdempotent instruction = new AssociatedTokenAccountInstruction1CreateIdempotent();
         instruction.setKeys(payer, owner, mint);
         return instruction;
     }

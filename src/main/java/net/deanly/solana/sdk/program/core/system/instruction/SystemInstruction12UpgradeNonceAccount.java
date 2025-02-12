@@ -30,7 +30,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction12UpgradeNonceAccount extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction12UpgradeNonceAccount extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 12; // Instruction index (12) for UpgradeNonceAccount

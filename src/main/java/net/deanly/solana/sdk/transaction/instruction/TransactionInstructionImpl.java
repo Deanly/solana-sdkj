@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.transaction.instruction;
 
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.rpc.client.Network;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +11,7 @@ import java.util.Objects;
 
 @Getter
 @ToString
-@Builder(builderClassName = "Builder")
+@lombok.Builder
 @EqualsAndHashCode
 public class TransactionInstructionImpl implements TransactionInstruction {
     private final PublicKey programId;
@@ -21,5 +22,10 @@ public class TransactionInstructionImpl implements TransactionInstruction {
         this.programId = Objects.requireNonNull(programId, "Program ID cannot be null");
         this.keys = Collections.unmodifiableList(Objects.requireNonNull(keys, "Keys cannot be null"));
         this.data = Arrays.copyOf(Objects.requireNonNull(data, "Data cannot be null"), data.length);
+    }
+
+    @Override
+    public PublicKey getProgramId(Network network) {
+        return this.programId;
     }
 }

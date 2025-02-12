@@ -40,7 +40,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction20InitializeMint2 extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction20InitializeMint2 extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 20; // Discriminator for InitializeMint2.

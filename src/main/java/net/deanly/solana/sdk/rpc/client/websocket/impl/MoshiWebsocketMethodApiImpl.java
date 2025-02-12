@@ -1,6 +1,7 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
 import net.deanly.solana.sdk.cache.RemovalAwareLRUCache;
+import net.deanly.solana.sdk.rpc.client.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
@@ -10,7 +11,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.adapter.*;
 import net.deanly.solana.sdk.rpc.client.exception.RpcWebSocketException;
 import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Slf4j
 public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
-    private final RpcClient.ClientConfig config;
+    private final ClientConfig config;
     private OkHttpClient httpClient;
     private WebSocket webSocket;
 
@@ -72,7 +72,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         final List<Object> params;
     }
 
-    public MoshiWebsocketMethodApiImpl(RpcClient.ClientConfig config) {
+    public MoshiWebsocketMethodApiImpl(ClientConfig config) {
         this.config = config;
         this.httpClient = createHttpClient();
         this.webSocket = connectWebSocket();

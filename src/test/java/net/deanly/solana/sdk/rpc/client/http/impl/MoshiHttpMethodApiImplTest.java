@@ -1,5 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
+import net.deanly.solana.sdk.rpc.client.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -36,12 +37,12 @@ class MoshiHttpMethodApiImplTest {
 
     private MoshiHttpMethodApiImpl clientApi; // 테스트할 대상 클래스
     private OkHttpClient mockHttpClient; // 모킹한 OkHttpClient
-    private RpcClient.ClientConfig mockConfig;
+    private ClientConfig mockConfig;
 
     @BeforeEach
     void setup() {
         // 기본 설정 생성
-        mockConfig = RpcClient.ClientConfig.builder()
+        mockConfig = ClientConfig.builder()
                 .endpoint("https://api.devnet.solana.com")
                 .readTimeoutMs(5000)
                 .mediaType(MediaType.get("application/json"))

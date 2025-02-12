@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
@@ -14,12 +15,12 @@ import java.util.stream.Collectors;
 public class KeyHolder {
     private final Map<PublicKey, KeyMeta> keyMetaMap = new LinkedHashMap<>();
 
-    public static KeyHolder compileKeys(List<TransactionInstruction> instructions, PublicKey payer) {
+    public static KeyHolder compileKeys(Network network, List<TransactionInstruction> instructions, PublicKey payer) {
         KeyHolder keyHolder = new KeyHolder();
         keyHolder.addKey(payer, true, true); // Payer is always a signer and writable
 
         for (TransactionInstruction instruction : instructions) {
-            keyHolder.addKey(instruction.getProgramId(), false, false);
+            keyHolder.addKey(instruction.getProgramId(network), false, false);
             for (var accountMeta : instruction.getKeys()) {
                 keyHolder.updateKey(accountMeta.getPublicKey(), accountMeta.isSigner(), accountMeta.isWritable());
             }

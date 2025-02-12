@@ -37,7 +37,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction11TransferWithSeed extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction11TransferWithSeed extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 11; // Instruction index (11) for TransferWithSeed

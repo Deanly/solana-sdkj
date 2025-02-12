@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 import lombok.ToString;
 import lombok.Value;
 import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.LoadedAddresses;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;
@@ -14,15 +15,30 @@ import java.util.stream.Collectors;
 @ToString
 public class MessageAccountKeys {
 
+    Network network;
     List<PublicKey> staticAccountKeys;
     LoadedAddresses accountKeysFromLookups;
 
     public MessageAccountKeys(List<PublicKey> staticAccountKeys, LoadedAddresses accountKeysFromLookups) {
+        this.network = Network.MAINNET;
         this.staticAccountKeys = Objects.requireNonNull(staticAccountKeys, "Static account keys cannot be null");
         this.accountKeysFromLookups = accountKeysFromLookups;
     }
 
     public MessageAccountKeys(List<PublicKey> staticAccountKeys) {
+        this.network = Network.MAINNET;
+        this.staticAccountKeys = Objects.requireNonNull(staticAccountKeys, "Static account keys cannot be null");
+        this.accountKeysFromLookups = new LoadedAddresses(Collections.emptyList(), Collections.emptyList());
+    }
+
+    public MessageAccountKeys(Network network, List<PublicKey> staticAccountKeys, LoadedAddresses accountKeysFromLookups) {
+        this.network = Objects.requireNonNull(network, "Network cannot be null");
+        this.staticAccountKeys = Objects.requireNonNull(staticAccountKeys, "Static account keys cannot be null");
+        this.accountKeysFromLookups = accountKeysFromLookups;
+    }
+
+    public MessageAccountKeys(Network network, List<PublicKey> staticAccountKeys) {
+        this.network = Objects.requireNonNull(network, "Network cannot be null");
         this.staticAccountKeys = Objects.requireNonNull(staticAccountKeys, "Static account keys cannot be null");
         this.accountKeysFromLookups = new LoadedAddresses(Collections.emptyList(), Collections.emptyList());
     }
@@ -88,7 +104,7 @@ public class MessageAccountKeys {
 
         // 2. Compile instructions
         return instructions.stream().map(instruction -> {
-            int programIdIndex = findKeyIndex(keyIndexMap, instruction.getProgramId());
+            int programIdIndex = findKeyIndex(keyIndexMap, instruction.getProgramId(network));
             List<Integer> accountKeyIndexes = instruction.getKeys().stream()
                     .map(meta -> findKeyIndex(keyIndexMap, meta.getPublicKey()))
                     .collect(Collectors.toList());

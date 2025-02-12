@@ -11,7 +11,7 @@ import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 
 import java.util.List;
 
-public class SplAssociatedTokenProgramTest {
+public class AssociatedTokenAccountProgramTest {
 
     // Using real Solana addresses
     private static final PublicKey FUNDING_ACCOUNT = new PublicKey("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr");
@@ -25,9 +25,9 @@ public class SplAssociatedTokenProgramTest {
 
     @Test
     public void testCreate() {
-        TransactionInstruction instruction = SplAssociatedTokenProgram.create(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
+        TransactionInstruction instruction = AssociatedTokenAccountProgram.create(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
 
-        assertEquals(SplAssociatedTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(6, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(0, instruction.getData()[0]);
@@ -37,9 +37,9 @@ public class SplAssociatedTokenProgramTest {
 
     @Test
     public void testCreateIdempotent() {
-        TransactionInstruction instruction = SplAssociatedTokenProgram.createIdempotent(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
+        TransactionInstruction instruction = AssociatedTokenAccountProgram.createIdempotent(FUNDING_ACCOUNT, WALLET_ADDRESS, MINT);
 
-        assertEquals(SplAssociatedTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(6, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(1, instruction.getData()[0]);
@@ -49,10 +49,10 @@ public class SplAssociatedTokenProgramTest {
 
     @Test
     public void testRecoverNested() {
-        TransactionInstruction instruction = SplAssociatedTokenProgram.recoverNested(
+        TransactionInstruction instruction = AssociatedTokenAccountProgram.recoverNested(
                 NESTED_ACCOUNT, NESTED_MINT, DESTINATION_ACCOUNT, OWNER_ACCOUNT, OWNER_MINT, WALLET_ADDRESS);
 
-        assertEquals(SplAssociatedTokenProgram.PROGRAM_ID, instruction.getProgramId());
+        assertEquals(AssociatedTokenAccountProgram.PROGRAM_ID, instruction.getProgramId());
         assertEquals(7, instruction.getKeys().size());
         assertEquals(1, instruction.getData().length);
         assertEquals(2, instruction.getData()[0]);

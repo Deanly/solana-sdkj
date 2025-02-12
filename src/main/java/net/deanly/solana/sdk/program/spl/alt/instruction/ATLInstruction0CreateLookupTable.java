@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ATLInstruction0CreateLookupTable extends AddressLookupTableProgram.Base implements TransactionInstruction {
+public class ATLInstruction0CreateLookupTable extends AtlInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 0; // Index (0) for CreateLookupTable

@@ -8,7 +8,7 @@ import lombok.Setter;
 import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.program.spl.ata.SplAssociatedTokenProgram;
+import net.deanly.solana.sdk.program.spl.ata.AssociatedTokenAccountProgram;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt8Field;
@@ -23,7 +23,7 @@ import java.util.List;
  * Represents a Solana program instruction for recovering a nested associated token account.
  *
  * <p>
- * This class is part of the {@link SplAssociatedTokenProgram} and implements the {@link TransactionInstruction}
+ * This class is part of the {@link AssociatedTokenAccountProgram} and implements the {@link TransactionInstruction}
  * interface. The instruction allows recovering a nested associated token account (ATA) and transferring
  * its contents to a target associated account, adhering to Solana program conventions.
  * </p>
@@ -37,7 +37,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SplAssociatedTokenInstruction2RecoverNested extends SplAssociatedTokenProgram.Base implements TransactionInstruction {
+public class AssociatedTokenAccountInstruction2RecoverNested extends SplAtaInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 2; // Instruction discriminator index (fixed).
@@ -118,7 +118,7 @@ public class SplAssociatedTokenInstruction2RecoverNested extends SplAssociatedTo
      * @param walletAddress Signer, writable wallet address of the owner owning the nested ATA.
      * @return Configured RecoverNestedAssociatedToken instruction.
      */
-    public static SplAssociatedTokenInstruction2RecoverNested create(
+    public static AssociatedTokenAccountInstruction2RecoverNested create(
             @NonNull PublicKey nestedAssociatedAccountAddress,
             @NonNull PublicKey nestedTokenMintAddress,
             @NonNull PublicKey destinationAssociatedAccountAddress,
@@ -127,8 +127,8 @@ public class SplAssociatedTokenInstruction2RecoverNested extends SplAssociatedTo
             @NonNull PublicKey walletAddress
     ) {
         // Instantiate and set metadata
-        SplAssociatedTokenInstruction2RecoverNested instruction =
-                new SplAssociatedTokenInstruction2RecoverNested();
+        AssociatedTokenAccountInstruction2RecoverNested instruction =
+                new AssociatedTokenAccountInstruction2RecoverNested();
         instruction.setKeys(
                 nestedAssociatedAccountAddress,
                 nestedTokenMintAddress,

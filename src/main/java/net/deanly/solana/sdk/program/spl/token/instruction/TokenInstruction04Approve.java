@@ -34,7 +34,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction04Approve extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction04Approve extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 4; // Discriminator for Approve instruction (index 4).

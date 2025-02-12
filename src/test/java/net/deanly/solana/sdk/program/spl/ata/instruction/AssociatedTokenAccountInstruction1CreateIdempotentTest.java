@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
-public class SplAssociatedTokenInstruction1CreateIdempotentTest {
+public class AssociatedTokenAccountInstruction1CreateIdempotentTest {
 
     @Test
     public void testCreateInstruction() {
@@ -23,8 +23,8 @@ public class SplAssociatedTokenInstruction1CreateIdempotentTest {
         PublicKey tokenProgram = SplTokenProgram.PROGRAM_ID;
 
         // Generate the instruction
-        SplAssociatedTokenInstruction1CreateIdempotent instruction =
-                SplAssociatedTokenInstruction1CreateIdempotent.create(
+        AssociatedTokenAccountInstruction1CreateIdempotent instruction =
+                AssociatedTokenAccountInstruction1CreateIdempotent.create(
                         payer, owner, mint
                 );
 

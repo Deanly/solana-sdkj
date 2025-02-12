@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 
 import lombok.*;
 import net.deanly.solana.sdk.program.spl.alt.state.AddressLookupTableAccount;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
@@ -23,7 +24,11 @@ public class CompiledKeys {
         this.staticKeyMetaMap = staticKeyMetaMap;
     }
 
+
     public static CompiledKeys compile(List<TransactionInstruction> instructions, PublicKey payer) {
+        return compile(Network.MAINNET, instructions, payer);
+    }
+    public static CompiledKeys compile(Network network, List<TransactionInstruction> instructions, PublicKey payer) {
         Objects.requireNonNull(payer, "Payer is required");
 
         Map<PublicKey, CompiledKeyMeta> keyMetaMap = new HashMap<>();
@@ -32,7 +37,7 @@ public class CompiledKeys {
         payerKeyMeta.setWritable(true);
 
         for (TransactionInstruction instruction : instructions) {
-            keyMetaMap.computeIfAbsent(instruction.getProgramId(), k -> new CompiledKeyMeta()).setInvoked(true);
+            keyMetaMap.computeIfAbsent(instruction.getProgramId(network), k -> new CompiledKeyMeta()).setInvoked(true);
             for (AccountMeta accountMeta : instruction.getKeys()) {
                 CompiledKeyMeta keyMeta = keyMetaMap.computeIfAbsent(accountMeta.getPublicKey(), k -> new CompiledKeyMeta());
                 keyMeta.setSigner(keyMeta.isSigner() || accountMeta.isSigner());

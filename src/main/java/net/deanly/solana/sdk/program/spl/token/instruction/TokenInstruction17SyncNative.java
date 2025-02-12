@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction17SyncNative extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction17SyncNative extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 17; // Discriminator for SyncNative instruction (index 17).

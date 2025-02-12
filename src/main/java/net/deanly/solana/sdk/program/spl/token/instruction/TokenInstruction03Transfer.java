@@ -35,7 +35,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction03Transfer extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction03Transfer extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 3; // Discriminator for Transfer instruction (index 3).

@@ -5,7 +5,7 @@ import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.program.core.system.SystemProgram;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.program.spl.ata.SplAssociatedTokenProgram;
+import net.deanly.solana.sdk.program.spl.ata.AssociatedTokenAccountProgram;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt8Field;
@@ -25,14 +25,14 @@ import java.util.List;
  * </p>
  *
  * <p>
- * This class extends {@link SplAssociatedTokenProgram} and implements the {@link TransactionInstruction}
+ * This class extends {@link AssociatedTokenAccountProgram} and implements the {@link TransactionInstruction}
  * interface, encapsulating the instruction logic, account metadata, and related data.
  * </p>
  */
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SplAssociatedTokenInstruction0Create extends SplAssociatedTokenProgram.Base implements TransactionInstruction {
+public class AssociatedTokenAccountInstruction0Create extends SplAtaInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 0; // Discriminator for the instruction.
@@ -105,13 +105,13 @@ public class SplAssociatedTokenInstruction0Create extends SplAssociatedTokenProg
      * @param mint         Token mint (readonly).
      * @return Configured CreateAssociatedToken instruction.
      */
-    public static SplAssociatedTokenInstruction0Create create(
+    public static AssociatedTokenAccountInstruction0Create create(
             @NonNull PublicKey payer,
             @NonNull PublicKey owner,
             @NonNull PublicKey mint
     ) {
         // Create a new instruction instance
-        SplAssociatedTokenInstruction0Create instruction = new SplAssociatedTokenInstruction0Create();
+        AssociatedTokenAccountInstruction0Create instruction = new AssociatedTokenAccountInstruction0Create();
 
         // Set the account keys for the instruction
         instruction.setKeys(payer, owner, mint);

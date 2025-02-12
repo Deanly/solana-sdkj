@@ -24,7 +24,7 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction01InitializeAccount extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction01InitializeAccount extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 1; // Discriminator for InitializeAccount (index = 1)

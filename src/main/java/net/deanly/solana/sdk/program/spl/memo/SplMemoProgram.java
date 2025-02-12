@@ -12,22 +12,6 @@ public class SplMemoProgram {
     public static final PublicKey PROGRAM_ID = new PublicKey("MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr");
     public static final PublicKey PROGRAM_ID_OLD = new PublicKey("Memo1UhkJRfHyvLMcVucJwxXeuD728EqVDDwQDxFMNo");
 
-    @Getter
-    @Setter
-    public static class Base extends Struct {
-        private PublicKey programId = PROGRAM_ID;
-
-        public void setProgramId(PublicKey programId) {
-            if (programId == null) {
-                throw new IllegalArgumentException("programId must not be null");
-            }
-            if (!programId.toBase58().startsWith("Memo")) {
-                throw new IllegalArgumentException("programId must be a valid Memo program");
-            }
-            this.programId = programId;
-        }
-    }
-
     public static SplMemoInstructionWrite write(
             String memo,
             List<PublicKey> signer) {

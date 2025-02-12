@@ -26,7 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction18InitializeAccount3 extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction18InitializeAccount3 extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 18; // Discriminator for InitializeAccount3 instruction (index 18).

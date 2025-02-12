@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SplAssociatedTokenInstruction2RecoverNestedTest {
+public class AssociatedTokenAccountInstruction2RecoverNestedTest {
 
     @Test
     public void instructionTest() {
@@ -22,8 +22,8 @@ public class SplAssociatedTokenInstruction2RecoverNestedTest {
         PublicKey tokenProgramKey = SplTokenProgram.PROGRAM_ID;
 
         // Create instruction
-        SplAssociatedTokenInstruction2RecoverNested instruction =
-                SplAssociatedTokenInstruction2RecoverNested.create(
+        AssociatedTokenAccountInstruction2RecoverNested instruction =
+                AssociatedTokenAccountInstruction2RecoverNested.create(
                         nestedAssociatedAccount,
                         nestedTokenMint,
                         destinationAccount,

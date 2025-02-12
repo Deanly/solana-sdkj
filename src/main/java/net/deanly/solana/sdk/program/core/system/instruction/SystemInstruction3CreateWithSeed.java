@@ -40,7 +40,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction3CreateWithSeed extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction3CreateWithSeed extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 3; // Instruction index (3), directly defined as required

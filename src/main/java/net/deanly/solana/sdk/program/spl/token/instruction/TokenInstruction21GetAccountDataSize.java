@@ -24,7 +24,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction21GetAccountDataSize extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction21GetAccountDataSize extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 21; // Discriminator for GetAccountDataSize.

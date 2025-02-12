@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ATLInstruction1FreezeLookupTable extends AddressLookupTableProgram.Base implements TransactionInstruction {
+public class ATLInstruction1FreezeLookupTable extends AtlInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 1; // Index (1) for FreezeLookupTable

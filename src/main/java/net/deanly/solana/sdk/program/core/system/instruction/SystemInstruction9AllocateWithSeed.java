@@ -38,7 +38,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction9AllocateWithSeed extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction9AllocateWithSeed extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 9; // Instruction index (9) for AllocateWithSeed

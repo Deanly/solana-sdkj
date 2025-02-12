@@ -6,7 +6,6 @@ import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solana.sdk.layout.field.PublicKeyField;
-import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt8Field;
@@ -35,7 +34,7 @@ import java.util.*;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenInstruction00InitializeMint extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction00InitializeMint extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 0; // Discriminator for InitializeMint

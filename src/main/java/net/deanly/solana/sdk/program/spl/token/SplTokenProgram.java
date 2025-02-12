@@ -1,9 +1,7 @@
 package net.deanly.solana.sdk.program.spl.token;
 
-import lombok.Getter;
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.program.spl.token.instruction.*;
 import net.deanly.solana.sdk.program.spl.token.type.AuthorityType;
 
@@ -13,11 +11,6 @@ import java.util.List;
 public class SplTokenProgram {
 
     public static final PublicKey PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-
-    @Getter
-    public static class Base extends Struct {
-        private final PublicKey programId = PROGRAM_ID;
-    }
 
     public static TokenInstruction00InitializeMint initializeMint(
             @NonNull PublicKey mint,

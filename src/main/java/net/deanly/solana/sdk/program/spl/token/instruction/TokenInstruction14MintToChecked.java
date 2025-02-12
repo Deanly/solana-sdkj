@@ -30,7 +30,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction14MintToChecked extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction14MintToChecked extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 14; // Discriminator for MintToChecked (index 14).

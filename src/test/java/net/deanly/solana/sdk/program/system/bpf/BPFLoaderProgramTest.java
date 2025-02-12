@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import net.deanly.solana.sdk.transaction.Transaction;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
-import net.deanly.solana.sdk.rpc.client.Cluster;
+import net.deanly.solana.sdk.rpc.client.Network;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 
@@ -30,7 +30,7 @@ public class BPFLoaderProgramTest {
 
     @BeforeEach
     public void setUp() {
-        client = new RpcClient(Cluster.DEVNET);
+        client = new RpcClient(Network.DEVNET);
         payer = new KeyPair();
         bufferKeyPair = new KeyPair();
         programKeyPair = new KeyPair();

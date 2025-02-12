@@ -1,14 +1,13 @@
 package net.deanly.solana.sdk.rpc.client;
 
-public enum Cluster {
+public enum Network {
     DEVNET("https://api.devnet.solana.com"),
     TESTNET("https://api.testnet.solana.com"),
-    MAINNET("https://api.mainnet-beta.solana.com"),
-    ANKR("https://rpc.ankr.com/solana");
+    MAINNET("https://api.mainnet-beta.solana.com");
 
     private String endpoint;
 
-    Cluster(String endpoint) {
+    Network(String endpoint) {
         this.endpoint = endpoint;
     }
 

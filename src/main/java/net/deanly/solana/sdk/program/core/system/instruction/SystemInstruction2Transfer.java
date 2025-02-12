@@ -31,7 +31,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction2Transfer extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction2Transfer extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 2; // Instruction index (2)

@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ATLInstruction4CloseLookupTable extends AddressLookupTableProgram.Base implements TransactionInstruction {
+public class ATLInstruction4CloseLookupTable extends AtlInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 4; // Index (4) for CloseLookupTable

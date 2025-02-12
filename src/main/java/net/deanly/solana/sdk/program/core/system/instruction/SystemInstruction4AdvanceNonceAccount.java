@@ -31,7 +31,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction4AdvanceNonceAccount extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction4AdvanceNonceAccount extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 4; // Instruction index (4), directly defined as required

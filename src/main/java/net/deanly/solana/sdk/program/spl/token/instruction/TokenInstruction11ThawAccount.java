@@ -32,7 +32,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class TokenInstruction11ThawAccount extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction11ThawAccount extends SplTokenInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt8Field.class)
     private final int discriminator = 11; // Discriminator for ThawAccount (index 11).

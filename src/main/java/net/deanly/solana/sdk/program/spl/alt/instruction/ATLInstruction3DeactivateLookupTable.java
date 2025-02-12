@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ATLInstruction3DeactivateLookupTable extends AddressLookupTableProgram.Base implements TransactionInstruction {
+public class ATLInstruction3DeactivateLookupTable extends AtlInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 3; // Index (3) for DeactivateLookupTable

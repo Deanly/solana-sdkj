@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc;
 
-import net.deanly.solana.sdk.rpc.client.Cluster;
+import net.deanly.solana.sdk.rpc.client.Network;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,7 +39,7 @@ public class WebsocketTest {
     private SubscriptionWebSocketClient createClient() {
         URI serverURI;
         try {
-            serverURI = new URI(Cluster.MAINNET.getEndpoint().replace("https", "wss"));
+            serverURI = new URI(Network.MAINNET.getEndpoint().replace("https", "wss"));
         } catch (URISyntaxException e) {
             throw new RuntimeException("Invalid URI", e);
         }

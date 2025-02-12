@@ -22,7 +22,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenInstruction23AmountToUiAmount extends SplTokenProgram.Base implements TransactionInstruction {
+public class TokenInstruction23AmountToUiAmount extends SplTokenInstructionBase implements TransactionInstruction {
 
     /**
      * The discriminator identifies this instruction.

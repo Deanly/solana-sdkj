@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.program.raydium.clmm.RaydiumClmmProgram;
 import net.deanly.solana.sdk.program.raydium.cpmm.instruction.*;
 
 import java.util.List;
@@ -16,12 +17,8 @@ import java.util.List;
  */
 public class RaydiumCpmmProgram {
 
-    public static final PublicKey PROGRAM_ID = new PublicKey("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
-
-    @Getter
-    public static class Base extends Struct {
-        private final PublicKey programId = PROGRAM_ID;
-    }
+    public static final PublicKey PROGRAM_ID_MAINNET = new PublicKey("CPMMoo8L3F4NbTegBCKVNunggL7H1ZpdTHKxQB5qKP1C");
+    public static final PublicKey PROGRAM_ID_DEVNET = new PublicKey("CPMDWBwJDtYax9qW7AyRuVC19Cc4L4Vcy4n2BHAbHkCW");
 
     /**
      * Creates a new CPMM Pool.

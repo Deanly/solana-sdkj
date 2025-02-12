@@ -33,7 +33,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SystemInstruction8Allocate extends SystemProgram.Base implements TransactionInstruction {
+public class SystemInstruction8Allocate extends SysInstructionBase implements TransactionInstruction {
 
     @StructField(order = 1, type = UInt32LEField.class)
     private final int instruction = 8; // Instruction index (8), directly defined as required

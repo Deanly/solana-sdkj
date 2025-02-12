@@ -6,6 +6,7 @@ import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
+import net.deanly.structlayout.type.basic.Bytes8Field;
 import net.deanly.structlayout.type.basic.UInt64LEField;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 
@@ -43,8 +44,10 @@ import java.util.List;
 @ToString
 public class CpmmInstruction00CreatePool extends RaydiumCpmmProgram.Base implements TransactionInstruction {
 
-    @StructField(order = 1, type = UInt64LEField.class)
-    private final int discriminator = 0; // Discriminator for CreatePool (index 0)
+    @StructField(order = 1, type = Bytes8Field.class)
+    private final byte[] discriminator = new byte[] {
+            (byte) 175, (byte) 175, (byte) 109, (byte) 31, (byte) 13, (byte) 152, (byte) 155, (byte) 237
+    }; // Discriminator for CreatePool (index 0)
 
     @Setter
     @StructField(order = 2, type = UInt64LEField.class)

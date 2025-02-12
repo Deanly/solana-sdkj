@@ -6,6 +6,7 @@ import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
+import net.deanly.structlayout.type.basic.Bytes8Field;
 import net.deanly.structlayout.type.basic.UInt64LEField;
 import net.deanly.structlayout.type.basic.UInt8Field;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
@@ -39,8 +40,10 @@ import java.util.List;
 @ToString
 public class CpmmInstruction03SwapBaseInput extends RaydiumCpmmProgram.Base implements TransactionInstruction {
 
-    @StructField(order = 1, type = UInt8Field.class)
-    private final int discriminator = 3; // Discriminator for SwapBaseInput (index 3)
+    @StructField(order = 1, type = Bytes8Field.class)
+    private final byte[] discriminator = new byte[] {
+            (byte) 143, (byte) 190, (byte) 90, (byte) 218, (byte) 196, (byte) 30, (byte) 51, (byte) 222
+    }; // Discriminator for SwapBaseInput (index 3)
 
     @Setter
     @StructField(order = 2, type = UInt64LEField.class)

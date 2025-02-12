@@ -6,6 +6,7 @@ import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
+import net.deanly.structlayout.type.basic.Bytes8Field;
 import net.deanly.structlayout.type.basic.UInt64LEField;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.structlayout.type.borsh.BorshBooleanField;
@@ -45,8 +46,10 @@ import java.util.List;
 @ToString
 public class CpmmInstruction05LockLiquidity extends RaydiumCpmmProgram.Base implements TransactionInstruction {
 
-    @StructField(order = 1, type = UInt64LEField.class)
-    private final int discriminator = 5; // Discriminator for LockLiquidity (index 5)
+    @StructField(order = 1, type = Bytes8Field.class)
+    private final byte[] discriminator = new byte[] {
+            (byte) 216, (byte) 157, (byte) 29, (byte) 78, (byte) 38, (byte) 51, (byte) 31, (byte) 26
+    }; // Discriminator for LockLiquidity (index 5)
 
     @Setter
     @StructField(order = 2, type = UInt64LEField.class)

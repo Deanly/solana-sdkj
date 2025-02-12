@@ -10,6 +10,7 @@ import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.annotation.StructSequenceField;
 import net.deanly.structlayout.type.advanced.NoneField;
 import net.deanly.structlayout.type.basic.*;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
 @ToString
 @RequiredArgsConstructor
 public class AddressLookupTableAccount {
-    private static final BigInteger U64_MAX_BIGINT = UInt64LEField.UINT64_MAX;
+    private static final UnsignedLong U64_MAX_BIGINT = UInt64LEField.UINT64_MAX;
 
     private final PublicKey key;
     private final State state;
@@ -52,7 +53,7 @@ public class AddressLookupTableAccount {
         long typeIndex;
 
         @StructField(order = 2, type = UInt64LEField.class)
-        BigInteger deactivationSlot;
+        UnsignedLong deactivationSlot;
 
         @StructField(order = 3, type = UInt64LEField.class)
         long lastExtendedSlot;
@@ -69,7 +70,7 @@ public class AddressLookupTableAccount {
         @StructSequenceField(order = 7, elementType = PublicKeyField.class, lengthType = NoneField.class)
         List<PublicKey> addresses;
 
-        public State(int typeIndex, BigInteger deactivationSlot, long lastExtendedSlot, int lastExtendedStartIndex, PublicKey authority, List<PublicKey> addresses) {
+        public State(int typeIndex, UnsignedLong deactivationSlot, long lastExtendedSlot, int lastExtendedStartIndex, PublicKey authority, List<PublicKey> addresses) {
             this.typeIndex = typeIndex;
             this.deactivationSlot = deactivationSlot;
             this.lastExtendedSlot = lastExtendedSlot;

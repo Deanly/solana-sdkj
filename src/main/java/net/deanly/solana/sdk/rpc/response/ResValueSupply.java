@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.rpc.response;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 
 import java.util.List;

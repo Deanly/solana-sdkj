@@ -2,9 +2,9 @@ package net.deanly.solana.sdk.program.alt.state;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -29,7 +29,7 @@ public class AddressLookupTableAccountTest {
     public static AddressLookupTableAccount createMockAddressLookupTableAccount(PublicKey tableKey) {
         // Mock parameters for AddressLookupTableState
         int typeIndex = 1;
-        BigInteger deactivationSlot = new BigInteger("FFFFFFFFFFFFFFFF", 16); // Active state
+        UnsignedLong deactivationSlot = UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16); // Active state
         long lastExtendedSlot = 1234567L; // Example last slot
         int lastExtendedStartIndex = 0; // Default index
         PublicKey authority = new PublicKey("SecondPubey22222222222222222222222222222222"); // Authority

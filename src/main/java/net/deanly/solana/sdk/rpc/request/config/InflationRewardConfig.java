@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.request.config;
 
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

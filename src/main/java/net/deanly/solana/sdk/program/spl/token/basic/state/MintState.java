@@ -10,6 +10,7 @@ import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt64LEField;
 import net.deanly.structlayout.type.basic.UInt8Field;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 
 import java.math.BigInteger;
 
@@ -24,7 +25,7 @@ public class MintState extends Struct {
     PublicKey mintAuthority; // (Optional) Mint 권한 (32 bytes)
 
     @StructField(order = 2, type = UInt64LEField.class)
-    BigInteger supply; // 현재 전체 발행량 (8 bytes)
+    UnsignedLong supply; // 현재 전체 발행량 (8 bytes)
 
     @StructField(order = 3, type = UInt8Field.class)
     int decimals; // 소수점 자릿수 (1 byte)

@@ -1,13 +1,12 @@
 package net.deanly.solana.sdk.rpc.response;
 
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.Json;
 import lombok.Getter;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.types.ValidatorIdentityInfo;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter

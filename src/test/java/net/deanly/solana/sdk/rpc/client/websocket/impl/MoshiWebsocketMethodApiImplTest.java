@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
@@ -22,15 +22,12 @@ import org.mockito.ArgumentCaptor;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Base64;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static net.deanly.solana.sdk.rpc.client.MoshiTestUtil.assertJsonEqualsIgnoringId;
 import static org.junit.jupiter.api.Assertions.*;

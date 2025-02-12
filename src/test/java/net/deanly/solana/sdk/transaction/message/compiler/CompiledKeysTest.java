@@ -8,8 +8,8 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.LoadedAddresses;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -137,7 +137,7 @@ class CompiledKeysTest {
 
         AddressLookupTableAccount.State atlState = new AddressLookupTableAccount.State(
                 1, // typeIndex
-                new BigInteger("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
+                UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
                 0, // lastExtendedSlot
                 0, // lastExtendedStartIndex
                 null, // 권한(authority): 현재는 없으므로 null

@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.http;
 
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;

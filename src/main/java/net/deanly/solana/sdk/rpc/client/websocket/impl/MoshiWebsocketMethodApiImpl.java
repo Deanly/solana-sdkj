@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
 import net.deanly.solana.sdk.cache.RemovalAwareLRUCache;
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
 import com.squareup.moshi.Moshi;

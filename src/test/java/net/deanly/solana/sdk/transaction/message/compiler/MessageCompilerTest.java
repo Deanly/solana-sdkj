@@ -4,6 +4,7 @@ import net.deanly.solana.sdk.transaction.instruction.TransactionInstructionImpl;
 import net.deanly.solana.sdk.transaction.message.Message;
 import net.deanly.solana.sdk.transaction.message.MessageV0;
 import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import org.junit.jupiter.api.Test;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -69,7 +70,7 @@ class MessageCompilerTest {
                 new PublicKey("ThirdPubkey33333333333333333333333333333333"),
                 new AddressLookupTableAccount.State(
                         1,
-                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
+                        UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,
@@ -168,7 +169,7 @@ class MessageCompilerTest {
                 new PublicKey("FourthPubke44444444444444444444444444444444"),
                 new AddressLookupTableAccount.State(
                         1,
-                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
+                        UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,
@@ -220,7 +221,7 @@ class MessageCompilerTest {
                 new PublicKey("FourthPubke44444444444444444444444444444444"),
                 new AddressLookupTableAccount.State(
                         1,
-                        new BigInteger("FFFFFFFFFFFFFFFF", 16),
+                        UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16),
                         0L,
                         0,
                         null,

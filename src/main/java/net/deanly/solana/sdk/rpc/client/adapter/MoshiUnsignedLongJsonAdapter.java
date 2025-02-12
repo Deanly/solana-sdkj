@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.adapter;
 
-import net.deanly.solana.sdk.types.guava.UnsignedLong;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.*;
 
 import java.io.IOException;

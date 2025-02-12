@@ -6,8 +6,8 @@ import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
 import net.deanly.solana.sdk.program.alt.state.AddressLookupTableAccount;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,7 +57,6 @@ class KeyHolderTest {
         assertEquals(1, index2);
     }
 
-
     @Test
     void generateHeader_generatesCorrectHeader() {
         PublicKey key1 = new PublicKey("EvLdNbr4AWYFNrPhmwbEkvbwPBnCkBjZyhaSUFbvLZUw");
@@ -77,7 +76,6 @@ class KeyHolderTest {
         assertEquals(-1, keyHolder.getKeyIndex(unknownKey));
     }
 
-
     @Test
     void processAddressTables_handlesAddressLookupTableCorrectly() {
         // Test Address Lookup Table
@@ -88,7 +86,7 @@ class KeyHolderTest {
         // AddressLookupTableAccount with a State containing one address
         AddressLookupTableAccount.State atlState = new AddressLookupTableAccount.State(
                 1, // typeIndex
-                new BigInteger("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
+                UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16), // deactivationSlot
                 0, // lastExtendedSlot
                 0, // lastExtendedStartIndex
                 null, // authority
@@ -118,7 +116,7 @@ class KeyHolderTest {
         // Empty AddressLookupTableAccount (no addresses)
         PublicKey atlKey = new PublicKey("8ZbeNDwpRSDrLZzjFxh46T6vAZisDjTheoTUGmJnFTVL");
         AddressLookupTableAccount.State emptyState = new AddressLookupTableAccount.State(
-                1,new BigInteger("FFFFFFFFFFFFFFFF", 16), 0, 0, null, List.of() // Empty address list
+                1, UnsignedLong.valueOf("FFFFFFFFFFFFFFFF", 16), 0, 0, null, List.of() // Empty address list
         );
         AddressLookupTableAccount emptyAtl = new AddressLookupTableAccount(atlKey, emptyState);
 

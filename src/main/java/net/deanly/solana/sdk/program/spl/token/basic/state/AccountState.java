@@ -13,6 +13,7 @@ import net.deanly.solana.sdk.program.spl.token.basic.type.AccountStateEnum;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
 import net.deanly.structlayout.type.basic.UInt64LEField;
+import net.deanly.structlayout.type.guava.UnsignedLong;
 
 import java.math.BigInteger;
 
@@ -30,7 +31,7 @@ public class AccountState extends Struct {
     PublicKey owner; // 계정 소유자 (32 bytes)
 
     @StructField(order = 3, type = UInt64LEField.class)
-    BigInteger amount; // 보유한 토큰 수량 (u64 - 8 bytes)
+    UnsignedLong amount; // 보유한 토큰 수량 (u64 - 8 bytes)
 
     @StructField(order = 4, type = PublicKeyBorshOptionField.class)
     PublicKey delegate; // (Optional) 위임된 토큰 계정 (32 bytes, COption)
@@ -39,10 +40,10 @@ public class AccountState extends Struct {
     AccountStateEnum state; // 계정 상태 - Enum (1 byte, AccountState)
 
     @StructField(order = 6, type = UInt64LECOptionField.class)
-    BigInteger isNative; // (Optional) 네이티브 계정 여부 (COption)
+    UnsignedLong isNative; // (Optional) 네이티브 계정 여부 (COption)
 
     @StructField(order = 7, type = UInt64LEField.class)
-    BigInteger delegatedAmount; // 위임된 토큰 수량 (8 bytes)
+    UnsignedLong delegatedAmount; // 위임된 토큰 수량 (8 bytes)
 
     @StructField(order = 8, type = PublicKeyBorshOptionField.class)
     PublicKey closeAuthority; // (Optional) 계정을 닫을 수 있는 사용자 권한 (32 bytes, COption)

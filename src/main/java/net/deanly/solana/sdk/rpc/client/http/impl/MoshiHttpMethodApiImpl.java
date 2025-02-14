@@ -560,10 +560,18 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     public Signature sendTransaction(Transaction transaction, SendTransactionConfig configuration) throws RpcException {
         Objects.requireNonNull(transaction, "transaction must not be null");
         if (!transaction.isSigned()) {
-            throw new IllegalArgumentException("transaction must be signed");
-        }
-        if (!this.config.getNetwork().equals(transaction.getNetwork())) {
-            throw new IllegalArgumentException("transaction network must not be the same as the rpc client network. transaction=" + transaction.getNetwork() + ", rpcClient=" + this.config.getNetwork());
+            if (transaction.getRecentBlockhashForCompile() == null) {
+                transaction.setRecentBlockhashForCompile(this.getLatestBlockhash().getValue().getBlockhash());
+            }
+            if (!this.config.getNetwork().equals(transaction.getNetwork())) {
+                transaction = new Transaction(this.config.getNetwork(), transaction.getInstructionsForCompile(), transaction.getAddressTableLookupsForCompile(), transaction.getRecentBlockhashForCompile(), transaction.getFeePayerForCompile(), transaction.getSignersForAfterCompile());
+            }
+
+            transaction.sign();
+        } else {
+            if (!this.config.getNetwork().equals(transaction.getNetwork())) {
+                throw new IllegalArgumentException("transaction network must not be the same as the rpc client network. transaction=" + transaction.getNetwork() + ", rpcClient=" + this.config.getNetwork());
+            }
         }
 
         byte[] serializedTransaction = transaction.serialize();

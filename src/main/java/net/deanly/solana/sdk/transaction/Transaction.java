@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 public class Transaction {
 
     @StructSequenceField(order = 1, elementType = SignatureField.class, lengthType = ShortVecField.class)
-    private final List<Signature> signatures;
+    private final List<Signature> signatures = new ArrayList<>();;
 
     @StructObjectField(order = 2)
     private VersionedMessage message;
@@ -47,6 +47,7 @@ public class Transaction {
     private final List<AddressLookupTableAccount> addressTableLookupsForCompile;
     private Blockhash recentBlockhashForCompile;
     private PublicKey feePayerForCompile;
+    private List<KeyPair> signersForAfterCompile;
     private final Network network;
 
     /**
@@ -54,7 +55,6 @@ public class Transaction {
      */
     public Transaction() {
         this.instructionsForCompile = new ArrayList<>();
-        this.signatures = new ArrayList<>();
         this.addressTableLookupsForCompile = new ArrayList<>();
         this.network = Network.MAINNET;
     }
@@ -68,8 +68,26 @@ public class Transaction {
     public Transaction(Network network) {
         this.network = Objects.requireNonNull(network, "Network cannot be null");
         this.instructionsForCompile = new ArrayList<>();
-        this.signatures = new ArrayList<>();
         this.addressTableLookupsForCompile = new ArrayList<>();
+    }
+
+    /**
+     * Constructs a new Transaction instance with the specified parameters.
+     *
+     * @param network The network in which the transaction will operate. Must not be null.
+     * @param instructions The list of transaction instructions to include in this transaction. Must not be null.
+     * @param addressTableLookups The list of address lookup table accounts to use for resolving additional accounts. Can be null.
+     * @param recentBlockhash The recent blockhash to associate with this transaction. Can be null.
+     * @param feePayer The public key of the account responsible for paying the transaction fee.  Must not be null.
+     * @param signersForAfterCompile The list of KeyPair objects representing the signers for the transaction. Must not be null.
+     */
+    public Transaction(Network network, List<TransactionInstruction> instructions, List<AddressLookupTableAccount> addressTableLookups, Blockhash recentBlockhash, PublicKey feePayer, List<KeyPair> signersForAfterCompile) {
+        this.network = Objects.requireNonNull(network, "Network cannot be null");
+        this.instructionsForCompile = Objects.requireNonNull(instructions, "Instructions cannot be null");
+        this.addressTableLookupsForCompile = addressTableLookups;
+        this.recentBlockhashForCompile = recentBlockhash;
+        this.feePayerForCompile = feePayer;
+        this.signersForAfterCompile = Objects.requireNonNull(signersForAfterCompile, "SignersForAfterCompile cannot be null");
     }
 
     /**
@@ -125,7 +143,50 @@ public class Transaction {
         this.recentBlockhashForCompile = Objects.requireNonNull(recentBlockhashForCompile, "Recent blockhash cannot be null");
     }
 
+    /**
+     * Sets the list of signers for compiling the transaction.
+     * The signers represent the accounts that will be used to sign the transaction.
+     *
+     * @param signersForAfterCompile A list of KeyPair objects representing the signers for the transaction.
+     *                               Must not be null.
+     */
+    public void setSigners(List<KeyPair> signersForAfterCompile) {
+        if (signersForAfterCompile == null) {
+            throw new NullPointerException("Signers cannot be null");
+        }
+        if (signersForAfterCompile.isEmpty()) {
+            throw new IllegalArgumentException("Signers cannot be empty");
+        }
+        this.signersForAfterCompile = signersForAfterCompile;
+    }
 
+    /**
+     * Sets a single signer for the transaction after compilation.
+     *
+     * @param signerForAfterCompile A KeyPair object representing the signer.
+     *                              Must not be null.
+     */
+    public void setSigner(KeyPair signerForAfterCompile) {
+        this.setSigners(List.of(signerForAfterCompile));
+    }
+
+    /**
+     * Signs the transaction using the list of signers specified in the
+     * `signersForAfterCompile` field.
+     * <p>
+     * This method calls the overloaded `sign(List<KeyPair> signers)` method to
+     * perform the signing operation using the pre-configured list of signers.
+     * The `signersForAfterCompile` list must not be null and must contain at
+     * least one signer. If the transaction is not already compiled, it will be
+     * compiled before signing.
+     * </p>
+     *
+     * @throws NullPointerException if `signersForAfterCompile` is null
+     * @throws IllegalArgumentException if `signersForAfterCompile` is empty
+     */
+    public void sign() {
+        this.sign(this.signersForAfterCompile);
+    }
 
     /**
      * Signs the transaction with a single signer.

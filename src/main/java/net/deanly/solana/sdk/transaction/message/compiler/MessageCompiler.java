@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.transaction.message.compiler;
 
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.Message;
 import net.deanly.solana.sdk.transaction.message.MessageV0;

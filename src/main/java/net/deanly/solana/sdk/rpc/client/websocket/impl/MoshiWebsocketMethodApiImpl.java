@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
 import net.deanly.solana.sdk.cache.RemovalAwareLRUCache;
-import net.deanly.solana.sdk.rpc.client.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.JsonReader;
@@ -125,11 +125,21 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
     protected WebSocket connectWebSocket() {
         try {
-            URI endpointURI = new URI(config.getEndpoint());
-            String scheme = "https".equals(endpointURI.getScheme()) ? "wss" : "ws";
-            String endpointURL = (new URI(scheme + "://" + endpointURI.getHost())).toString();
+            String endpointURL = this.config.getEndpointWebsocket();
+            if (endpointURL == null) {
+                URI endpointURI = new URI(config.getEndpointHttp());
+                String scheme = "https".equals(endpointURI.getScheme()) ? "wss" : "ws";
+                endpointURL = (new URI(scheme + "://" + endpointURI.getHost())).toString();
+            }
 
-            Request request = new Request.Builder().url(endpointURL).build();
+            Request.Builder requestBuilder = new Request.Builder();
+            requestBuilder.url(endpointURL);
+            if (this.config.getHeaders() != null) {
+                this.config.getHeaders().forEach(header -> {
+                    requestBuilder.addHeader(header.getKey(), header.getValue());
+                });
+            }
+            Request request = requestBuilder.build();
 
             log.info("Connecting to WebSocket: {}", endpointURL);
             return this.httpClient.newWebSocket(request, new WebSocketListener() {

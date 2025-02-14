@@ -1,9 +1,8 @@
 package net.deanly.solana.sdk.rpc.client.websocket.impl;
 
-import net.deanly.solana.sdk.rpc.client.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.websocket.NotificationListener;
 import net.deanly.solana.sdk.rpc.request.RpcRequest;
 import net.deanly.solana.sdk.rpc.request.config.*;
@@ -46,7 +45,7 @@ public class MoshiWebsocketMethodApiImplTest {
     void setup() {
         // 기본 설정 생성
         this.mockConfig = ClientConfig.builder()
-                .endpoint("https://api.devnet.solana.com")
+                .endpointHttp("https://api.devnet.solana.com")
                 .readTimeoutMs(5000)
                 .mediaType(MediaType.get("application/json"))
                 .build();

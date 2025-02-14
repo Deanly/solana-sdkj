@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.transaction.message;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;

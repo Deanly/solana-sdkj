@@ -1,4 +1,4 @@
-package net.deanly.solana.sdk.rpc.client;
+package net.deanly.solana.sdk.rpc.client.config;
 
 public enum Network {
     DEVNET("https://api.devnet.solana.com"),

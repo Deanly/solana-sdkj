@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.program.spl.memo.instruction;
 
 import lombok.*;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.layout.field.UTF8StringField;
 import net.deanly.solana.sdk.program.spl.memo.SplMemoProgram;

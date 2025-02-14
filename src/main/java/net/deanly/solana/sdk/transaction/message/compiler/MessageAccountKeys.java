@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.transaction.message.compiler;
 import lombok.ToString;
 import lombok.Value;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.transaction.message.meta.LoadedAddresses;
 import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction;

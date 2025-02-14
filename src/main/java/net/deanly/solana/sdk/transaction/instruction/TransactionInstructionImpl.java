@@ -2,7 +2,7 @@ package net.deanly.solana.sdk.transaction.instruction;
 
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 
 import java.util.Arrays;
 import java.util.Collections;

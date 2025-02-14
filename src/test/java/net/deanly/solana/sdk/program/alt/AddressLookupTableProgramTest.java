@@ -1,7 +1,7 @@
 package net.deanly.solana.sdk.program.alt;
 
 import net.deanly.solana.sdk.program.spl.alt.AddressLookupTableProgram;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 

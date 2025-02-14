@@ -1,9 +1,11 @@
-package net.deanly.solana.sdk.rpc.client;
+package net.deanly.solana.sdk.rpc.client.config;
 
 
+import com.squareup.moshi.JsonAdapter;
 import lombok.Getter;
 import okhttp3.MediaType;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -18,7 +20,11 @@ public class ClientConfig {
     @lombok.Builder.Default
     private Network network = Network.MAINNET;
 
-    private String endpoint;
+    private List<RequestHeader> headers;
+
+    private String endpointHttp;
+
+    private String endpointWebsocket;
 
     private Integer connectTimeoutMs;
 
@@ -48,10 +54,14 @@ public class ClientConfig {
     @lombok.Builder.Default
     private Long websocketPendingUnsubscriptionExpireTimeMs = TimeUnit.MINUTES.toMillis(5);
 
-    public String getEndpoint() {
-        if (endpoint == null) {
+    // dependency moshi
+    private List<JsonAdapter.Factory> moshiJsonAdapterFactories;
+
+    public String getEndpointHttp() {
+        if (endpointHttp == null) {
             return network.getEndpoint();
         }
-        return endpoint;
+        return endpointHttp;
     }
+
 }

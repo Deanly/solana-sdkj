@@ -5,7 +5,7 @@ import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.KeyPair;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.crypto.Ed25519Signer;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.rpc.response.ResValueInstruction;
 import net.deanly.solana.sdk.rpc.response.ResValueTransaction;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;

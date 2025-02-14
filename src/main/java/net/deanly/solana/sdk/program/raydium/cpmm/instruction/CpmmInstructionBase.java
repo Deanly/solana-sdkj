@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.program.raydium.cpmm.instruction;
 import lombok.Getter;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.program.raydium.cpmm.RaydiumCpmmProgram;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 
 @Getter
 abstract class CpmmInstructionBase {

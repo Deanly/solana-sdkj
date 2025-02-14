@@ -41,6 +41,7 @@ public enum Encoding {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @lombok.Builder
     /// Data slicing is only available for base58, base64, or base64+zstd encodings.
     public static class DataSlice {
         /// number of bytes to return

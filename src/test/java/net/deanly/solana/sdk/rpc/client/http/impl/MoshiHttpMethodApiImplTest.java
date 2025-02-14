@@ -1,12 +1,11 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
-import net.deanly.solana.sdk.rpc.client.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.rpc.client.RpcClient;
 import net.deanly.solana.sdk.rpc.client.adapter.MoshiNumberJsonAdapter;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
 import net.deanly.solana.sdk.rpc.request.config.*;
@@ -26,6 +25,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -43,7 +43,7 @@ class MoshiHttpMethodApiImplTest {
     void setup() {
         // 기본 설정 생성
         mockConfig = ClientConfig.builder()
-                .endpoint("https://api.devnet.solana.com")
+                .endpointHttp("https://api.devnet.solana.com")
                 .readTimeoutMs(5000)
                 .mediaType(MediaType.get("application/json"))
                 .build();
@@ -73,7 +73,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -104,7 +104,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정: Node is unhealthy
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -143,7 +143,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정: Node is behind by 42 slots
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -187,7 +187,7 @@ class MoshiHttpMethodApiImplTest {
         // Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -275,7 +275,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -335,7 +335,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -475,7 +475,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -553,7 +553,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -610,7 +610,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -693,7 +693,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -750,7 +750,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -817,7 +817,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -835,7 +835,7 @@ class MoshiHttpMethodApiImplTest {
         UnsignedLong slot = UnsignedLong.valueOf(5);
 
         // 4. 메서드 호출
-        Long blockTime = clientApi.getBlockTime(slot);
+        Instant blockTime = clientApi.getBlockTime(slot);
 
         // 5. 요청 데이터 캡처 및 검증
         ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
@@ -872,7 +872,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 6. 응답 데이터 검증
         assertNotNull(blockTime);
-        assertEquals(1574721591L, blockTime); // 기대 값
+        assertEquals(Instant.ofEpochSecond(1574721591L), blockTime); // 기대 값
     }
 
     @Test
@@ -883,7 +883,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -950,7 +950,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -1024,7 +1024,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -1086,7 +1086,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -1153,7 +1153,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -1205,7 +1205,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -1258,7 +1258,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1304,7 +1304,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1360,7 +1360,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (에러 케이스: No snapshot)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1396,7 +1396,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1450,7 +1450,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1512,7 +1512,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1572,7 +1572,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1657,7 +1657,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1741,7 +1741,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1818,7 +1818,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1894,7 +1894,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1945,7 +1945,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -1996,7 +1996,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2048,7 +2048,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2159,7 +2159,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2266,7 +2266,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2364,7 +2364,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2467,7 +2467,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2546,7 +2546,7 @@ class MoshiHttpMethodApiImplTest {
         // 2. Mock 응답 설정 (성공 케이스)
         Response mockResponse = new Response.Builder()
                 .request(new Request.Builder()
-                        .url(mockConfig.getEndpoint())
+                        .url(mockConfig.getEndpointHttp())
                         .build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
@@ -2643,7 +2643,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -2694,7 +2694,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -2745,7 +2745,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -2813,7 +2813,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -2869,7 +2869,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -2942,7 +2942,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3012,7 +3012,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3144,7 +3144,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3306,7 +3306,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3403,7 +3403,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3477,7 +3477,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3602,7 +3602,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3653,7 +3653,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3709,7 +3709,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3801,7 +3801,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3871,7 +3871,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3922,7 +3922,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -3980,7 +3980,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")
@@ -4037,7 +4037,7 @@ class MoshiHttpMethodApiImplTest {
 
         // 2. Mock 응답 설정
         Response mockResponse = new Response.Builder()
-                .request(new Request.Builder().url(mockConfig.getEndpoint()).build())
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
                 .protocol(Protocol.HTTP_1_1)
                 .code(200)
                 .message("OK")

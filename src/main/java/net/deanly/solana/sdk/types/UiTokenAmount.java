@@ -1,15 +1,13 @@
 package net.deanly.solana.sdk.types;
 
 import com.squareup.moshi.Json;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class UiTokenAmount {
     /// Raw amount of tokens as a string, ignoring decimals.
     @Json(name = "amount")

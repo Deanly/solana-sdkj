@@ -1,6 +1,8 @@
 package net.deanly.solana.sdk.rpc.client;
 
 import lombok.Getter;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.rpc.client.http.HttpMethodApi;
 import net.deanly.solana.sdk.rpc.client.http.SyncApi;
 import net.deanly.solana.sdk.rpc.client.http.impl.MoshiHttpMethodApiImpl;
@@ -9,9 +11,6 @@ import net.deanly.solana.sdk.rpc.client.http.impl.LegacyRpcApiImpl;
 import net.deanly.solana.sdk.rpc.client.http.impl.MoshiSyncApiImpl;
 import net.deanly.solana.sdk.rpc.client.websocket.WebsocketMethodApi;
 import net.deanly.solana.sdk.rpc.client.websocket.impl.MoshiWebsocketMethodApiImpl;
-import okhttp3.MediaType;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * RpcClient is responsible for making RPC calls to a Solana cluster.
@@ -50,7 +49,7 @@ public class RpcClient {
      */
     public RpcClient(String endpoint) {
         this(ClientConfig.builder()
-                .endpoint(endpoint)
+                .endpointHttp(endpoint)
                 .build());
     }
 
@@ -62,7 +61,7 @@ public class RpcClient {
      */
     public RpcClient(String endpoint, String userAgent) {
         this(ClientConfig.builder()
-                .endpoint(endpoint)
+                .endpointHttp(endpoint)
                 .userAgent(userAgent)
                 .build());
     }
@@ -75,7 +74,7 @@ public class RpcClient {
      */
     public RpcClient(String endpoint, int timeout) {
         this(ClientConfig.builder()
-                .endpoint(endpoint)
+                .endpointHttp(endpoint)
                 .readTimeoutMs(timeout * 1000)
                 .build());
     }
@@ -90,7 +89,7 @@ public class RpcClient {
      */
     public RpcClient(String endpoint, int readTimeoutMs, int connectTimeoutMs, int writeTimeoutMs) {
         this(ClientConfig.builder()
-                .endpoint(endpoint)
+                .endpointHttp(endpoint)
                 .readTimeoutMs(readTimeoutMs)
                 .connectTimeoutMs(connectTimeoutMs)
                 .writeTimeoutMs(writeTimeoutMs)
@@ -106,7 +105,7 @@ public class RpcClient {
      */
     public RpcClient(String endpoint, String proxyHost, int proxyPort) {
         this(ClientConfig.builder()
-                .endpoint(endpoint)
+                .endpointHttp(endpoint)
                 .proxyHost(proxyHost)
                 .proxyPort(proxyPort)
                 .build());
@@ -155,7 +154,7 @@ public class RpcClient {
      * @return the RPC endpoint
      */
     public String getEndpoint() {
-        return this.config.getEndpoint();
+        return this.config.getEndpointHttp();
     }
 
 }

@@ -1,6 +1,6 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
-import net.deanly.solana.sdk.rpc.client.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -32,26 +33,29 @@ import java.util.concurrent.TimeUnit;
 public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     private final ClientConfig config;
     private OkHttpClient httpClient;
-    private final Moshi moshi = new Moshi.Builder()
-            .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
-            .add(MoshiResValueTransactionJsonAdapter.FACTORY)
-            .add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter())
-            .add(StateData.class, new MoshiStateDataJsonAdapter())
-            .add(PublicKey.class, new MoshiPublicKeyJsonAdapter())
-            .add(Blockhash.class, new MoshiBlockhashJsonAdapter())
-            .add(GenesisHash.class, new MoshiGenesisHashJsonAdapter())
-            .add(Signature.class, new MoshiSignatureJsonAdapter())
-            .add(EpochCredits.class, new MoshiEpochCreditsJsonAdapter())
-            .add(ValidatorIdentityInfo.class, new MoshiValidatorIdentityInfoJsonAdapter())
-//            .add(ResValueTransaction.class, new MoshiResValueTransactionJsonAdapter())
-            .build();
-
-    private JsonAdapter<RpcRequest> rpcRequestJsonAdapter = moshi.adapter(RpcRequest.class);
+    private final Moshi moshi;
+    private final JsonAdapter<RpcRequest> rpcRequestJsonAdapter;
     private final Map<Type, JsonAdapter<?>> adapterCache = new ConcurrentHashMap<>();
 
     public MoshiHttpMethodApiImpl(ClientConfig config) {
         this.config = config;
         this.httpClient = this.createHttpClient();
+        Moshi.Builder mb = new Moshi.Builder();
+        mb.add(MoshiFilterCriteriaJsonAdapter.FACTORY);
+        mb.add(MoshiResValueTransactionJsonAdapter.FACTORY);
+        mb.add(UnsignedLong.class, new MoshiUnsignedLongJsonAdapter());
+        mb.add(StateData.class, new MoshiStateDataJsonAdapter());
+        mb.add(PublicKey.class, new MoshiPublicKeyJsonAdapter());
+        mb.add(Blockhash.class, new MoshiBlockhashJsonAdapter());
+        mb.add(GenesisHash.class, new MoshiGenesisHashJsonAdapter());
+        mb.add(Signature.class, new MoshiSignatureJsonAdapter());
+        mb.add(EpochCredits.class, new MoshiEpochCreditsJsonAdapter());
+        mb.add(ValidatorIdentityInfo.class, new MoshiValidatorIdentityInfoJsonAdapter());
+        if (config.getMoshiJsonAdapterFactories() != null) {
+            config.getMoshiJsonAdapterFactories().forEach(mb::add);
+        }
+        this.moshi = mb.build();
+        this.rpcRequestJsonAdapter = this.moshi.adapter(RpcRequest.class);
     }
 
     public OkHttpClient createHttpClient() {
@@ -96,9 +100,15 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
 
         JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
 
-        Request request = new Request.Builder().url(this.config.getEndpoint())
-                .post(RequestBody.create(this.rpcRequestJsonAdapter.toJson(rpcRequest), this.config.getMediaType()))
-                .build();
+        Request.Builder requestBuilder = new Request.Builder();
+        requestBuilder.url(this.config.getEndpointHttp());
+        requestBuilder.post(RequestBody.create(this.rpcRequestJsonAdapter.toJson(rpcRequest), this.config.getMediaType()));
+        if (this.config.getHeaders() != null) {
+            this.config.getHeaders().forEach(header -> {
+                requestBuilder.addHeader(header.getKey(), header.getValue());
+            });
+        }
+        Request request = requestBuilder.build();
 
         try {
             Response response = this.httpClient.newCall(request).execute();
@@ -250,10 +260,11 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public Long getBlockTime(UnsignedLong slot) throws RpcException {
+    public Instant getBlockTime(UnsignedLong slot) throws RpcException {
         Objects.requireNonNull(slot, "slot must not be null");
         Type type = Types.newParameterizedType(RpcResponse.class, Long.class);
-        return this.call("getBlockTime", this.getParams(slot), type, null);
+        long epochSeconds = this.call("getBlockTime", this.getParams(slot), type, null);
+        return Instant.ofEpochSecond(epochSeconds);
     }
 
     @Override
@@ -591,6 +602,10 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
 
         Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueSimulatedTransaction.class);
         return this.call("simulateTransaction", this.getParams(encodedTransaction, configuration), type, null);
+    }
+
+    public <T> T requestV2(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException {
+        return this.call(method, params, responseType, errorDataType);
     }
 
     private String encodeTransaction(byte[] serializedTransaction, Encoding encoding) {

@@ -1,11 +1,10 @@
 package net.deanly.solana.sdk.program.spl.ata.instruction;
 
-import lombok.Getter;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.program.exception.ProgramException;
 import net.deanly.solana.sdk.program.spl.ata.AssociatedTokenAccountProgram;
 import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 
 import java.util.List;
 

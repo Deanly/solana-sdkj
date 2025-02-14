@@ -12,6 +12,8 @@ import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.solana.sdk.types.GenesisHash;
 import net.deanly.solana.sdk.types.Signature;
 
+import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -135,7 +137,7 @@ public interface HttpMethodApi {
      * @throws RpcException If an error occurs during the RPC call.
      * @see <a href="https://solana.com/ko/docs/rpc/http/getblocktime">getBlockTime RPC Method</a>
      */
-    Long getBlockTime(UnsignedLong slot) throws RpcException;
+    Instant getBlockTime(UnsignedLong slot) throws RpcException;
 
     /**
      * Returns information about all the nodes participating in the cluster.
@@ -710,6 +712,22 @@ public interface HttpMethodApi {
     RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction, SimulateTransactionConfig configuration) throws RpcException;
     default RpcResultObject<ResValueSimulatedTransaction> simulateTransaction(Transaction transaction) throws RpcException {
         return simulateTransaction(transaction, null);
+    }
+
+    /**
+     * Sends a request to a remote procedure call (RPC) endpoint and processes the response.
+     *
+     * @param <T> The type of the response object.
+     * @param method The name of the RPC method being called.
+     * @param params A list of parameters to be sent with the RPC request.
+     * @param responseType The type of the expected response object.
+     * @param errorDataType The type of the error data in case of an RPC error.
+     * @return The response object of the specified type.
+     * @throws RpcException If an error occurs during the RPC request or response processing.
+     */
+    <T> T requestV2(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException;
+    default <T> T requestV2(String method, List<Object> params, Type responseType) throws RpcException {
+        return requestV2(method, params, responseType, null);
     }
 
 }

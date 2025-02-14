@@ -1,9 +1,8 @@
 package net.deanly.solana.sdk.program.core.system.instruction;
 
-import lombok.Getter;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.program.core.system.SystemProgram;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 
 abstract class SysInstructionBase {
     public PublicKey getProgramId(Network network) {

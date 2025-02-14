@@ -3,7 +3,7 @@ package net.deanly.solana.sdk.transaction.message;
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.Struct;
-import net.deanly.solana.sdk.rpc.client.Network;
+import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.layout.field.BlockhashField;
 import net.deanly.solana.sdk.transaction.message.meta.MessageAddressTableLookup;

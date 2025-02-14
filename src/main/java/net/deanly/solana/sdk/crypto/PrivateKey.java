@@ -15,6 +15,10 @@ public class PrivateKey {
         this.encoded = encoded.clone();
     }
 
+    public PrivateKey(String encoded) {
+        this(Base58.decode(encoded));
+    }
+
     public byte[] getEncoded() {
         if (this.isCleared) {
             throw new IllegalStateException("Private key has been cleared.");

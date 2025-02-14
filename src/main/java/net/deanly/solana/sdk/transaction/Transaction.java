@@ -144,6 +144,7 @@ public class Transaction {
      * @throws IllegalArgumentException if no signers are provided
      */
     public void sign(List<KeyPair> signers) {
+        Objects.requireNonNull(recentBlockhashForCompile, "Recent-Blockhash cannot be null");
         if (signers == null || signers.isEmpty()) {
             throw new IllegalArgumentException("No signers provided");
         }

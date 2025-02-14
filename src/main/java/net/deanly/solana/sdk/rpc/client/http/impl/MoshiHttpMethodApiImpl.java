@@ -95,7 +95,7 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
      * @return The result of the JSON-RPC call, parsed into the specified response type.
      * @throws RpcException   If an error occurs during the RPC call or when parsing the response.
      */
-    public <T> T call(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException {
+    private <T> T call(String method, List<Object> params, Type responseType, Type errorDataType) throws RpcException {
         RpcRequest rpcRequest = new RpcRequest(method, params);
 
         JsonAdapter<RpcResponse<T>> resultAdapter = getCachedAdapter(responseType);
@@ -153,11 +153,6 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         } catch (IOException e) {
             throw new RpcException("IO error during RPC call: " + e.getMessage());
         }
-    }
-
-    @Deprecated
-    public <T> T call(String method, List<Object> params, Type responseType) throws RpcException {
-        return this.call(method, params, responseType, null);
     }
 
     @SuppressWarnings("unchecked")

@@ -8,6 +8,10 @@ import net.deanly.solana.sdk.rpc.client.config.Network;
 @Getter
 abstract class CpmmInstructionBase {
 
+    public CpmmInstructionBase() {
+        throw new UnsupportedOperationException("Development in progress. Please wait for the next release.");
+    }
+
     public PublicKey getProgramId(Network network) {
         switch (network) {
             case MAINNET:

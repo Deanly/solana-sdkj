@@ -2,6 +2,8 @@ package net.deanly.solana.sdk.program.raydium.cpmm.instruction;
 
 import lombok.*;
 import net.deanly.solana.sdk.program.raydium.cpmm.RaydiumCpmmProgram;
+import net.deanly.solana.sdk.program.spl.ata.AssociatedTokenAccountProgram;
+import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.structlayout.StructLayout;
@@ -129,8 +131,9 @@ public class CpmmInstruction00CreatePool extends CpmmInstructionBase implements 
         this.keys.add(new AccountMeta(vaultB, false, true)); // Vault B: writable, not signer
         this.keys.add(new AccountMeta(createPoolFeeAccount, false, true)); // Fee Account: writable, not signer
         this.keys.add(new AccountMeta(observationId, false, true)); // Observation: writable, not signer
-        this.keys.add(new AccountMeta(tokenProgram, false, false)); // Token Program: read-only, not writable
-        this.keys.add(new AccountMeta(associatedTokenProgram, false, false)); // Associated Token Program: read-only, not writable
+
+        this.keys.add(AccountMeta.roleReadOnlyNoSigner(SplTokenProgram.PROGRAM_ID)); // Token Program: read-only, not writable
+        this.keys.add(AccountMeta.roleReadOnlyNoSigner(AssociatedTokenAccountProgram.PROGRAM_ID)); // Associated Token Program: read-only, not writable
         this.keys.add(new AccountMeta(systemProgram, false, false)); // System Program: read-only, not writable
         this.keys.add(new AccountMeta(rentProgram, false, false)); // Rent Program: read-only, not writable
     }

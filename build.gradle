@@ -5,7 +5,7 @@ plugins {
 
 group = 'net.deanly'
 version = '0.0.1'
-description = 'Solana RPC Methods for java'
+description = 'Solana Standard Development Kits for Java'
 
 java {
     toolchain {
@@ -20,29 +20,32 @@ repositories {
 }
 
 dependencies {
-    api 'org.bouncycastle:bcprov-jdk15to18:1.79'
-    api 'com.squareup.okhttp3:okhttp:4.12.0'
-    api 'com.squareup.moshi:moshi:1.15.2'
-    api 'com.squareup.moshi:moshi-adapters:1.15.2'
-    api 'org.java-websocket:Java-WebSocket:1.6.0'
+    // SLF4J
+    api 'org.slf4j:slf4j-api:2.0.16'
 
-    implementation project(":struct-layout")
-//    implementation 'net.deanly:struct-layout:0.1.1'
+    // Struct Layout
+    api project(":struct-layout")
+//    api 'net.deanly:struct-layout:0.3.2'
 
-    api 'org.projectlombok:lombok:1.18.36'
+    // Internal Libraries
+    implementation 'org.bouncycastle:bcprov-jdk15to18:1.79'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.moshi:moshi:1.15.2'
+    implementation 'com.squareup.moshi:moshi-adapters:1.15.2'
+
+    // Compile Time
     compileOnly 'org.projectlombok:lombok:1.18.36'
     annotationProcessor 'org.projectlombok:lombok:1.18.36'
     testCompileOnly 'org.projectlombok:lombok:1.18.36'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-    // 테스트 의존성
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.4'
-    testImplementation 'org.slf4j:slf4j-api:2.0.16'
+    // Test
     testRuntimeOnly 'ch.qos.logback:logback-classic:1.4.12'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.4'
     testImplementation 'org.mockito:mockito-core:5.14.2'
     testImplementation 'org.javassist:javassist:3.30.2-GA'
+    testRuntimeOnly 'ch.qos.logback:logback-classic:1.4.12'
 }
 
 tasks.withType(JavaCompile) {

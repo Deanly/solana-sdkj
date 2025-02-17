@@ -1,158 +1,221 @@
-# SolanaJ
+# Solana RPC SDK for Java 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
-[![Maven Central](https://img.shields.io/maven-central/v/com.mmorrell/solanaj.svg)](https://search.maven.org/artifact/com.mmorrell/solanaj)
-[![Solana](https://img.shields.io/badge/Solana-Compatible-blueviolet)](https://solana.com/)
-[![Java](https://img.shields.io/badge/Pure-Java-orange)](https://www.java.com/)
 [![Documentation](https://img.shields.io/badge/API-Documentation-lightgrey)](https://docs.solana.com/apps/jsonrpc-api)
-[![Discord](https://img.shields.io/discord/889577356681945098?color=blueviolet)](https://discord.gg/solana)
-[![GitHub Stars](https://img.shields.io/github/stars/skynetcap/solanaj?style=social)](https://github.com/skynetcap/solanaj)
+[![Maven Central](https://img.shields.io/maven-central/v/net.deanly/solana-sdkj)](https://search.maven.org/artifact/net.deanly/solana-sdkj)
 
-Solana blockchain client, written in pure Java. SolanaJ is an API for integrating with Solana blockchain using the [Solana RPC API](https://docs.solana.com/apps/jsonrpc-api).
+`solana-sdkj` provides a flexible, developer-friendly way to integrate with the Solana blockchain ecosystem. It builds upon Solana RPC methods with a focus on supporting Java developers in creating applications with System Programs and other Solana-native programs. It aims to simplify working with Program States and enables easy customizability and extendability of Solana programs.
 
-This fork includes functionality for multiple Solana programs, including the Serum DEX.
+## ✨ Features
 
-## Table of Contents
+- Full support for **Solana RPC** API methods.
+- Simplified handling of **System Programs** and state management.
+- Extendable and customizable program definitions for easy integration.
+- Built with pure Java and compatible with Java 17+.
 
-- [SolanaJ-Programs](#solanaj-programs)
+---
+
+## 📚 Table of Contents
+
 - [Requirements](#%EF%B8%8F-requirements)
 - [Dependencies](#-dependencies)
-- [Installation](#-installation)
-- [Build](#%EF%B8%8F-build)
-- [Examples](#-examples)
-    - [Transfer Lamports](#transfer-lamports)
-    - [Get Balance](#get-balance)
-    - [Get Serum Market + Orderbooks](#get-serum-market--orderbooks)
-    - [Send a Transaction with Memo Program](#send-a-transaction-with-memo-program)
-- [Contributing](#-contributing)
+- [Installation](#%EF%B8%8F-installation)
+- [Getting Started](#-getting-started)
+  - [Retrieve Account Balance](#retrieve-account-balance)
+  - [Transfer SOL (Lamports)](#transfer-sol-lamports)
+  - [Simulate Transaction](#simulate-transaction)
 - [License](#-license)
 
-## SolanaJ-Programs
-
-For SolanaJ implementations of popular Solana programs such as Serum, please visit: [https://github.com/skynetcap/solanaj-programs](https://github.com/skynetcap/solanaj-programs)
+---
 
 ## 🛠️ Requirements
 
-- Java 17+
+- Java 17 or higher.
 
-## 📚 Dependencies
+---
 
-- bitcoinj
-- OkHttp
-- Moshi
+## 📦 Dependencies
 
-## 📦 Installation
+`solana-sdkj` depends on the following libraries:
+- [OkHttp](https://square.github.io/okhttp/) – For making HTTP requests.
+- [Moshi](https://github.com/square/moshi) – JSON serialization/deserialization library.
+- [BouncyCastle](https://www.bouncycastle.org/) – For cryptographic operations.
+- [Struct-layout](https://github.com/Deanly/struct-layout) - For Borsh data.
 
-Add the following Maven dependency to your project's `pom.xml`:
+---
+
+## 🏗️ Installation
+
+You can include `solana-sdkj` in your project via Maven. Add the following dependency to your `pom.xml`:
 
 ```xml
 <dependency>
-    <groupId>com.mmorrell</groupId>
-    <artifactId>solanaj</artifactId>
-    <version>1.19.2</version>
+  <groupId>net.deanly</groupId>
+  <artifactId>solana-sdkj</artifactId>
+  <version>0.0.1</version>
 </dependency>
 ```
 
-## 🏗️ Build
+If you're using Gradle, add the following to your `build.gradle`:
 
-1. In `pom.xml`, update the `maven-gpg-plugin` configuration with your homedir and keyname:
-
-```xml
-<configuration>
-    <homedir>/home/your_username/.gnupg/</homedir>
-    <keyname>YOUR_GPG_KEY_ID</keyname>
-</configuration>
+```gradle
+implementation 'net.deanly:solana-sdkj:0.0.1'
 ```
 
-2. Check if you have a GPG key:
+---
 
-```sh
-gpg --list-secret-keys
-```
+## 🚀 Getting Started
 
-3. If no key is returned, create one:
+### Retrieve Account Balance
 
-```sh
-gpg --full-generate-key
-```
-
-4. Run the Maven install command:
-
-```sh
-mvn install
-```
-
-The build should complete successfully.
-
-## 🚀 Examples
-
-### Transfer Lamports
+`solana-sdkj` lets you easily interact with Solana through the RPC API and built-in program abstractions. Here is a quick example:
 
 ```java
-RpcClient client = new RpcClient(Cluster.TESTNET);
+import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.Network;
+import net.deanly.solana.sdk.types.PublicKey;
 
-PublicKey fromPublicKey = new PublicKey("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo");
-PublicKey toPublickKey = new PublicKey("GrDMoeqMLFjeXQ24H56S1RLgT4R76jsuWCd6SvXyGPQ5");
-int lamports = 3000;
+public class Example {
+  public static void main(String[] args) throws Exception {
+    RpcClient rpcClient = new RpcClient(ClientConfig.builder()
+            .network(Network.DEVNET)
+            .build());
 
-Account signer = new Account(secret_key);
+    // Example: Retrieve Balance
+    PublicKey publicKey = new PublicKey("YourPublicKeyHere");
+    long balance = rpcClient.getRpcHttpApi().getBalance(publicKey);
 
-Transaction transaction = new Transaction();
-transaction.addInstruction(SystemProgram.transfer(fromPublicKey, toPublickKey, lamports));
-
-String signature = client.getApi().sendTransaction(transaction, signer);
+    System.out.println("Balance: " + balance);
+  }
+}
 ```
 
-### Get Balance
+### Transfer SOL (Lamports)
+
+This example demonstrates how to transfer SOL (measured in Lamports) from one wallet to another.
 
 ```java
-RpcClient client = new RpcClient(Cluster.TESTNET);
+import net.deanly.solana.sdk.crypto.KeyPair;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
+import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.Network;
+import net.deanly.solana.sdk.transaction.Transaction;
 
-long balance = client.getApi().getBalance(new PublicKey("QqCCvshxtqMAL2CVALqiJB7uEeE5mjSPsseQdDzsRUo"));
+public class TransferExample {
+  public static void main(String[] args) {
+    // Configure Solana RPC
+    RpcClient rpcClient = new RpcClient(ClientConfig.builder().network(Network.DEVNET).build());
+
+    try {
+      // Account setup
+      PublicKey senderPublicKey = new PublicKey("YOUR_SENDER_PUBLIC_KEY");
+      PublicKey receiverPublicKey = new PublicKey("YOUR_RECEIVER_PUBLIC_KEY");
+      KeyPair senderKeyPair = new KeyPair("YOUR_SENDER_PRIVATE_KEY_IN_BASE58".getBytes());
+
+      // Amount to transfer (in lamports, 1 SOL = 10^9 lamports)
+      long lamports = 1000000L;
+
+      // Build transaction
+      Transaction transaction = new Transaction();
+      transaction.addInstruction(
+              SystemProgram.transfer(senderPublicKey, receiverPublicKey, lamports)
+      );
+      transaction.setSigner(senderKeyPair);
+
+      // Send transaction
+      String transactionSignature = rpcClient.getRpcHttpApi().sendTransaction(transaction).getValue();
+      System.out.println("Transaction sent successfully! Signature: " + transactionSignature);
+    } catch (Exception e) {
+      System.err.println("Failed to complete transfer: " + e.getMessage());
+    }
+  }
+}
 ```
 
-### Get Serum Market + Orderbooks
+### Simulate Transaction
+
+Use the `simulateTransaction` RPC method to test the validity of a Solana transaction without executing it on-chain.
 
 ```java
-final PublicKey solUsdcPublicKey = new PublicKey("7xMDbYTCqQEcK2aM9LbetGtNFJpzKdfXzLL5juaLh4GJ");
-final Market solUsdcMarket = new MarketBuilder()
-        .setClient(new RpcClient())
-        .setPublicKey(solUsdcPublicKey)
-        .setRetrieveOrderBooks(true)
-        .build();
+import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.Network;
+import net.deanly.solana.sdk.crypto.KeyPair;
+import net.deanly.solana.sdk.crypto.PublicKey;
+import net.deanly.solana.sdk.transaction.Transaction;
+import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
+import net.deanly.solana.sdk.program.core.system.SystemProgram;
+import net.deanly.solana.sdk.types.Blockhash;
+import net.deanly.solana.sdk.rpc.request.config.SimulateTransactionConfig;
+import net.deanly.solana.sdk.rpc.response.ResValueSimulatedTransaction;
+import net.deanly.structlayout.StructLayout;
 
-final OrderBook bids = solUsdcMarket.getBidOrderBook();
+public class SimulateTransactionExample {
+  public static void main(String[] args) {
+    // Configure Solana RPC
+    RpcClient rpcClient = new RpcClient(ClientConfig.builder().network(Network.DEVNET).build());
+
+    try {
+      // Fetch recent blockhash
+      Blockhash recentBlockhash = rpcClient.getRpcHttpApi()
+              .getLatestBlockhash()
+              .getValue()
+              .getBlockhash();
+
+      // Account setup
+      PublicKey senderPublicKey = new PublicKey("YOUR_SENDER_PUBLIC_KEY");
+      PublicKey receiverPublicKey = new PublicKey("YOUR_RECEIVER_PUBLIC_KEY");
+      KeyPair senderKeyPair = new KeyPair("YOUR_SENDER_PRIVATE_KEY_IN_BASE58".getBytes());
+
+      // Transaction setup
+      long lamports = 100000L; // Amount in lamports
+      Transaction transaction = new Transaction();
+      transaction.setRecentBlockhashForCompile(recentBlockhash);
+      transaction.addInstruction(
+              SystemProgram.transfer(senderPublicKey, receiverPublicKey, lamports)
+      );
+      transaction.sign(senderKeyPair);
+
+      // Simulate transaction
+      var config = SimulateTransactionConfig.builder().skipPreflight(true).build();
+      ResValueSimulatedTransaction simulateResponse = rpcClient.getRpcHttpApi()
+              .simulateTransaction(transaction, config).getValue();
+
+      // Print results
+      StructLayout.debug(transaction);
+      System.out.println("Simulation Result: " + simulateResponse);
+    } catch (Exception e) {
+      System.err.println("Simulation failed: " + e.getMessage());
+    }
+  }
+}
 ```
 
-### Send a Transaction with Memo Program
+The `simulateTransaction` function allows developers to test transactions before committing them to the blockchain. The result will indicate if the transaction would succeed or fail and, if it fails, what issues to address.
 
-```java
-// Create KeyPair from private key
-final Account feePayer = new Account(Base58.decode(new String(data)));
-final Transaction transaction = new Transaction();
+---
+🚧 Difference from solanaj
 
-// Add instruction to write memo
-transaction.addInstruction(
-        MemoProgram.writeUtf8(feePayer.getPublicKey(),"Hello from SolanaJ :)")
-);
+`solanaj`, developed by Michael Morrell, laid a solid foundation for Java-based Solana development.   
+`solana-sdkj` enhances and extends this foundation, introducing additional features and optimizations for modern Java applications:
+- Uses BouncyCastle for enhanced cryptographic security.
+- Simplifies Borsh serialization with Struct-layout for better maintainability.
+- Enhances type safety in RPC APIs using generics and stricter type definitions.
+- Provides well-structured classes for configurations and data handling.
+- Redesigns communication logic with improved support for HTTP and WebSocket interactions.
+- Extends transaction compilation with MessageV0 support, ensuring compatibility with Solana’s evolving architecture.
+- Refactors the codebase for improved maintainability, extensibility, and performance.
 
-String response = client.getApi().sendTransaction(transaction, feePayer);
-```
+We recognize the contributions of `solanaj` and its community, and our goal is to extend its capabilities while introducing enhancements tailored for Java developers.
 
-## 🤝 Contributing
-
-We welcome contributions to SolanaJ! Here's how you can help:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature-name`)
-3. Make your changes
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin feature/your-feature-name`)
-6. Create a new Pull Request
-
-Please make sure to update tests as appropriate and adhere to the existing coding style.
+---
 
 ## 📄 License
 
-SolanaJ is open-source software licensed under the [MIT License](LICENSE). See the LICENSE file for more details.
+`solana-sdkj` is open-source software licensed under the [MIT License](LICENSE).
+
+This project expands upon the groundwork laid by `solanaj`, bringing architectural improvements and expanded functionality while ensuring compatibility with the Solana ecosystem.

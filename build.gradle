@@ -1,6 +1,8 @@
 plugins {
     id 'java-library'
+    id 'signing'
     id 'maven-publish'
+    id 'org.jreleaser' version '1.16.0'
 }
 
 group = 'net.deanly'
@@ -24,8 +26,7 @@ dependencies {
     api 'org.slf4j:slf4j-api:2.0.16'
 
     // Struct Layout
-    api project(":struct-layout")
-//    api 'net.deanly:struct-layout:0.3.2'
+    api 'net.deanly:struct-layout:0.3.2'
 
     // Internal Libraries
     implementation 'org.bouncycastle:bcprov-jdk15to18:1.79'
@@ -57,4 +58,79 @@ tasks.test {
     jvmArgs += [
             "--add-opens", "java.base/java.lang=ALL-UNNAMED"
     ]
+}
+
+tasks.withType(Javadoc) { // Lombok 이슈로 인해 Javadoc을 비활성화
+    enabled = false
+}
+
+tasks.named("build") {
+    doFirst {
+        file("$buildDir/jreleaser").mkdirs()
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            pom {
+                name.set('solana-sdkj')
+                description.set('Solana SDK for Java - A lightweight library for interacting with the Solana blockchain')
+                url.set('https://github.com/deanly/solana-sdkj')
+                inceptionYear.set('2025')
+                licenses {
+                    license {
+                        name.set('MIT License')
+                        url.set('https://opensource.org/licenses/MIT')
+                    }
+                }
+                scm {
+                    connection.set('scm:git:https://github.com/deanly/solana-sdkj.git')
+                    developerConnection.set('scm:git:ssh://github.com/deanly/solana-sdkj.git')
+                    url.set('https://github.com/deanly/solana-sdkj')
+                }
+                developers {
+                    developer {
+                        id.set('deanly')
+                        name.set('Dean Lee')
+                        email.set('deanly.dev@gmail.com')
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+}
+
+signing {
+    required { gradle.taskGraph.hasTask("publish") }
+    sign publishing.publications.maven
+}
+
+jreleaser {
+    signing {
+        active = 'ALWAYS'
+        armored = true
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
+    gitRootSearch = true
+    project {
+        license.set("MIT")
+    }
 }

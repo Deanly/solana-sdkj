@@ -174,15 +174,15 @@ public class Transaction {
      * Signs the transaction using the list of signers specified in the
      * `signersForAfterCompile` field.
      * <p>
-     * This method calls the overloaded `sign(List<KeyPair> signers)` method to
+     * This method calls the overloaded {@code sign(List<KeyPair> signers)} method to
      * perform the signing operation using the pre-configured list of signers.
-     * The `signersForAfterCompile` list must not be null and must contain at
+     * The {@code signersForAfterCompile} list must not be null and must contain at
      * least one signer. If the transaction is not already compiled, it will be
      * compiled before signing.
      * </p>
      *
-     * @throws NullPointerException if `signersForAfterCompile` is null
-     * @throws IllegalArgumentException if `signersForAfterCompile` is empty
+     * @throws NullPointerException if {@code signersForAfterCompile} is null
+     * @throws IllegalArgumentException if {@code signersForAfterCompile} is empty
      */
     public void sign() {
         this.sign(this.signersForAfterCompile);

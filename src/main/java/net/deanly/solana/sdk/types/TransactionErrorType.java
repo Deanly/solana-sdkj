@@ -3,8 +3,10 @@ package net.deanly.solana.sdk.types;
 import com.squareup.moshi.Json;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 @AllArgsConstructor
 public enum TransactionErrorType {
     @Json(name = "AccountInUse")

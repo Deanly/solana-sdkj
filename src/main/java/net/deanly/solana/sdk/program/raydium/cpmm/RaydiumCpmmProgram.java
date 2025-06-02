@@ -1,13 +1,8 @@
 package net.deanly.solana.sdk.program.raydium.cpmm;
 
-import lombok.Getter;
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
-import net.deanly.solana.sdk.program.raydium.clmm.RaydiumClmmProgram;
 import net.deanly.solana.sdk.program.raydium.cpmm.instruction.*;
-
-import java.util.List;
 
 /**
  * <p>Standard AMM (CP-Swap, New)</p>

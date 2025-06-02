@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.layout.field.PublicKeyBorshOptionField;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -16,7 +16,7 @@ import net.deanly.structlayout.type.guava.UnsignedLong;
 @ToString
 @NoArgsConstructor
 // https://docs.rs/spl-token/latest/spl_token/state/struct.Mint.html
-public class MintState extends Struct {
+public class MintState extends State {
     public static final int BYTES_LENGTH = 82;
 
     @StructField(order = 1, type = PublicKeyBorshOptionField.class)

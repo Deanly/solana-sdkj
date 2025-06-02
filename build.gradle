@@ -26,7 +26,7 @@ dependencies {
     api 'org.slf4j:slf4j-api:2.0.16'
 
     // Struct Layout
-    api 'net.deanly:struct-layout:0.3.2'
+    api 'net.deanly:struct-layout:0.3.4'
 
     // Internal Libraries
     implementation 'org.bouncycastle:bcprov-jdk15to18:1.79'

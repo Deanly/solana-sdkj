@@ -2,7 +2,6 @@ package net.deanly.solana.sdk.program.spl.alt.state;
 
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.layout.field.PublicKeyPadding2Field;
 import net.deanly.solana.sdk.layout.field.PublicKeyField;
 import net.deanly.structlayout.StructLayout;
@@ -47,7 +46,7 @@ public class AddressLookupTableAccount {
     @Getter
     @ToString
     @NoArgsConstructor
-    public static class State extends Struct {
+    public static class State extends net.deanly.solana.sdk.layout.State {
         @StructField(order = 1, type = UInt32LEField.class)
         long typeIndex;
 

@@ -1,6 +1,14 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.deanly.solana.sdk.layout.State;
+import net.deanly.solana.sdk.layout.field.PublicKeyField;
 import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.structlayout.annotation.StructField;
+import net.deanly.structlayout.codec.encode.StructEncoder;
+import net.deanly.structlayout.exception.StructDecodingException;
+import net.deanly.structlayout.type.basic.UInt8Field;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -62,6 +70,19 @@ class MoshiHttpMethodApiImplTest {
 
     private void assertNumericEquals(Number expected, Number actual) {
         assertEquals(expected.doubleValue(), actual.doubleValue(), 0.0001);
+    }
+
+    // ========== 테스트용 DummyState ==========
+    @Setter
+    @Getter
+    public static class DummyState extends State {
+
+        @StructField(order = 0, type = UInt8Field.class)
+        private int version;
+
+        @StructField(order = 1, type = PublicKeyField.class)
+        private PublicKey owner;
+
     }
 
     @Test
@@ -264,6 +285,89 @@ class MoshiHttpMethodApiImplTest {
         assertEquals(UnsignedLong.valueOf(0L), result.getValue().getSpace());
         assertEquals("", result.getValue().getData().getValue());
         assertEquals("base58", result.getValue().getData().getEncoding().getValue());
+    }
+
+    @Test
+    void testGetAccountState() throws IOException, RpcException, StructDecodingException {
+        // Arrange - DummyState를 Borsh로 인코딩한 후 base64로 변환
+        DummyState dummy = new DummyState();
+        dummy.setVersion(1);
+        dummy.setOwner(PublicKey.valueOf("11111111111111111111111111111111"));
+
+        byte[] encoded = StructEncoder.encode(dummy);
+        String base64 = java.util.Base64.getEncoder().encodeToString(encoded);
+
+        // Mock HTTP 응답 설정
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder()
+                        .url(mockConfig.getEndpointHttp())
+                        .build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+                    {
+                        "jsonrpc": "2.0",
+                        "result": {
+                            "context": { "apiVersion": "2.0.15", "slot": 341197053 },
+                            "value": {
+                                "data": ["%s", "base64"],
+                                "executable": false,
+                                "lamports": 100000,
+                                "owner": "11111111111111111111111111111111",
+                                "rentEpoch": 100,
+                                "space": 9
+                            }
+                        },
+                        "id": 1
+                    }
+                """.formatted(base64), MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // Target public key
+        PublicKey pubkey = PublicKey.valueOf("Dummy11111111111111111111111111111111111111");
+
+        // Act
+        DummyState result = clientApi.getAccountState(pubkey, DummyState.class);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.getVersion());
+        assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), result.getOwner());
+
+        // 요청 JSON 구조 검증 (Encoding.BASE64 고정)
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+        Buffer buffer = new Buffer();
+        capturedRequest.body().writeTo(buffer);
+        String actualJson = buffer.readUtf8();
+
+        String expectedJson = """
+            {
+              "jsonrpc": "2.0",
+              "id": 1,
+              "method": "getAccountInfo",
+              "params": [
+                "Dummy11111111111111111111111111111111111111",
+                {
+                  "encoding": "base64"
+                }
+              ]
+            }
+        """;
+
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+        Map<String, Object> actualMap = adapter.fromJson(actualJson);
+        Map<String, Object> expectedMap = adapter.fromJson(expectedJson);
+        actualMap.remove("id");
+        expectedMap.remove("id");
+        assertEquals(expectedMap, actualMap);
     }
 
     @Test
@@ -2151,6 +2255,113 @@ class MoshiHttpMethodApiImplTest {
     }
 
     @Test
+    void testGetMultipleAccountStates() throws IOException, RpcException, StructDecodingException {
+        // Arrange - DummyState 2개를 생성 및 Borsh 인코딩 후 base64 변환
+        DummyState dummy1 = new DummyState();
+        dummy1.setVersion(1);
+        dummy1.setOwner(PublicKey.valueOf("11111111111111111111111111111111"));
+        String encoded1 = Base64.toBase64String(StructEncoder.encode(dummy1));
+
+        DummyState dummy2 = new DummyState();
+        dummy2.setVersion(2);
+        dummy2.setOwner(PublicKey.valueOf("22222222222222222222222222222222111111111111"));
+        String encoded2 = Base64.toBase64String(StructEncoder.encode(dummy2));
+
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder().url(mockConfig.getEndpointHttp()).build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+              {
+                "jsonrpc": "2.0",
+                "result": {
+                  "context": { "apiVersion": "2.0.15", "slot": 341197247 },
+                  "value": [
+                    {
+                      "data": ["%s", "base64"],
+                      "executable": false,
+                      "lamports": 100,
+                      "owner": "11111111111111111111111111111111",
+                      "rentEpoch": 1,
+                      "space": 9
+                    },
+                    {
+                      "data": ["%s", "base64"],
+                      "executable": false,
+                      "lamports": 200,
+                      "owner": "22222222222222222222222222222222111111111111",
+                      "rentEpoch": 2,
+                      "space": 9
+                    }
+                  ]
+                },
+                "id": 1
+              }
+            """.formatted(encoded1, encoded2), MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        List<PublicKey> accounts = List.of(
+                PublicKey.valueOf("11111111111111111111111111111111"),
+                PublicKey.valueOf("22222222222222222222222222222222111111111111")
+        );
+
+        // Act
+        List<DummyState> result = clientApi.getMultipleAccountStates(accounts, DummyState.class);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        DummyState r1 = result.get(0);
+        assertNotNull(r1);
+        assertEquals(1, r1.getVersion());
+        assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), r1.getOwner());
+
+        DummyState r2 = result.get(1);
+        assertNotNull(r2);
+        assertEquals(2, r2.getVersion());
+        assertEquals(PublicKey.valueOf("22222222222222222222222222222222111111111111"), r2.getOwner());
+
+        // 요청 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+        Buffer requestBodyBuffer = new Buffer();
+        capturedRequest.body().writeTo(requestBodyBuffer);
+        String actualRequestJson = requestBodyBuffer.readUtf8();
+
+        String expectedJson = """
+      {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "getMultipleAccounts",
+        "params": [
+          [
+            "11111111111111111111111111111111",
+            "22222222222222222222222222222222111111111111"
+          ],
+          {
+            "encoding": "base64"
+          }
+        ]
+      }
+    """;
+
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+        Map<String, Object> actualMap = adapter.fromJson(actualRequestJson);
+        Map<String, Object> expectedMap = adapter.fromJson(expectedJson);
+        actualMap.remove("id");
+        expectedMap.remove("id");
+        assertEquals(expectedMap, actualMap);
+    }
+
+    @Test
     void testGetProgramAccounts_Success() throws IOException, RpcException {
         // 1. Mock Call 설정
         Call mockCall = mock(Call.class);
@@ -2255,6 +2466,91 @@ class MoshiHttpMethodApiImplTest {
         assertEquals(UnsignedLong.valueOf(28), programAccount.getAccount().getRentEpoch());
         assertEquals(UnsignedLong.valueOf(42), programAccount.getAccount().getSpace());
         assertEquals(PublicKey.valueOf("CxELquR1gPP8wHe33gZ4QxqGB3sZ9RSwsJ2KshVewkFY"), programAccount.getPubkey());
+    }
+
+    @Test
+    void testGetProgramAccountStates() throws IOException, RpcException {
+        // Arrange - DummyState를 StructEncoder로 인코딩한 후 base64로 변환
+        DummyState dummy = new DummyState();
+        dummy.setVersion(1);
+        dummy.setOwner(PublicKey.valueOf("11111111111111111111111111111111"));
+
+        byte[] encoded = StructEncoder.encode(dummy);
+        String base64 = org.bouncycastle.util.encoders.Base64.toBase64String(encoded);
+
+        // Mock 응답 생성
+        Call mockCall = mock(Call.class);
+        when(mockHttpClient.newCall(any())).thenReturn(mockCall);
+
+        Response mockResponse = new Response.Builder()
+                .request(new Request.Builder()
+                        .url(mockConfig.getEndpointHttp())
+                        .build())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body(ResponseBody.create("""
+                {
+                  "jsonrpc": "2.0",
+                  "result": [
+                    {
+                      "account": {
+                        "data": ["%s", "base64"],
+                        "executable": false,
+                        "lamports": 100000,
+                        "owner": "11111111111111111111111111111111",
+                        "rentEpoch": 100,
+                        "space": 9
+                      },
+                      "pubkey": "Dummy11111111111111111111111111111111111111"
+                    }
+                  ],
+                  "id": 1
+                }
+            """.formatted(base64), MediaType.get("application/json")))
+                .build();
+        when(mockCall.execute()).thenReturn(mockResponse);
+
+        // Act
+        PublicKey programId = PublicKey.valueOf("Program111111111111111111111111111111111111");
+        List<DummyState> states = clientApi.getProgramAccountStates(programId, List.of(), DummyState.class);
+
+        // Assert
+        assertNotNull(states);
+        assertEquals(1, states.size());
+        assertEquals(1, states.get(0).getVersion());
+        assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), states.get(0).getOwner());
+
+        // 요청 검증
+        ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
+        verify(mockHttpClient).newCall(requestCaptor.capture());
+        Request capturedRequest = requestCaptor.getValue();
+        Buffer buffer = new Buffer();
+        capturedRequest.body().writeTo(buffer);
+        String actualJson = buffer.readUtf8();
+
+        String expectedJson = """
+        {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "getProgramAccounts",
+          "params": [
+            "Program111111111111111111111111111111111111",
+            {
+              "encoding": "base64",
+              "filters": []
+            }
+          ]
+        }
+    """;
+
+        Moshi moshi = new Moshi.Builder().build();
+        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(Types.newParameterizedType(Map.class, String.class, Object.class));
+        Map<String, Object> actualMap = adapter.fromJson(actualJson);
+        Map<String, Object> expectedMap = adapter.fromJson(expectedJson);
+        actualMap.remove("id");
+        expectedMap.remove("id");
+        assertEquals(expectedMap, actualMap);
     }
 
     @Test

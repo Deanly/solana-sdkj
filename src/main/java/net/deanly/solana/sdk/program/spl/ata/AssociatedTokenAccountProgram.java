@@ -2,12 +2,12 @@ package net.deanly.solana.sdk.program.spl.ata;
 
 import lombok.NonNull;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountInstruction0Create;
 import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountInstruction1CreateIdempotent;
 import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountInstruction2RecoverNested;
 
-public class AssociatedTokenAccountProgram extends Struct {
+public class AssociatedTokenAccountProgram extends State {
 
     public static final PublicKey PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");;
 

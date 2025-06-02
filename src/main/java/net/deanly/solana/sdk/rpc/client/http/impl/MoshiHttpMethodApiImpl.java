@@ -1,6 +1,9 @@
 package net.deanly.solana.sdk.rpc.client.http.impl;
 
+import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
+import net.deanly.structlayout.exception.StructDecodingException;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -190,6 +193,18 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         Objects.requireNonNull(account, "account must not be null");
         Type type = Types.newParameterizedType(RpcResponseV2.class, ResValueAccountInfo.class);
         return this.call("getAccountInfo", this.getParams(account, configuration), type, null);
+    }
+
+    private static final AccountInfoConfig DEFAULT_ACCOUNT_INFO_CONFIG = AccountInfoConfig.builder().encoding(Encoding.BASE64).build();
+
+    @Override
+    public <T extends State> T getAccountState(PublicKey pubkey, Class<T> clazz) throws RpcException, IllegalStateException, StructDecodingException {
+        RpcResultObject<ResValueAccountInfo> result = this.getAccountInfo(pubkey, DEFAULT_ACCOUNT_INFO_CONFIG);
+        if (result == null || result.getValue() == null || result.getValue().getData() == null) {
+            throw new IllegalStateException("Account data is missing.");
+        }
+        StateData stateData = result.getValue().getData();
+        return stateData.decodeAsStruct(clazz);
     }
 
     @Override
@@ -395,11 +410,57 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         return this.call("getMultipleAccounts", this.getParams(accounts, configuration), type, null);
     }
 
+    private static final MultipleAccountsConfig DEFAULT_MUTIPLE_ACCOUNTS_CONFIG = MultipleAccountsConfig.builder()
+            .encoding(Encoding.BASE64)
+            .build();
+
+    @Override
+    public <T extends State> List<T> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException {
+        RpcResultObject<List<ResValueAccountInfo>> result = getMultipleAccounts(accounts, DEFAULT_MUTIPLE_ACCOUNTS_CONFIG);
+
+        List<T> states = new ArrayList<>();
+        for (ResValueAccountInfo info : result.getValue()) {
+            if (info != null && info.getData() != null && info.getData().getValue() != null) {
+                try {
+                    states.add(info.getData().decodeAsStruct(clazz));
+                } catch (Exception e) {
+                    states.add(null); // decoding 실패 시 null 추가
+                }
+            } else {
+                states.add(null);
+            }
+        }
+        return states;
+    }
+
     @Override
     public List<ResValueProgram> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException {
         Objects.requireNonNull(programId, "programId must not be null");
         Type type = Types.newParameterizedType(RpcResponse.class, Types.newParameterizedType(List.class, ResValueProgram.class));
         return this.call("getProgramAccounts", this.getParams(programId, configuration), type, null);
+    }
+
+    @Override
+    public <T extends State> List<T> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException {
+        ProgramAccountsConfig config = ProgramAccountsConfig.builder()
+                .filters(filters)
+                .encoding(Encoding.BASE64)
+                .build();
+        List<ResValueProgram> results = getProgramAccounts(programId, config);
+
+        List<T> states = new ArrayList<>();
+        for (ResValueProgram res : results) {
+            if (res != null && res.getAccount() != null && res.getAccount().getData() != null) {
+                try {
+                    states.add(res.getAccount().getData().decodeAsStruct(clazz));
+                } catch (Exception e) {
+                    states.add(null);
+                }
+            } else {
+                states.add(null);
+            }
+        }
+        return states;
     }
 
     @Override

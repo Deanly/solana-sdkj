@@ -21,7 +21,7 @@ import net.deanly.structlayout.StructLayout;
  * Usage Example:
  * <pre>
  * {@code
- *      public class ExampleStruct extends Struct {
+ *      public class ExampleStruct extends State {
  *          @StructField(order = 1, type = UInt32LEField.class)
  *          private int exampleField;
  *      }
@@ -29,7 +29,7 @@ import net.deanly.structlayout.StructLayout;
  * </pre>
  * @see <a href="https://github.com/Deanly/struct-layout">Struct Layout Github</a>
  */
-public abstract class Struct {
+public abstract class State {
 
     public byte[] serialize() {
         return StructLayout.encode(this);

@@ -2,6 +2,7 @@ package net.deanly.solana.sdk.transaction.message;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstructionImpl;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
+import net.deanly.structlayout.exception.StructDecodingException;
 import org.junit.jupiter.api.Test;
 import net.deanly.solana.sdk.transaction.instruction.AccountMeta;
 import net.deanly.solana.sdk.crypto.PublicKey;
@@ -137,7 +138,8 @@ class MessageV0Test {
         ByteBuffer buffer = ByteBuffer.allocate(10).put((byte) 127); // Invalid version (127)
 
         // Act & Assert: Ensure IllegalArgumentException is thrown for invalid version
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+//        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+        StructDecodingException exception = assertThrows(StructDecodingException.class, () ->
                 MessageV0.deserialize(buffer.flip())
         );
     }

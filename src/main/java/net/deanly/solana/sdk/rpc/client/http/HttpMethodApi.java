@@ -1,5 +1,8 @@
 package net.deanly.solana.sdk.rpc.client.http;
 
+import net.deanly.solana.sdk.layout.State;
+import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
+import net.deanly.structlayout.exception.StructDecodingException;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
@@ -33,6 +36,39 @@ public interface HttpMethodApi {
     default RpcResultObject<ResValueAccountInfo> getAccountInfo(PublicKey pubkey) throws RpcException {
         return getAccountInfo(pubkey, null);
     }
+
+    /**
+     * Retrieves and decodes the binary state data of a Solana account into a structured Java object.
+     * <p>
+     * This method performs the following steps:
+     * <ol>
+     *     <li>Calls {@code getAccountInfo} RPC to retrieve account data using the provided public key.</li>
+     *     <li>Reads the binary-encoded {@code data} field (e.g., base58/base64).</li>
+     *     <li>Uses StructLayout to decode the binary into the specified {@code State} class.</li>
+     * </ol>
+     *
+     * <h3>Example Use Case:</h3>
+     * <pre>{@code
+     * PublicKey mint = new PublicKey("...");
+     * TokenMetadataState state = getAccountState(mint, TokenMetadataState.class);
+     * }</pre>
+     *
+     * <h3>Important:</h3>
+     * <ul>
+     *     <li>The {@code clazz} must extend the {@code State} base class (usually backed by StructLayout).</li>
+     *     <li>The target account must contain a compatible Borsh-encoded struct payload.</li>
+     *     <li>If {@code data} is missing or encoding is unsupported, an exception will be thrown.</li>
+     * </ul>
+     *
+     * @param pubkey The public key of the account to query.
+     * @param clazz The target class to decode the account data into.
+     * @param <T> A type that extends {@code State}, annotated and decodable by StructLayout.
+     * @return A decoded instance of {@code T} representing the account's binary state.
+     * @throws RpcException If the Solana RPC call fails.
+     * @throws IllegalStateException If the account data is missing or improperly encoded.
+     * @throws StructDecodingException If decoding the state data fails.
+     */
+    <T extends State> T getAccountState(PublicKey pubkey, Class<T> clazz) throws RpcException, IllegalStateException, StructDecodingException;
 
     /**
      * Returns the balance of the account of provided Pubkey.
@@ -357,6 +393,25 @@ public interface HttpMethodApi {
     }
 
     /**
+     * Retrieves and decodes the state of multiple Solana accounts as the specified {@code State} type.
+     * <p>
+     * This method attempts to decode each account's data using the provided {@code State} class.
+     * If an account's data is missing, improperly encoded, or incompatible with the specified class,
+     * that entry in the returned list will be {@code null}.
+     * </p>
+     *
+     * <p><strong>Note:</strong> All accounts must be known to follow the same binary structure.
+     * Mixing accounts with different underlying layouts may result in partial decoding or {@code null} values.</p>
+     *
+     * @param accounts List of account PublicKeys (max 100).
+     * @param clazz    Target State class to decode each account.
+     * @param <T>      Type of the target decoded StructLayout State.
+     * @return List of decoded state objects (null if data missing or decoding fails).
+     * @throws RpcException If RPC communication fails.
+     */
+    <T extends State> List<T> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException;
+
+    /**
      * Returns all accounts owned by the provided program Pubkey.
      *
      * @param programId     The Pubkey of the program, as a base-58 encoded string.
@@ -368,6 +423,29 @@ public interface HttpMethodApi {
     List<ResValueProgram> getProgramAccounts(PublicKey programId, ProgramAccountsConfig configuration) throws RpcException;
     default List<ResValueProgram> getProgramAccounts(PublicKey programId) throws RpcException {
         return getProgramAccounts(programId, null);
+    }
+
+    /**
+     * Retrieves and decodes all Solana accounts owned by the specified program as the given {@code State} type,
+     * applying the provided filters.
+     *
+     * <p>This method issues a {@code getProgramAccounts} RPC call with optional filters and attempts to decode
+     * each result into the specified {@code State} class. Accounts that fail decoding due to missing data,
+     * incorrect encoding, or incompatible structure will be represented as {@code null} in the returned list.</p>
+     *
+     * <p><strong>Warning:</strong> This method assumes that all matched accounts follow a uniform binary layout
+     * compatible with the provided {@code State} class. Use filters (e.g., {@code dataSize}) to ensure structural consistency.</p>
+     *
+     * @param programId The public key of the program that owns the accounts.
+     * @param filters   Optional list of filters (e.g., {@code dataSize}, {@code memcmp}) to narrow the result set.
+     * @param clazz     The target class extending {@code State} to decode each account into.
+     * @param <T>       A class type that extends {@code State}.
+     * @return A list of decoded {@code State} objects or {@code null} for failed decoding, in no particular order.
+     * @throws RpcException If the RPC request fails.
+     */
+    <T extends State> List<T> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException;
+    default <T extends State> List<T> getProgramAccountStates(PublicKey programId, Class<T> clazz) throws RpcException {
+        return getProgramAccountStates(programId, null, clazz);
     }
 
     /**

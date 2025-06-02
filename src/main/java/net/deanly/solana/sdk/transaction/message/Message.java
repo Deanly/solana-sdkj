@@ -2,7 +2,7 @@ package net.deanly.solana.sdk.transaction.message;
 
 import lombok.*;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.rpc.client.config.Network;
 import net.deanly.solana.sdk.transaction.instruction.TransactionInstruction;
 import net.deanly.solana.sdk.layout.field.BlockhashField;
@@ -27,7 +27,7 @@ import java.util.*;
 @ToString
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class Message extends Struct implements VersionedMessage {
+public class Message extends State implements VersionedMessage {
 
     @StructObjectField(order = 1)
     protected MessageHeader header;

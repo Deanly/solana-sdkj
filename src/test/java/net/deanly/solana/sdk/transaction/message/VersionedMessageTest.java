@@ -6,6 +6,7 @@ import net.deanly.solana.sdk.transaction.message.meta.MessageCompiledInstruction
 import net.deanly.solana.sdk.transaction.message.meta.MessageHeader;
 import net.deanly.solana.sdk.types.Blockhash;
 import net.deanly.structlayout.StructLayout;
+import net.deanly.structlayout.exception.StructDecodingException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -76,7 +77,7 @@ class VersionedMessageTest {
         byte[] invalidMessage = new byte[]{0, 1, 2, 3, 4};
 
         // Attempt deserialization and verify an exception is thrown
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        Exception exception = assertThrows(StructDecodingException.class, () -> {
             VersionedMessage.deserialize(invalidMessage);
         });
     }

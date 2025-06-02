@@ -3,7 +3,12 @@ package net.deanly.solana.sdk.types;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import net.deanly.solana.sdk.layout.State;
+import net.deanly.solana.sdk.types.codec.Base58;
+import net.deanly.structlayout.StructLayout;
+import net.deanly.structlayout.exception.StructDecodingException;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,6 +41,22 @@ public class StateData {
         this.value = value;
         this.object = null;
         this.isSingleType = isSingleType;
+    }
+
+    public <T extends State> T decodeAsStruct(Class<T> structClass) throws IllegalStateException, StructDecodingException {
+        if (this.value == null) {
+            throw new IllegalStateException("Cannot decode: no value present for encoding type " + this.encoding);
+        }
+
+        byte[] bytes;
+        if (this.encoding == Encoding.BASE58) {
+            bytes = Base58.decode(this.value);
+        } else if (this.encoding == Encoding.BASE64) {
+            bytes = Base64.getDecoder().decode(this.value);
+        } else {
+            throw new IllegalStateException("Unsupported encoding: " + this.encoding);
+        }
+        return StructLayout.decode(bytes, structClass);
     }
 
 

@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
+import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.layout.field.PublicKeyField;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -18,7 +18,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 // https://docs.rs/spl-token/latest/spl_token/state/struct.Multisig.html
-public class MultisigState extends Struct {
+public class MultisigState extends State {
     public static final int BYTES_LENGTH = 355;
 
     @StructField(order = 1, type = UInt8Field.class)

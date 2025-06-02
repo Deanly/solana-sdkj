@@ -1,9 +1,6 @@
 package net.deanly.solana.sdk.program.spl.memo;
 
-import lombok.Getter;
-import lombok.Setter;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.program.spl.memo.instruction.SplMemoInstructionWrite;
 
 import java.util.List;

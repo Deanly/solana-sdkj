@@ -1,8 +1,6 @@
 package net.deanly.solana.sdk.program.core.system;
 
-import lombok.Getter;
 import net.deanly.solana.sdk.crypto.PublicKey;
-import net.deanly.solana.sdk.layout.Struct;
 import net.deanly.solana.sdk.program.core.system.instruction.*;
 
 /**

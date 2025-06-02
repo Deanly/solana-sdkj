@@ -25,6 +25,7 @@
   - [Retrieve Account Balance](#retrieve-account-balance)
   - [Transfer SOL (Lamports)](#transfer-sol-lamports)
   - [Simulate Transaction](#simulate-transaction)
+  - [Read Account State](#read-account-state-via-structlayout-tokenmetadata-example)
 - [License](#-license)
 
 ---

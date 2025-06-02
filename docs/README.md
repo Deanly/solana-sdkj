@@ -53,14 +53,14 @@ You can include `solana-sdkj` in your project via Maven. Add the following depen
 <dependency>
   <groupId>net.deanly</groupId>
   <artifactId>solana-sdkj</artifactId>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
 </dependency>
 ```
 
 If you're using Gradle, add the following to your `build.gradle`:
 
 ```gradle
-implementation 'net.deanly:solana-sdkj:0.0.1'
+implementation 'net.deanly:solana-sdkj:0.1.0'
 ```
 
 ---
@@ -196,6 +196,72 @@ public class SimulateTransactionExample {
 ```
 
 The `simulateTransaction` function allows developers to test transactions before committing them to the blockchain. The result will indicate if the transaction would succeed or fail and, if it fails, what issues to address.
+
+
+### Read Account State via StructLayout (TokenMetadata Example)
+
+You can decode a Solana account’s data into a structured class (State) using getAccountState. This makes it easy to work with Borsh-encoded on-chain data, such as Metaplex’s Token Metadata.
+```java
+import net.deanly.solana.sdk.rpc.client.RpcClient;
+import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
+import net.deanly.solana.sdk.rpc.client.config.Network;
+import net.deanly.solana.sdk.types.PublicKey;
+import net.deanly.solana.sdk.types.ProgramDerivedAddress;
+import net.deanly.solana.sdk.rpc.response.ResValueAccountInfo;
+import net.deanly.solana.sdk.rpc.request.config.AccountInfoConfig;
+import net.deanly.solana.sdk.types.Encoding;
+import net.deanly.solana.sdk.program.metaplex.tokenmetadata.state.TokenMetadataState;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+public class ReadTokenMetadataExample {
+  public static void main(String[] args) throws Exception {
+    RpcClient rpcClient = new RpcClient(ClientConfig.builder()
+            .network(Network.MAINNET)
+            .build());
+
+    // Target Mint Address
+    String mintBase58 = "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN";
+    PublicKey mint = PublicKey.valueOf(mintBase58);
+
+    // Metaplex Token Metadata Program ID
+    PublicKey metadataProgramId = TokenMetadataProgram.PROGRAM_ID;
+
+    // Derive Metadata PDA
+    List<byte[]> seeds = List.of(
+            "metadata".getBytes(StandardCharsets.UTF_8),
+            metadataProgramId.toByteArray(),
+            mint.toByteArray()
+    );
+    ProgramDerivedAddress pda = PublicKey.findProgramAddress(seeds, metadataProgramId);
+    System.out.println("Metadata PDA: " + pda.getAddress().toBase58());
+
+    // Fetch and decode state directly
+    TokenMetadataState state = rpcClient.getRpcHttpApi().getAccountState(pda.getAddress(), TokenMetadataState.class);
+
+    System.out.println("Decoded Token Metadata:");
+    System.out.println(state);
+  }
+}
+```
+Sample Output
+```
+TokenMetadataState(
+  key=4,
+  updateAuthority=5e2qRc1DNEXmyxP8qwPwJhRWjef7usLyi7v5xjqLr5G7,
+  mint=6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN,
+  name=OFFICIAL TRUMP,
+  symbol=TRUMP,
+  uri=https://arweave.net/cSCP0h2n1crjeSWE9KF-XtLciJalDNFs7Vf-Sm0NNY0,
+  sellerFeeBasisPoints=0,
+  creators=[...],
+  primarySaleHappened=false,
+  isMutable=false,
+  ...
+)
+```
+`getAccountState` automatically decodes Borsh-encoded data using the class you provide (which must extend State). You can define your own `@StructLayout-annotated` types to read custom program accounts.
 
 ---
 🚧 Difference from solanaj

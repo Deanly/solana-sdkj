@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'net.deanly'
-version = '0.0.1'
+version = '0.1.0'
 description = 'Solana Standard Development Kits for Java'
 
 java {
@@ -129,8 +129,21 @@ jreleaser {
             }
         }
     }
-    gitRootSearch = true
     project {
-        license.set("MIT")
+        name = 'solana-sdkj'
+        description = 'Solana RPC Methods for java'
+        website = 'https://github.com/Deanly/solana-sdkj'
+        license = 'MIT'
+    }
+
+    gitRootSearch = true
+    release {
+        github {
+            enabled = true
+            setRepoOwner('Deanly')
+            name = 'struct-layout'
+            tagName = 'v{{projectVersion}}'
+            releaseName = 'Release {{tagName}}'
+        }
     }
 }

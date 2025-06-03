@@ -55,9 +55,6 @@ tasks.withType(JavaCompile) {
 
 tasks.test {
     useJUnitPlatform()
-    jvmArgs += [
-            "--add-opens", "java.base/java.lang=ALL-UNNAMED"
-    ]
 }
 
 tasks.withType(Javadoc) { // Lombok 이슈로 인해 Javadoc을 비활성화

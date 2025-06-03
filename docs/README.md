@@ -41,14 +41,14 @@ You can include `solana-sdkj` in your project via Maven. Add the following depen
 <dependency>
   <groupId>net.deanly</groupId>
   <artifactId>solana-sdkj</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.1</version>
 </dependency>
 ```
 
 If you're using Gradle, add the following to your `build.gradle`:
 
 ```gradle
-implementation 'net.deanly:solana-sdkj:0.1.0'
+implementation 'net.deanly:solana-sdkj:0.1.1'
 ```
 
 ---

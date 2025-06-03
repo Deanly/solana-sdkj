@@ -5,7 +5,7 @@ import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.program.spl.token.SplTokenProgram;
 import net.deanly.solana.sdk.rpc.client.config.Network;
 
-abstract class SplTokenInstructionBase extends State {
+abstract class SplTokenInstructionBase {
 
     public PublicKey getProgramId(Network network) {
         return SplTokenProgram.PROGRAM_ID;

@@ -7,7 +7,7 @@ import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountI
 import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountInstruction1CreateIdempotent;
 import net.deanly.solana.sdk.program.spl.ata.instruction.AssociatedTokenAccountInstruction2RecoverNested;
 
-public class AssociatedTokenAccountProgram extends State {
+public class AssociatedTokenAccountProgram {
 
     public static final PublicKey PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");;
 

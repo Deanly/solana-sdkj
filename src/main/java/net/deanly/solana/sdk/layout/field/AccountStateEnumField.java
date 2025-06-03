@@ -12,7 +12,7 @@ public class AccountStateEnumField extends FieldBase<AccountStateEnum> {
     @Override
     public byte[] encode(AccountStateEnum value) {
         if (value == null) {
-            throw new IllegalArgumentException("AuthorityType value cannot be null.");
+            throw new IllegalArgumentException("AccountStateEnum value cannot be null.");
         }
 
         byte[] result = new byte[1];
@@ -30,8 +30,8 @@ public class AccountStateEnumField extends FieldBase<AccountStateEnum> {
         }
 
         int stateValue = Byte.toUnsignedInt(bytes[offset]); // Read as an unsigned byte
-        if (stateValue < 0 || stateValue >= AuthorityType.values().length) {
-            throw new IllegalArgumentException("Invalid AccountState value: " + stateValue);
+        if (stateValue >= AccountStateEnum.values().length) {
+            throw new IllegalArgumentException("Invalid AccountStateEnum value: " + stateValue);
         }
 
         return AccountStateEnum.values()[stateValue];

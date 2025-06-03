@@ -4,6 +4,7 @@ import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.rpc.client.config.ClientConfig;
 import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
 import net.deanly.structlayout.exception.StructDecodingException;
+import net.deanly.structlayout.support.Tuple2;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -533,12 +534,64 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
         return this.call("getTokenAccountsByDelegate", this.getParams(delegate, filter, configuration), type, null);
     }
 
+    private static final TokenAccountsByDelegateConfig DEFAULT_TOKEN_ACCOUNT_BY_DELEGATE_CONFIG = TokenAccountsByDelegateConfig.builder()
+            .encoding(Encoding.BASE64)
+            .build();
+
+    @Override
+    public <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByDelegate(
+            PublicKey delegate,
+            TokenAccountsByDelegateFilter filter,
+            Class<T> clazz
+    ) throws RpcException {
+        RpcResultObject<List<ResValueTokenAccount>> result = this.getTokenAccountsByDelegate(delegate, filter, DEFAULT_TOKEN_ACCOUNT_BY_DELEGATE_CONFIG);
+
+        List<Tuple2<PublicKey, T>> decodedStates = new ArrayList<>();
+        for (ResValueTokenAccount item : result.getValue()) {
+            try {
+                StateData stateData = item.getAccount().getData();
+                T decoded = stateData.decodeAsStruct(clazz);
+                decodedStates.add(Tuple2.of(item.getPubkey(), decoded));
+            } catch (Exception e) {
+                decodedStates.add(Tuple2.of(item.getPubkey(), null));
+            }
+        }
+
+        return decodedStates;
+    }
+
     @Override
     public RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByOwner(PublicKey owner, TokenAccountsByOwnerFilter filter, TokenAccountsByOwnerConfig configuration) throws RpcException {
         Objects.requireNonNull(owner, "owner must not be null");
         Objects.requireNonNull(filter, "filter must not be null");
         Type type = Types.newParameterizedType(RpcResponseV2.class, Types.newParameterizedType(List.class, ResValueTokenAccount.class));
         return this.call("getTokenAccountsByOwner", this.getParams(owner, filter, configuration), type, null);
+    }
+
+    private static final TokenAccountsByOwnerConfig DEFAULT_TOKEN_ACCOUNT_BY_OWNER_CONFIG = TokenAccountsByOwnerConfig.builder()
+            .encoding(Encoding.BASE64)
+            .build();
+
+    @Override
+    public <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByOwner(
+            PublicKey owner,
+            TokenAccountsByOwnerFilter filter,
+            Class<T> clazz
+    ) throws RpcException {
+        RpcResultObject<List<ResValueTokenAccount>> result = this.getTokenAccountsByOwner(owner, filter, DEFAULT_TOKEN_ACCOUNT_BY_OWNER_CONFIG);
+
+        List<Tuple2<PublicKey, T>> decodedStates = new ArrayList<>();
+        for (ResValueTokenAccount item : result.getValue()) {
+            try {
+                StateData stateData = item.getAccount().getData();
+                T decoded = stateData.decodeAsStruct(clazz);
+                decodedStates.add(Tuple2.of(item.getPubkey(), decoded));
+            } catch (Exception e) {
+                decodedStates.add(Tuple2.of(item.getPubkey(), null)); // 개별 실패 항목에 대해 null 처리
+            }
+        }
+
+        return decodedStates;
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.deanly.solana.sdk.rpc.client.http;
 import net.deanly.solana.sdk.layout.State;
 import net.deanly.solana.sdk.rpc.request.filter.ProgramAccountFilter;
 import net.deanly.structlayout.exception.StructDecodingException;
+import net.deanly.structlayout.support.Tuple2;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.exception.RpcException;
@@ -613,6 +614,24 @@ public interface HttpMethodApi {
     }
 
     /**
+     * Returns a list of account states where the given public key is the delegate.
+     * Each account's data is decoded into the given struct class.
+     * <p>
+     * Note: If decoding fails for an individual account, `null` is included in its place.
+     *
+     * @param delegate The delegate public key.
+     * @param filter Optional filter (mint or programId).
+     * @param clazz The expected struct class to decode each account into.
+     * @return A list of decoded state objects (may contain nulls).
+     * @throws RpcException If the RPC call fails.
+     */
+    <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByDelegate(
+            PublicKey delegate,
+            TokenAccountsByDelegateFilter filter,
+            Class<T> clazz
+    ) throws RpcException;
+
+    /**
      * Returns all SPL Token accounts by token owner.
      *
      * @param owner         The public key of the account owner to query.
@@ -630,6 +649,23 @@ public interface HttpMethodApi {
     default RpcResultObject<List<ResValueTokenAccount>> getTokenAccountsByOwner(PublicKey owner, TokenAccountsByOwnerFilter filter) throws RpcException {
         return getTokenAccountsByOwner(owner, filter, null);
     }
+
+    /**
+     * Returns a list of account states owned by the given public key.
+     * Each account's data is decoded into the specified struct class, and paired with the corresponding account public key.
+     * <p>
+     * Note: If decoding fails for an individual account, the corresponding value in the tuple will be {@code null}.
+     *
+     * @param owner The owner public key to query token accounts for.
+     * @param filter Optional filter (mint or programId).
+     * @param clazz The struct class to decode the account data into.
+     * @return A list of tuples, each containing the account public key and the decoded state (may be {@code null} if decoding fails).
+     * @throws RpcException If the RPC call fails.
+     */
+    <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByOwner(
+            PublicKey owner,
+            TokenAccountsByOwnerFilter filter,
+            Class<T> clazz) throws RpcException;
 
     /**
      * Returns the 20 largest accounts of a particular SPL Token type.

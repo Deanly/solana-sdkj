@@ -182,6 +182,30 @@ public class SimulateTransactionExample {
   }
 }
 ```
+Sample Output
+```plaintext
+Order             Field                       Offset  Bytes (HEX)
+=======================================================================
+1[].length        signatures                  0000000 01
+1[0]              signatures                  0000001 39 CD A1 D0 56 A4 08 6B 63 D6 F3 BA 0C FA 32 F2 F9 35 BE 7F 87 F4 10 C4 26 45 B1 AE 26 0D A9 21 9C D3 8A 0B 45 E9 F6 C7 B3 65 F6 08 A4 0E 2B 85 A7 71 0B 3E 73 05 58 DE 66 92 E6 69 4A 73 AC 05
+2-1-1             numRequiredSignatures       0000065 01
+2-1-2             numReadonlySignedAccounts   0000066 00
+2-1-3             numReadonlyUnsignedAccounts 0000067 01
+2-2[].length      staticAccountKeys           0000068 03
+2-2[0]            staticAccountKeys           0000069 B8 A3 A3 BD 09 5C 2D F5 D4 68 BE 74 E4 A8 29 C4 F2 52 44 77 79 3D 52 19 29 EE 73 C3 43 84 41 F2
+2-2[1]            staticAccountKeys           0000101 22 6B FA 70 D4 05 93 83 03 CA 98 BD B5 A2 BA FA 8C 47 4D B5 38 FE 1B F2 5A 65 49 7F A8 3F DF F7
+2-2[2]            staticAccountKeys           0000133 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+2-3               recentBlockhash             0000165 50 29 81 53 E9 3F 5F D5 A7 38 A4 FF 3F AA AF 4E 4A 27 70 BA 70 6F 41 97 47 C1 F0 11 A3 88 D5 27
+2-4[].length      instructions                0000197 01
+2-4[0]-1          programIdIndex              0000198 02
+2-4[0]-2[].length accountKeyIndexes           0000199 02
+2-4[0]-2[0]       accountKeyIndexes           0000200 00
+2-4[0]-2[1]       accountKeyIndexes           0000201 01
+2-4[0]-3          data                        0000202 0C 03 00 00 00 40 42 0F 00 00 00 00 00
+=======================================================================
+Total Bytes: 215
+Simulation Result: ResValueSimulatedTransaction(err=null, logs=[Program 11111111111111111111111111111111 invoke [1], Program 11111111111111111111111111111111 success], accounts=null, unitsConsumed=150, returnData=null, innerInstruction=[])
+```
 
 The `simulateTransaction` function allows developers to test transactions before committing them to the blockchain. The result will indicate if the transaction would succeed or fail and, if it fails, what issues to address.
 

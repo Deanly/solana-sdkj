@@ -6,7 +6,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/net.deanly/solana-sdkj)](https://search.maven.org/artifact/net.deanly/solana-sdkj)
 
 `solana-sdkj` is a modern, developer-friendly SDK for building Java applications on the Solana blockchain.  
-It provides complete RPC access, convenient abstractions for System Programs, and first-class support for Borsh-encoded program states using `struct-layout`.
+It provides complete RPC access, convenient abstractions for System Programs, and first-class support for Borsh-encoded program states using [struct-layout](https://github.com/Deanly/struct-layout).
 
 ---
 

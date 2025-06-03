@@ -1,38 +1,25 @@
-# Solana RPC SDK for Java 
+# Solana SDK for Java (`solana-sdkj`)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Java Version](https://img.shields.io/badge/Java-17%2B-blue)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 [![Documentation](https://img.shields.io/badge/API-Documentation-lightgrey)](https://docs.solana.com/apps/jsonrpc-api)
 [![Maven Central](https://img.shields.io/maven-central/v/net.deanly/solana-sdkj)](https://search.maven.org/artifact/net.deanly/solana-sdkj)
 
-`solana-sdkj` provides a flexible, developer-friendly way to integrate with the Solana blockchain ecosystem. It builds upon Solana RPC methods with a focus on supporting Java developers in creating applications with System Programs and other Solana-native programs. It aims to simplify working with Program States and enables easy customizability and extendability of Solana programs.
+`solana-sdkj` is a modern, developer-friendly SDK for building Java applications on the Solana blockchain.  
+It provides complete RPC access, convenient abstractions for System Programs, and first-class support for Borsh-encoded program states using `struct-layout`.
+
+---
 
 ## ✨ Features
 
-- Full support for **Solana RPC** API methods.
-- Simplified handling of **System Programs** and state management.
-- Extendable and customizable program definitions for easy integration.
-- Built with pure Java and compatible with Java 17+.
-
----
-
-## 📚 Table of Contents
-
-- [Requirements](#%EF%B8%8F-requirements)
-- [Dependencies](#-dependencies)
-- [Installation](#%EF%B8%8F-installation)
-- [Getting Started](#-getting-started)
-  - [Retrieve Account Balance](#retrieve-account-balance)
-  - [Transfer SOL (Lamports)](#transfer-sol-lamports)
-  - [Simulate Transaction](#simulate-transaction)
-  - [Read Account State](#read-account-state-via-structlayout-tokenmetadata-example)
-- [License](#-license)
-
----
-
-## 🛠️ Requirements
-
-- Java 17 or higher.
+- Full support for all **Solana RPC** methods
+- Built-in abstractions for **SystemProgram**, **Transactions**, **Program Derived Addresses**, and **VersionedMessage** (v0)
+- Strong **Borsh/Rust/C state decoding** via `@StructLayout`  
+  Easily map program account data into structured Java classes  
+  Extend the `State` class and pair it with `getAccountState()` to decode any base64-encoded account with full type safety
+- Safer and more maintainable than `jsonParsed` — no runtime casting, no fragile field access.
+- Clean interoperability with custom programs and PDA-based layouts
+- Java 17+ compatible, with secure cryptography powered by **BouncyCastle**
 
 ---
 
@@ -264,25 +251,43 @@ TokenMetadataState(
 ```
 `getAccountState` automatically decodes Borsh-encoded data using the class you provide (which must extend State). You can define your own `@StructLayout-annotated` types to read custom program accounts.
 
+### Read Token Accounts via JSON_PARSED
+
+You can also access raw JSON-parsed account data without defining a typed model, using key-path access:
+
+```java
+public static void sample() {
+  var address = net.deanly.solana.sdk.crypto.PublicKey.valueOf("");
+
+  RpcResultObject<List<ResValueTokenAccount>> result = rpc.getRpcHttpApi()
+          .getTokenAccountsByOwner(
+                  address,
+                  TokenAccountByOwnerFilter.builder()
+                          .programId(SplTokenProgram.PROGRAM_ID)
+                          .build(),
+                  TokenAccountsByOwnerConfig.builder()
+                          .encoding(Encoding.JSON_PARSED)
+                          .build());
+
+  for (ResValueTokenAccount value : result.getValue()) {
+    String mint = (String) value.getAccount().getData().getObjectValue("parsed.info.mint");
+    String amount = (String) value.getAccount().getData().getObjectValue("parsed.info.tokenAmount.uiAmountString");
+    System.out.println("Mint: " + mint + ", Amount: " + amount);
+  }
+}
+```
+
+
 ---
-🚧 Difference from solanaj
 
-`solanaj`, developed by Michael Morrell, laid a solid foundation for Java-based Solana development.   
-`solana-sdkj` enhances and extends this foundation, introducing additional features and optimizations for modern Java applications:
-- Uses BouncyCastle for enhanced cryptographic security.
-- Simplifies Borsh serialization with Struct-layout for better maintainability.
-- Enhances type safety in RPC APIs using generics and stricter type definitions.
-- Provides well-structured classes for configurations and data handling.
-- Redesigns communication logic with improved support for HTTP and WebSocket interactions.
-- Extends transaction compilation with MessageV0 support, ensuring compatibility with Solana’s evolving architecture.
-- Refactors the codebase for improved maintainability, extensibility, and performance.
+## 🤝 Acknowledgement
 
-We recognize the contributions of `solanaj` and its community, and our goal is to extend its capabilities while introducing enhancements tailored for Java developers.
+This project is inspired by solanaj by Michael Morrell.
+We appreciate the groundwork laid by its contributors and aim to continue that spirit with an extended and modernized architecture tailored for today’s Java developers.
 
 ---
 
 ## 📄 License
 
-`solana-sdkj` is open-source software licensed under the [MIT License](LICENSE).
+Licensed under thee [MIT License](LICENSE).
 
-This project expands upon the groundwork laid by `solanaj`, bringing architectural improvements and expanded functionality while ensuring compatibility with the Solana ecosystem.

@@ -306,7 +306,7 @@ public static void sample() {
 
 ## 🤝 Acknowledgement
 
-This project is inspired by solanaj by Michael Morrell.
+This project is inspired by [solanaj](https://github.com/skynetcap/solanaj/tree/main) by Michael Morrell.
 We appreciate the groundwork laid by its contributors and aim to continue that spirit with an extended and modernized architecture tailored for today’s Java developers.
 
 ---

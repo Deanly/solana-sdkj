@@ -2311,18 +2311,18 @@ class MoshiHttpMethodApiImplTest {
         );
 
         // Act
-        List<DummyState> result = clientApi.getMultipleAccountStates(accounts, DummyState.class);
+        List<ResAccountState<DummyState>> result = clientApi.getMultipleAccountStates(accounts, DummyState.class);
 
         // Assert
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        DummyState r1 = result.get(0);
+        DummyState r1 = result.get(0).state();
         assertNotNull(r1);
         assertEquals(1, r1.getVersion());
         assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), r1.getOwner());
 
-        DummyState r2 = result.get(1);
+        DummyState r2 = result.get(1).state();
         assertNotNull(r2);
         assertEquals(2, r2.getVersion());
         assertEquals(PublicKey.valueOf("22222222222222222222222222222222111111111111"), r2.getOwner());
@@ -2513,13 +2513,13 @@ class MoshiHttpMethodApiImplTest {
 
         // Act
         PublicKey programId = PublicKey.valueOf("Program111111111111111111111111111111111111");
-        List<DummyState> states = clientApi.getProgramAccountStates(programId, List.of(), DummyState.class);
+        List<ResAccountState<DummyState>> states = clientApi.getProgramAccountStates(programId, List.of(), DummyState.class);
 
         // Assert
         assertNotNull(states);
         assertEquals(1, states.size());
-        assertEquals(1, states.get(0).getVersion());
-        assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), states.get(0).getOwner());
+        assertEquals(1, states.get(0).state().getVersion());
+        assertEquals(PublicKey.valueOf("11111111111111111111111111111111"), states.get(0).state().getOwner());
 
         // 요청 검증
         ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);

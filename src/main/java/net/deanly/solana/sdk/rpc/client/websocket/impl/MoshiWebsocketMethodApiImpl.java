@@ -9,7 +9,6 @@ import com.squareup.moshi.Moshi;
 import com.squareup.moshi.Types;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.rpc.client.adapter.*;
 import net.deanly.solana.sdk.rpc.client.exception.RpcWebSocketException;
@@ -22,7 +21,10 @@ import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
@@ -32,8 +34,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Slf4j
 public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
+    private static final Logger log = LoggerFactory.getLogger(MoshiWebsocketMethodApiImpl.class);
 
     private final ClientConfig config;
     private OkHttpClient httpClient;
@@ -99,6 +101,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     protected OkHttpClient createHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MILLISECONDS);
+        builder.pingInterval(15, TimeUnit.SECONDS);
 
         if (this.config.getWriteTimeoutMs() != null) {
             builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MILLISECONDS);
@@ -141,11 +144,11 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             }
             Request request = requestBuilder.build();
 
-            log.info("Connecting to WebSocket: {}", endpointURL);
+            log.debug("Connecting to WebSocket: {}", endpointURL);
             return this.httpClient.newWebSocket(request, new WebSocketListener() {
                 @Override
                 public void onOpen(WebSocket webSocket, Response response) {
-                    log.info("WebSocket connected");
+                    log.debug("WebSocket connected");
                 }
 
                 @Override
@@ -155,14 +158,14 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
                 @Override
                 public void onClosed(WebSocket webSocket, int code, String reason) {
-                    log.warn("WebSocket closed: " + reason);
+                    log.debug("WebSocket closed: " + reason);
                     // 재연결 처리
                     triggerReconnect();
                 }
 
                 @Override
                 public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                    log.error("WebSocket failure: " + t.getMessage());
+                    log.error("WebSocket failure", t);
                     // 재연결 처리
                     triggerReconnect();
                 }
@@ -190,7 +193,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         }
         this.reconnectAttempts++;
 
-        log.info("Reconnecting WebSocket... (attempt: {}, delay: {} ms)", this.reconnectAttempts, this.reconnectDelay);
+        log.debug("Reconnecting WebSocket... (attempt: {}, delay: {} ms)", this.reconnectAttempts, this.reconnectDelay);
 
         scheduler.schedule(() -> {
             try {
@@ -201,20 +204,20 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             } catch (Exception e) {
                 // 지수 백오프 방식
                 this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // 최대 30초
-                log.warn("Reconnect attempt failed. Retrying... (next delay: {} ms)", this.reconnectDelay);
+                log.debug("Reconnect attempt failed. Retrying... (next delay: {} ms)", this.reconnectDelay);
                 reconnectWebSocket();
             }
         }, this.reconnectDelay, TimeUnit.MILLISECONDS);
     }
 
     protected void resubscribeAll() {
-        log.info("Resubscribing to all active subscriptions...");
+        log.debug("Resubscribing to all active subscriptions...");
 
         listeners.asMap().forEach((subscriptionId, context) -> {
             try {
                 RpcRequest request = buildResubscribeRequest(subscriptionId, context);
                 webSocket.send(getCachedAdapter(context.type).toJson(request)); // 재구독 요청 전송
-                log.info("Resubscribed to subscription ID: {}", subscriptionId);
+                log.debug("Resubscribed to subscription ID: {}", subscriptionId);
             } catch (Exception e) {
                 log.error("Failed to resubscribe for ID: {}", subscriptionId, e);
             }
@@ -255,9 +258,9 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
                 return;
             }
 
-            log.warn("Unrecognized message format: {}", message);
+            log.debug("Unrecognized message format: {}", message);
         } catch (Exception e) {
-            log.error("Failed to process message: {}", e.getMessage());
+            log.error("Failed to process message: {}", message,  e);
         }
     }
 
@@ -471,7 +474,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
             this.listeners.put(subscriptionId, new SubscriptionContext<>(type, listener, method, params));
             log.debug("Listener Added: SubscriptionID={}, Method={}", subscriptionId, method);
-            log.info("Subscribe \"{}\" Started: SubscriptionID={}", method, subscriptionId);
+            log.debug("Subscribe \"{}\" Started: SubscriptionID={}", method, subscriptionId);
 
             return RpcResponse.<SubscriptionId>builder()
                     .id(id)
@@ -480,7 +483,6 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
                     .build();
 
         } catch (Exception e) {
-            log.error("Subscription failed: {}", e.getMessage());
             throw new RpcWebSocketException("Subscription timeout", e);
         }
     }
@@ -502,13 +504,12 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             return RpcResponse.<Boolean>builder().result(result).build();
 
         } catch (Exception e) {
-            log.error("Unsubscribe failed: {}", e.getMessage());
             throw new RpcWebSocketException(e.getMessage(), e);
 
         } finally {
             // 요청 완료 후 Listener 제거
             this.removeListener(subscriptionId);
-            log.info("Subscribe \"{}\" Ended: SubscriptionID={}", method, subscriptionId);
+            log.debug("Subscribe \"{}\" Ended: SubscriptionID={}", method, subscriptionId);
         }
     }
 

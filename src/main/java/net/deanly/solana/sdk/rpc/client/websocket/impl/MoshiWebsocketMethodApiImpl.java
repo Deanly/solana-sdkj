@@ -21,6 +21,7 @@ import net.deanly.solana.sdk.rpc.request.filter.LogsFilter;
 import net.deanly.solana.sdk.rpc.response.*;
 import net.deanly.solana.sdk.types.*;
 import okhttp3.*;
+import okio.ByteString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,8 +112,11 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         builder.writeTimeout(10, TimeUnit.SECONDS);
         builder.pingInterval(15, TimeUnit.SECONDS);
 
+        if (this.config.getReadTimeoutMs() != null) {
+            builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MILLISECONDS);
+        }
         if (this.config.getWriteTimeoutMs() != null) {
-            builder.readTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MILLISECONDS);
+            builder.writeTimeout(this.config.getWriteTimeoutMs(), TimeUnit.MILLISECONDS);
         }
         if (this.config.getConnectTimeoutMs() != null) {
             builder.connectTimeout(this.config.getConnectTimeoutMs(), TimeUnit.MILLISECONDS);
@@ -176,6 +180,16 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
                     resubscribeAll();
                 }
 
+                @Override public void onMessage(WebSocket ws, String text) {
+                    try { handleMessage(text); }
+                    catch (Exception e) { log.error("onMessage(text) failed", e); }
+                }
+
+                @Override public void onMessage(WebSocket ws, ByteString bytes) {
+                    try { handleMessage(bytes.utf8()); }
+                    catch (Exception e) { log.error("onMessage(bytes) failed", e); }
+                }
+
                 @Override public void onClosed(WebSocket ws, int code, String reason) {
                     connected = false;
                     log.info("WebSocket closed: code={} reason={}", code, reason);
@@ -203,7 +217,7 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> { Thread t=new Thread(r,"ws-reconnect"); t.setDaemon(true); return t; });
 
-    private void triggerReconnect() {
+    protected void triggerReconnect() {
         if (reconnecting.compareAndSet(false, true)) {
             scheduleReconnectNow();
         }
@@ -515,9 +529,8 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
         this.pendingSubscriptions.put(id, subscriptionFuture);
         log.debug("Pending Listener Added: RequestID={}, Method={}", id, method);
 
-        Type requestType = Types.newParameterizedType(RpcRequest.class, RpcRequest.class);
-        JsonAdapter<RpcRequest> requestJsonAdapter = this.getCachedAdapter(requestType);
-        this.webSocket.send(requestJsonAdapter.toJson(request));
+        String json = this.rpcRequestJsonAdapter.toJson(request);
+        this.webSocket.send(json);
 
         try {
             SubscriptionId subscriptionId = subscriptionFuture.get(5, TimeUnit.SECONDS);

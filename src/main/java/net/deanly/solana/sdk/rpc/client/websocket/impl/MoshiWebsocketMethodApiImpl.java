@@ -45,6 +45,13 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     protected final RemovalAwareLRUCache<Long, CompletableFuture<SubscriptionId>> pendingSubscriptions;
     protected final RemovalAwareLRUCache<Long, CompletableFuture<Boolean>> pendingUnsubscriptions;
 
+    private final AtomicBoolean reconnecting = new AtomicBoolean(false);
+    private volatile boolean connected = false;
+    private int reconnectDelayMs = 1000;
+    private int reconnectAttempts = 0;
+    private static final int MAX_RECONNECT_ATTEMPTS = 10;
+    private final Map<Long, SubscriptionId> resubscribeMap = new ConcurrentHashMap<>();
+
 
     private final Moshi moshi = new Moshi.Builder()
             .add(MoshiFilterCriteriaJsonAdapter.FACTORY)
@@ -100,7 +107,8 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
 
     protected OkHttpClient createHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.readTimeout(this.config.getReadTimeoutMs(), TimeUnit.MILLISECONDS);
+        builder.readTimeout(0, TimeUnit.MILLISECONDS);
+        builder.writeTimeout(10, TimeUnit.SECONDS);
         builder.pingInterval(15, TimeUnit.SECONDS);
 
         if (this.config.getWriteTimeoutMs() != null) {
@@ -129,13 +137,26 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     protected WebSocket connectWebSocket() {
         try {
             String endpointURL = this.config.getEndpointWebsocket();
-            if (endpointURL == null) {
-                URI endpointURI = new URI(config.getEndpointHttp());
-                String scheme = "https".equals(endpointURI.getScheme()) ? "wss" : "ws";
-                endpointURL = (new URI(scheme + "://" + endpointURI.getHost())).toString();
+            if (endpointURL == null || endpointURL.isBlank()) {
+                URI http = URI.create(config.getEndpointHttp());
+                String wsScheme = "https".equalsIgnoreCase(http.getScheme()) ? "wss" : "ws";
+                String host = http.getHost();
+                int port = http.getPort();
+                String path = http.getRawPath();
+                if (path == null || path.isEmpty()) path = "/";
+
+                String authority = (port == -1) ? host : host + ":" + port;
+                endpointURL = wsScheme + "://" + authority + path;
             }
 
-            Request.Builder requestBuilder = new Request.Builder();
+            Request.Builder requestBuilder = new Request.Builder().url(endpointURL); // ✅ ws/wss 문자열 OK
+            if (config.getHeaders() != null) {
+                config.getHeaders().forEach(h -> requestBuilder.addHeader(h.getKey(), h.getValue()));
+            }
+            if (config.getUserAgent() != null) {
+                requestBuilder.header("User-Agent", config.getUserAgent());
+            }
+
             requestBuilder.url(endpointURL);
             if (this.config.getHeaders() != null) {
                 this.config.getHeaders().forEach(header -> {
@@ -145,84 +166,102 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
             Request request = requestBuilder.build();
 
             log.debug("Connecting to WebSocket: {}", endpointURL);
-            return this.httpClient.newWebSocket(request, new WebSocketListener() {
-                @Override
-                public void onOpen(WebSocket webSocket, Response response) {
+            return httpClient.newWebSocket(request, new WebSocketListener() {
+                @Override public void onOpen(WebSocket ws, Response resp) {
+                    connected = true;
+                    reconnectAttempts = 0;
+                    reconnectDelayMs = 1000;
+                    reconnecting.set(false);
                     log.debug("WebSocket connected");
+                    resubscribeAll();
                 }
 
-                @Override
-                public void onMessage(WebSocket webSocket, String text) {
-                    handleMessage(text); // 메시지 핸들링
-                }
-
-                @Override
-                public void onClosed(WebSocket webSocket, int code, String reason) {
-                    log.debug("WebSocket closed: " + reason);
-                    // 재연결 처리
+                @Override public void onClosed(WebSocket ws, int code, String reason) {
+                    connected = false;
+                    log.info("WebSocket closed: code={} reason={}", code, reason);
                     triggerReconnect();
                 }
 
-                @Override
-                public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                @Override public void onFailure(WebSocket ws, Throwable t, Response resp) {
+                    connected = false;
                     log.error("WebSocket failure", t);
-                    // 재연결 처리
                     triggerReconnect();
                 }
             });
+
         } catch (Exception e) {
             throw new RpcWebSocketException("Failed to connect to WebSocket", e);
         }
     }
 
-    private final AtomicBoolean reconnecting = new AtomicBoolean(false);
-    protected void triggerReconnect() {
+    public void close() {
+        try { if (webSocket != null) webSocket.close(1000, "shutdown"); } catch (Exception ignore) {}
+        try { if (webSocket != null) webSocket.cancel(); } catch (Exception ignore) {}
+        scheduler.shutdownNow();
+    }
+
+    private final ScheduledExecutorService scheduler =
+            Executors.newSingleThreadScheduledExecutor(r -> { Thread t=new Thread(r,"ws-reconnect"); t.setDaemon(true); return t; });
+
+    private void triggerReconnect() {
         if (reconnecting.compareAndSet(false, true)) {
-            reconnectWebSocket();
+            scheduleReconnectNow();
         }
     }
 
-    private int reconnectDelay = 1000; // 초기 1초
-    private int reconnectAttempts = 0;
-    protected static final int MAX_RECONNECT_ATTEMPTS = 10; // 재연결 최대 시도 횟수
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    protected void reconnectWebSocket() {
-        if (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-            log.error("Max reconnect attempts reached. Cannot reconnect.");
-            return;
-        }
-        this.reconnectAttempts++;
+    private void scheduleReconnectNow() {
+        int delay = reconnectDelayMs;
+        scheduler.schedule(this::doReconnect, delay, TimeUnit.MILLISECONDS);
+    }
 
-        log.debug("Reconnecting WebSocket... (attempt: {}, delay: {} ms)", this.reconnectAttempts, this.reconnectDelay);
-
-        scheduler.schedule(() -> {
-            try {
-                this.webSocket = connectWebSocket();
-                resubscribeAll();
-                this.reconnectDelay = 1000; // 성공 시 초기화
-                this.reconnectAttempts = 0; // 재시도 횟수 초기화
-            } catch (Exception e) {
-                // 지수 백오프 방식
-                this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30000); // 최대 30초
-                log.debug("Reconnect attempt failed. Retrying... (next delay: {} ms)", this.reconnectDelay);
-                reconnectWebSocket();
+    private void doReconnect() {
+        try {
+            // 이전 소켓 정리
+            if (webSocket != null) {
+                try { webSocket.close(1001, "reconnect"); } catch (Exception ignore) {}
+                try { webSocket.cancel(); } catch (Exception ignore) {}
             }
-        }, this.reconnectDelay, TimeUnit.MILLISECONDS);
+
+            // 새 소켓 연결
+            webSocket = connectWebSocket(); // onOpen에서 connected=true, resubscribeAll() 호출
+
+            // 연결 시점은 비동기(onOpen). 성공 처리/리셋은 onOpen에서.
+        } catch (Exception e) {
+            // 실패 → 백오프
+            reconnectAttempts++;
+            reconnectDelayMs = Math.min(reconnectDelayMs * 2, 30_000);
+            if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+                log.error("Max reconnect attempts reached. Stop reconnecting.", e);
+                reconnecting.set(false); // 멈춤
+                return;
+            }
+            log.warn("Reconnect failed. attempt={}, nextDelay={}ms", reconnectAttempts, reconnectDelayMs, e);
+            scheduleReconnectNow();
+        }
     }
 
     protected void resubscribeAll() {
-        log.debug("Resubscribing to all active subscriptions...");
-
-        listeners.asMap().forEach((subscriptionId, context) -> {
+        log.debug("Resubscribing to {} active subscriptions...", listeners.size());
+        listeners.asMap().forEach((oldSubId, ctx) -> {
             try {
-                RpcRequest request = buildResubscribeRequest(subscriptionId, context);
-                webSocket.send(getCachedAdapter(context.type).toJson(request)); // 재구독 요청 전송
-                log.debug("Resubscribed to subscription ID: {}", subscriptionId);
+                RpcRequest req = createRpcRequest(ctx.method, ctx.params);
+                long reqId = req.getId();
+
+                // 새 구독 응답을 기다리기 위한 pending 등록
+                CompletableFuture<SubscriptionId> fut = new CompletableFuture<>();
+                pendingSubscriptions.put(reqId, fut);
+
+                // 이 요청이 성공하면 oldSubId → newSubId로 교체할 것임
+                resubscribeMap.put(reqId, oldSubId);
+
+                // 전송
+                webSocket.send(getCachedAdapter(RpcRequest.class).toJson(req));
             } catch (Exception e) {
-                log.error("Failed to resubscribe for ID: {}", subscriptionId, e);
+                log.error("Failed to enqueue resubscribe for {}", oldSubId, e);
             }
         });
     }
+
 
     private RpcRequest buildResubscribeRequest(SubscriptionId subscriptionId, SubscriptionContext<?> context) {
         String method = context.method;
@@ -318,26 +357,37 @@ public class MoshiWebsocketMethodApiImpl implements WebsocketMethodApi {
     }
 
     private void handleSubscriptionResponse(String message, Long id) throws IOException {
-        if (this.getPendingSubscription(id) != null) {
-            JsonAdapter<RpcResponse<SubscriptionId>> responseAdapter = this.getCachedAdapter(Types.newParameterizedType(RpcResponse.class, SubscriptionId.class));
-            RpcResponse<SubscriptionId> response = responseAdapter.fromJson(message);
+        if (getPendingSubscription(id) != null) {
+            JsonAdapter<RpcResponse<SubscriptionId>> adapter =
+                    getCachedAdapter(Types.newParameterizedType(RpcResponse.class, SubscriptionId.class));
+            RpcResponse<SubscriptionId> resp = adapter.fromJson(message);
+            if (resp == null) return;
 
-            if (response != null) {
-                Long requestId = response.getId(); // same id
-                CompletableFuture<SubscriptionId> future = this.getPendingSubscription(requestId);
-                this.removePendingSubscription(requestId);
+            CompletableFuture<SubscriptionId> fut = getPendingSubscription(resp.getId());
+            removePendingSubscription(resp.getId());
 
-                if (future != null) {
-                    if (response.getError() != null) {
-                        future.completeExceptionally(new RpcWebSocketException(response.getError().getMessage()));
-                        log.error("Subscription error: {}", response.getError().getMessage());
-                    } else {
-                        future.complete(response.getResult());
-                    }
+            if (resp.getError() != null) {
+                fut.completeExceptionally(new RpcWebSocketException(resp.getError().getMessage()));
+                log.error("Subscription error: {}", resp.getError().getMessage());
+                return;
+            }
+
+            SubscriptionId newId = resp.getResult();
+            SubscriptionId oldId = resubscribeMap.remove(resp.getId());
+
+            if (oldId != null) {
+                SubscriptionContext<?> ctx = listeners.getIfPresent(oldId);
+                if (ctx != null) {
+                    listeners.invalidate(oldId);   // old 제거
+                    listeners.put(newId, ctx);     // new로 교체
+                    log.debug("Resubscribed: {} -> {}", oldId, newId);
                 } else {
-                    log.warn("No pending subscription found for request ID: {}", requestId);
+                    log.warn("Resubscribe: old listener not found {}", oldId);
                 }
             }
+
+            fut.complete(newId);
+
         } else if (this.getPendingUnsubscription(id) != null) {
             JsonAdapter<RpcResponse<Boolean>> responseAdapter = this.getCachedAdapter(Types.newParameterizedType(RpcResponse.class, Boolean.class));
             RpcResponse<Boolean> response = responseAdapter.fromJson(message);

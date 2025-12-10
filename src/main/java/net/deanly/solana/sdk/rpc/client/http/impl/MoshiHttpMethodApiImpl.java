@@ -416,19 +416,19 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
             .build();
 
     @Override
-    public <T extends State> List<T> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException {
+    public <T extends State> List<ResAccountState<T>> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException {
         RpcResultObject<List<ResValueAccountInfo>> result = getMultipleAccounts(accounts, DEFAULT_MUTIPLE_ACCOUNTS_CONFIG);
 
-        List<T> states = new ArrayList<>();
+        List<ResAccountState<T>> states = new ArrayList<>();
         for (ResValueAccountInfo info : result.getValue()) {
             if (info != null && info.getData() != null && info.getData().getValue() != null) {
                 try {
-                    states.add(info.getData().decodeAsStruct(clazz));
+                    states.add(new ResAccountState<>(info.getOwner(), info.getData().decodeAsStruct(clazz), null));
                 } catch (Exception e) {
-                    states.add(null); // decoding 실패 시 null 추가
+                    states.add(new ResAccountState<>(info.getOwner(), null, e));
                 }
             } else {
-                states.add(null);
+                states.add(new ResAccountState<>(info != null ? info.getOwner() : null, null, new RpcException("Account data is missing")));
             }
         }
         return states;
@@ -442,23 +442,23 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
     }
 
     @Override
-    public <T extends State> List<T> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException {
+    public <T extends State> List<ResAccountState<T>> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException {
         ProgramAccountsConfig config = ProgramAccountsConfig.builder()
                 .filters(filters)
                 .encoding(Encoding.BASE64)
                 .build();
         List<ResValueProgram> results = getProgramAccounts(programId, config);
 
-        List<T> states = new ArrayList<>();
+        List<ResAccountState<T>> states = new ArrayList<>();
         for (ResValueProgram res : results) {
             if (res != null && res.getAccount() != null && res.getAccount().getData() != null) {
                 try {
-                    states.add(res.getAccount().getData().decodeAsStruct(clazz));
+                    states.add(new ResAccountState<>(res.getPubkey(), res.getAccount().getData().decodeAsStruct(clazz), null));
                 } catch (Exception e) {
-                    states.add(null);
+                    states.add(new ResAccountState<>(res.getPubkey(), null, e));
                 }
             } else {
-                states.add(null);
+                states.add(new ResAccountState<>(res != null ? res.getPubkey() : null, null, new RpcException("Account data is missing")));
             }
         }
         return states;
@@ -573,21 +573,21 @@ public class MoshiHttpMethodApiImpl implements HttpMethodApi {
             .build();
 
     @Override
-    public <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByOwner(
+    public <T extends State> List<ResAccountState<T>> getTokenAccountStatesByOwner(
             PublicKey owner,
             TokenAccountsByOwnerFilter filter,
             Class<T> clazz
     ) throws RpcException {
         RpcResultObject<List<ResValueTokenAccount>> result = this.getTokenAccountsByOwner(owner, filter, DEFAULT_TOKEN_ACCOUNT_BY_OWNER_CONFIG);
 
-        List<Tuple2<PublicKey, T>> decodedStates = new ArrayList<>();
+        List<ResAccountState<T>> decodedStates = new ArrayList<>();
         for (ResValueTokenAccount item : result.getValue()) {
             try {
                 StateData stateData = item.getAccount().getData();
                 T decoded = stateData.decodeAsStruct(clazz);
-                decodedStates.add(Tuple2.of(item.getPubkey(), decoded));
+                decodedStates.add(new ResAccountState<>(item.getPubkey(), decoded, null));
             } catch (Exception e) {
-                decodedStates.add(Tuple2.of(item.getPubkey(), null)); // 개별 실패 항목에 대해 null 처리
+                decodedStates.add(new ResAccountState<>(item.getPubkey(), null, e));
             }
         }
 

@@ -1,11 +1,11 @@
 package net.deanly.solana.sdk.program.spl.token.state;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import net.deanly.solana.sdk.crypto.PublicKey;
 import net.deanly.solana.sdk.layout.State;
-import net.deanly.solana.sdk.layout.field.PublicKeyBorshOptionField;
 import net.deanly.solana.sdk.layout.field.PublicKeyCOptionField;
 import net.deanly.structlayout.StructLayout;
 import net.deanly.structlayout.annotation.StructField;
@@ -14,9 +14,10 @@ import net.deanly.structlayout.type.basic.UInt8Field;
 import net.deanly.structlayout.type.borsh.BorshBooleanField;
 import net.deanly.structlayout.type.guava.UnsignedLong;
 
-@Getter
+@Data
 @ToString
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 // https://docs.rs/spl-token/latest/spl_token/state/struct.Mint.html
 public class MintState extends State {
     public static final int BYTES_LENGTH = 82;

@@ -410,7 +410,7 @@ public interface HttpMethodApi {
      * @return List of decoded state objects (null if data missing or decoding fails).
      * @throws RpcException If RPC communication fails.
      */
-    <T extends State> List<T> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException;
+    <T extends State> List<ResAccountState<T>> getMultipleAccountStates(List<PublicKey> accounts, Class<T> clazz) throws RpcException;
 
     /**
      * Returns all accounts owned by the provided program Pubkey.
@@ -444,8 +444,8 @@ public interface HttpMethodApi {
      * @return A list of decoded {@code State} objects or {@code null} for failed decoding, in no particular order.
      * @throws RpcException If the RPC request fails.
      */
-    <T extends State> List<T> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException;
-    default <T extends State> List<T> getProgramAccountStates(PublicKey programId, Class<T> clazz) throws RpcException {
+    <T extends State> List<ResAccountState<T>> getProgramAccountStates(PublicKey programId, List<ProgramAccountFilter> filters, Class<T> clazz) throws RpcException;
+    default <T extends State> List<ResAccountState<T>> getProgramAccountStates(PublicKey programId, Class<T> clazz) throws RpcException {
         return getProgramAccountStates(programId, null, clazz);
     }
 
@@ -662,7 +662,7 @@ public interface HttpMethodApi {
      * @return A list of tuples, each containing the account public key and the decoded state (may be {@code null} if decoding fails).
      * @throws RpcException If the RPC call fails.
      */
-    <T extends State> List<Tuple2<PublicKey, T>> getTokenAccountStatesByOwner(
+    <T extends State> List<ResAccountState<T>> getTokenAccountStatesByOwner(
             PublicKey owner,
             TokenAccountsByOwnerFilter filter,
             Class<T> clazz) throws RpcException;
